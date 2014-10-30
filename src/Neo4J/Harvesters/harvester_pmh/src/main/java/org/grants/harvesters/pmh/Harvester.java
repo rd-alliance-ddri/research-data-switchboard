@@ -41,6 +41,72 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * OAI:PMH Harvester Library
+ * 
+ * This Library is designed to harvest any OAI:PMH repository and store the data locally.
+ * The data will be stored as a collection of .xml files. The files will be stored as:
+ * <p>
+ * {@code
+ *   <Base Folder>/<Metadata Name>/<Set Name>/<Record Identifier>.xml
+ * }
+ * <p>
+ * The library will also create an index for every set. The index file will be opened and 
+ * closed automatically. The index will be used to track record timestamp and updated record
+ * file if needed. The set index will be stored as:
+ * <p>
+ * {@code 
+ *   <Base Folder>/<Metadata Name>/<Set Name>.xml
+ * }
+ * <p>  
+ * The library will cope outdated records in the cache before overwriting them. The cached files will 
+ * be stored as:
+ * <p>
+ * {@code 
+ *   <Base Folder>/<Metadata Name>/_cache/<Set Name>/<Record Identifier>_<Record Timestamp>.xml
+ * }
+ * <p>
+ * While working, the library will also create temporary status file. The file could be used to track 
+ * library work status. It also will be used to resume harvesting process, if it was terminated by
+ * any reason. If such behavior is not needed, the status file must be deleted before calling the
+ * harvest function. The status file will be stored as: 
+ * <p>
+ * {@code 
+ *    <Base Folder>/<Metadata Name>/status.xml
+ * }
+ * <p>
+ * To use the library, simple construct the Harvester object and then call the harvest function with 
+ * desired medadata prefix. The harvest function can be called several times with different metadata
+ * prefixes to harvest different metadata. Example:
+ * <p><pre>
+ * {@code 
+ * 	try {
+ *      // CERN repository
+ *	    String repoUri = "http://cds.cern.ch/oai2d.py/";
+ *
+ *      // Base folder to store XML data
+ *      String folderXml = "cern/xml";
+ *  
+ *      // Construct Harvester object.
+ *      Harvester harvester = new Harvester(repoUri, folderXml);
+ *			
+ *      // List and display supported meatadata formats
+ *	    List<MetadataFormat> formats = harvester.listMetadataFormats();
+ *	    System.out.println("Supported metadata formats:");
+ *	    for (MetadataFormat format : formats) {
+ *	        System.out.println(format.toString());
+ *	    }
+ *			
+ * 		// harvest the metdata with first prefix on the list
+ *		harvester.harvest(formats.get(0).getMetadataPrefix));
+ *	} catch (Exception e) {
+ *	    e.printStackTrace();
+ *	}
+ * }</pre>
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ * @version 1.0.5
+ */
 public class Harvester {
 	
 	protected static final String URL_IDENTIFY = "?verb=Identify";
@@ -50,14 +116,36 @@ public class Harvester {
 	protected static final String URL_LIST_RECORDS_RESUMPTION_TOKEN = "?verb=ListRecords&resumptionToken=%s";
 
 	protected static final String ELEMENT_ROOT = "OAI-PMH";
-	
+
+	/**
+	 * variable to store repo URL. Can not be null.
+	 */
 	protected String repoUrl;
 	
+	/**
+	 * Variable to store base folder for harvested data. Can not be null.
+	 */
 	protected String folderBase;
+	
+	/**
+	 * Variable to store folder for current meta data. Will be automatically 
+	 * initialized after harvesting process will be started.
+	 */
 	protected String folderXml;
 
+	/**
+	 * Variable to store current index name as {@code<folderXml>/<setName>.idx} .
+	 */
 	protected String indexName;
+	
+	/**
+	 * Variable to store current set index
+	 */
 	protected Map<String, Record> records;
+	
+	/**
+	 * Document builder factory to load and parse XML documents
+	 */
 	protected DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	
 //	private String responseDate;
@@ -73,11 +161,17 @@ public class Harvester {
 	private Marshaller jaxbMarshaller;
 	private Unmarshaller jaxbUnmarshaller;
 	
+	/**
+	 * Harvester constructor
+	 * 
+	 * @param repoUrl : The Repository URL
+	 * @param folderBase : The address of the folder, there received data must be saved.
+	 * @throws JAXBException
+	 */
 	public Harvester( final String repoUrl, final String folderBase ) throws JAXBException {
 		this.repoUrl = repoUrl;
 		this.folderBase = folderBase;
-		
-
+	
 		jaxbContext = JAXBContext.newInstance(Status.class);
 		jaxbMarshaller = jaxbContext.createMarshaller();
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -85,13 +179,50 @@ public class Harvester {
 	
 	}
 	
+	/**
+	 * Return the repository name (available after calling identify() function).
+	 * @return String - Repository name
+	 */
 	public String getRepositoryName() { return repositoryName; }
+	
+	/**
+	 * Return protocol version (available after calling identify() function).
+	 * @return String - protocol version
+	 */
 	public String getProtocolVersion() { return protocolVersion; }
+	
+	/**
+	 * Return the earliest timestamp in the repository (available after calling identify() function).
+	 * @return String - earliest timestamp
+	 */
 	public String getEarliestTimestamp() { return earliestTimestamp; }
+	
+	/**
+	 * Return deleted record behavior (available after calling identify() function).
+	 * @return String - deleted record behavior
+	 */
 	public String getDeletedRecordBehavior() { return deletedRecord; }
+	
+	/**
+	 * Return granularity template (available after calling identify() function).
+	 * @return String - granularity template
+	 */
 	public String getGranularityTemplate() { return granularity; }
+	
+	/**
+	 * Return admin email of repositiry (available after calling identify() function).
+	 * @return String - admin email
+	 */
 	public String getAdminEmail() { return adminEmail; }	
 	
+	/**
+	 * Protected function to return XML Document
+	 * @param uri resource URI
+	 * @return Document - the loaded document
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	protected Document GetXml( final String uri ) throws ParserConfigurationException, SAXException, IOException {
 		dbf.setNamespaceAware(true);
 	    dbf.setExpandEntityReferences(false);
@@ -110,6 +241,13 @@ public class Harvester {
 		return doc;
 	}
 	
+	/**
+	 * Protected function to print Document
+	 * @param doc XML Document
+	 * @param out Output Stream (System.out to print in console)
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
 	protected void printDocument(Document doc, OutputStream out) 
 			throws IOException, TransformerException {
 	    TransformerFactory tf = TransformerFactory.newInstance();
@@ -123,8 +261,13 @@ public class Harvester {
 	    transformer.transform(new DOMSource(doc), 
 	         new StreamResult(new OutputStreamWriter(out, "UTF-8")));
 	}
-
 	
+	/**
+	 * Protected function to find child element by tag name 
+	 * @param parent Parent element
+	 * @param tagName Tag name
+	 * @return Element - Child element or null if such element could not be found
+	 */
 	protected Element getChildElementByTagName(Element parent, String tagName) {
 	    for(Node child = parent.getFirstChild(); child != null; child = child.getNextSibling())
 	        if(child instanceof Element && tagName.equals(((Element) child).getTagName())) 
@@ -132,6 +275,12 @@ public class Harvester {
 	    return null;
 	}
 	
+	/**
+	 * Protected function to find child elements by tag name 
+	 * @param parent Parent element
+	 * @param tagName Tag name
+	 * @return {@code List<Element>} - List of child elements or null if such element could not be found
+	 */
 	protected List<Element> getChildElementsByTagName(Element parent, String tagName) {
 		List<Element> elements = null;
 		for(Node child = parent.getFirstChild(); child != null; child = child.getNextSibling())
@@ -143,6 +292,12 @@ public class Harvester {
 	    return elements;
 	}
 	
+	/**
+	 * Protected function to return Document element by tag name
+	 * @param doc - XML Document
+	 * @param tagName - Tag name
+	 * @return Element - Element or null if such element could not be found
+	 */
 	protected Element getDocumentElementByTagName(Document doc, String tagName) {
 		NodeList list = doc.getElementsByTagName(tagName);
 		if (null != list)
@@ -154,6 +309,12 @@ public class Harvester {
 		return null;
 	}
 	
+	/**
+	 * Protected function to return text context of the child element 
+	 * @param parent - Parent element
+	 * @param tagName - Tag name
+	 * @return String - text context of element or null, if there is no such element or element does not have text context
+	 */
 	protected String getChildElementTextByTagName(Element parent, String tagName) {
 		Element element = getChildElementByTagName(parent, tagName);
 		if (null != element)
@@ -161,6 +322,11 @@ public class Harvester {
 		return null;
 	}
 		
+	/**
+	 * Protected function to check for error block in OAI:PMH response
+	 * @param root - OAI:PMH Root element
+	 * @return true, if there is an error block, false if not.
+	 */
 	protected boolean CheckForError(Element root) {
 		NodeList nl = root.getElementsByTagName("error");
 		if (null != nl && nl.getLength() > 0)
@@ -180,6 +346,11 @@ public class Harvester {
 		return true;
 	}
 	
+	/**
+	 * Function to indentify on OAI:PMH Server. Could be used to test connection with the server.
+	 * Also will initialize all server information variables.
+	 * @return true if connection could be established and server didn't return any error.
+	 */
 	public boolean identify() {
 		String url =  repoUrl + URL_IDENTIFY;
 		
@@ -212,19 +383,10 @@ public class Harvester {
 		return false;
 	}
 	
-	/*<ListMetadataFormats>
-<metadataFormat>
-            <metadataPrefix>marcxml</metadataPrefix>
-            <schema>http://www.openarchives.org/OAI/1.1/dc.xsd</schema>
-            <metadataNamespace>http://purl.org/dc/elements/1.1/</metadataNamespace>
-        </metadataFormat>
-        <metadataFormat>
-            <metadataPrefix>oai_dc</metadataPrefix>
-            <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>
-            <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>
-        </metadataFormat>
-    </ListMetadataFormats>*/
-	
+	/**
+	 * Function to list supported metadata formats
+	 * @return {@code List<MetadataFormat>} - list of metadata formats
+	 */
 	public List<MetadataFormat> listMetadataFormats() {
 		String url =  repoUrl + URL_LIST_METADATA_FORMATS;
 		
@@ -241,6 +403,10 @@ public class Harvester {
 		return null;
 	}
 	
+	/**
+	 * Function to list sets
+	 * @return Map<String, String> where Key is set name and Value is set specification
+	 */
 	public Map<String, String> listSets() {
 		String url =  repoUrl + URL_LIST_SETS;
 		
@@ -280,14 +446,40 @@ public class Harvester {
 		return null;
 	}
 	
+	/**
+	 * Protected function to find record in the index
+	 * @param set - Set name
+	 * @param key - Record key
+	 * @return Record or null if there is no such record
+	 */
 	protected Record findRecord( final String set, final String key ) {
 		return records.get(set + ":" + key);
 	}
 	
+	/**
+	 * Protected function to add record to the index
+	 * @param record - Record to add
+	 */
 	protected void addRecord( Record record) {
-		records.put(record.set + ":" + record.key, record);
+		records.put(record.getSet() + ":" + record.getKey(), record);
 	}
 	
+	/**
+	 * Function to download records from the server. 
+	 * If server will return resumption token, the function will return it, 
+	 * otherways it will return null. If resumption token has been returned, 
+	 * the function mast to be called again with this token, to download 
+	 * next set of records.
+	 * @param set name of the set
+	 * @param metadataPrefix one of supported metadata prefix
+	 * @param resumptionToken resuption token or null, if need to download first records from the set.
+	 * @return String - Resumption Token or null, if there is no more records in the set
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerException
+	 */
 	public String downloadRecords( final String set, final MetadataPrefix metadataPrefix, 
 			final String resumptionToken ) throws ParserConfigurationException, SAXException, 
 			IOException, TransformerFactoryConfigurationError, TransformerException {
@@ -338,7 +530,7 @@ public class Harvester {
 				String datestamp = getChildElementTextByTagName(header, "datestamp");
 				
 				Record rec = findRecord(set, identifier);
-				if (null == rec || !rec.date.equals(datestamp)) {
+				if (null == rec || !rec.getDate().equals(datestamp)) {
 					// the file missing in the index, or file date is different
 					
 					String keyName = URLEncoder.encode(identifier, "UTF-8");
@@ -354,14 +546,14 @@ public class Harvester {
 						new File(filePath).renameTo(new File(setCachePath + "/" + getCacheFileName(keyName, datestamp)));
 					} else {
 						rec = new Record();
-						rec.set = set;
-						rec.key = identifier;
+						rec.setSet(set);
+						rec.setKey(identifier);
 					//	rec.file = setName + "/" + fineName;
 						
 						addRecord(rec);
 					}
 					
-					rec.date = datestamp;
+					rec.setDate(datestamp);
 					
 					transformer.transform(new DOMSource(record), new StreamResult(filePath));						
 				}
@@ -388,42 +580,56 @@ public class Harvester {
 		return null;
 	}		
 	
+	/**
+	 * Protected function to generate index file name
+	 * @param indexName Set name
+	 * @return path to index file
+	 */
 	protected String getIndexPath(final String indexName) {
 		return folderXml + "/" + indexName + ".idx";
 	}
 	
+	/**
+	 * Protected function to generate set path
+	 * @param setName Set name
+	 * @return path to set folder
+	 */
 	protected String getSetPath(final String setName) {
 		return folderXml + "/" + setName;
 	}
 	
+	/**
+	 * Protected function to generate set cache path
+	 * @param setName Set name
+	 * @return path to set cache folder
+	 */
 	protected String getCacheSetPath(final String setName) {
 		return folderXml + "/_cache/" + setName;
 	}
 	
+	/**
+	 * Protected function to generate record file name
+	 * @param keyName record identificator
+	 * @return path to file
+	 */
 	protected String getFileNme(final String keyName)  {
 		return keyName + ".xml";
 	}
 	
+	/**
+	 * Protected function to generate record file cache name
+	 * @param keyName record identificator
+	 * @param timestamp record timestamp
+	 * @return path to cache file
+	 */
 	protected String getCacheFileName(final String keyName, final String timestamp)  {
 		return keyName + "_" + timestamp + ".xml";
 	}
-	
-	
-	/*
-	protected String getSetPath(final String set) {
-		return folderXml + "/index.xml";
-	}
-	
-	
-	
-	protected String getRecordPath(Record record) throws UnsupportedEncodingException {
-		return folderXml + "/" + record.getFileName(false);
-	}
-	
-	protected String getRecordCachePath(Record record) throws UnsupportedEncodingException {
-		return folderXml + "/cache/" + record.getFileName(true);
-	}*/
-	
+
+	/**
+	 * Protected function to open or create new index
+	 * @param indexName index name
+	 */
 	protected void initIndex(final String indexName) {
 		if (this.indexName == null || !this.indexName.equals(indexName)) {		
 			records = new HashMap<String, Record>();
@@ -455,6 +661,9 @@ public class Harvester {
 		}
 	}
 	
+	/**
+	 * Protected function to save and close index 
+	 */
 	protected void saveIndex() {
 		if (null != this.indexName) {
 			try {
@@ -478,6 +687,20 @@ public class Harvester {
 		}
 	}
 	
+	/**
+	 * Main function to organize the standard harvest process. The function will identify 
+	 * on the server and will download list of the sets. Then it will download each set, 
+	 * creating index, if needed. Every record of the set will be stored in the separate 
+	 * file in the set folder. If function will find, that some record has been changed, 
+	 * the old record will be stored in the set cache folder. The function will also create 
+	 * and update harvesting status in the xml file under repo base folder. This file will 
+	 * be deleted after harvesting process will be finished. If, by any reason, harvesting 
+	 * process will be terminated, the status file will be left on disk. In this case the 
+	 * function will try to load in and resume it work. If, by some reason this behaviour 
+	 * is not required, the status file must be deleted before calling this function.
+	 * @param prefix A metadata prefix
+	 * @throws Exception
+	 */
 	public void harvest(MetadataPrefix prefix) throws Exception {
 		
 		folderXml = folderBase + "/" + prefix.name();
@@ -553,22 +776,43 @@ public class Harvester {
 			fileStatus.delete();
 	}
 	
+	/**
+	 * Function to get Repo URL
+	 * @return String - Repo URL
+	 */
 	public String getRepoUrl() {
 		return repoUrl;
 	}
 
+	/**
+	 * Function to get base folder path
+	 * @return String - base folder
+	 */
 	public String getFolderBase() {
 		return folderBase;
 	}
 
+	/**
+	 * Function to set Repo URL
+	 * @param repoUrl an Repo URL
+	 */
 	public void setRepoUrl(String repoUrl) {
 		this.repoUrl = repoUrl;
 	}
 
+	/**
+	 * Function to set base folder base
+	 * @param folderBase base folder path
+	 */
 	public void setFolderBase(String folderBase) {
 		this.folderBase = folderBase;
 	}
 	
+	/**
+	 * Protected function to load harvesting status
+	 * @param file a harvest status file
+	 * @return Status - Harvesting status
+	 */
 	protected Status loadStatus(File file) {
 		try {
 			if (file.exists() && !file.isDirectory())
@@ -579,6 +823,12 @@ public class Harvester {
 		
 		return new Status();
 	}
+	
+	/**
+	 * Protected function to save harvesting status 
+	 * @param status Harvesting status
+	 * @param file Status file
+	 */
 	
 	protected void saveStatus(Status status, File file) {
 		try {

@@ -8,17 +8,83 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Class to store information about supported metadata
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class MetadataFormat {
 	
-	public static final String TAG_METADATA_FORMAT = "metadataFormat";
-	public static final String TAG_METADATA_PREFIX = "metadataPrefix";
-	public static final String TAG_SCHEMA = "schema";
-	public static final String TAG_METADATA_NAMESPACE = "metadataNamespace";
+	protected static final String TAG_METADATA_FORMAT = "metadataFormat";
+	protected static final String TAG_METADATA_PREFIX = "metadataPrefix";
+	protected static final String TAG_SCHEMA = "schema";
+	protected static final String TAG_METADATA_NAMESPACE = "metadataNamespace";
 	
-	public String metadataPrefix;
-	public String schema;
-	public String metadataNamespace;
+	private String metadataPrefix;
+	private String schema;
+	private String metadataNamespace;
 	
+	/**
+	 * Return metadata prefix as string
+	 * @return String - metadata prefix
+	 */
+	public String getMetadataPrefixString() {
+		return metadataPrefix;
+	}
+
+	/**
+	 * Function will try to convert string containing metadata prefix into actual MetadataPrefix
+	 * @return MetadataPrefix
+	 */
+	public MetadataPrefix getMetadataPrefix() {
+		return MetadataPrefix.valueOf(metadataPrefix);
+	}
+	
+	/**
+	 * Set metadata prefix
+	 * @param metadataPrefix an metadata prefix string
+	 */
+	public void setMetadataPrefixString(String metadataPrefix) {
+		this.metadataPrefix = metadataPrefix;
+	}
+
+	/**
+	 * Return schema
+	 * @return String - schema
+	 */
+	public String getSchema() {
+		return schema;
+	}
+	
+	/**
+	 * Set Schema
+	 * @param schema String
+	 */
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+
+	/**
+	 * Return metatdata namespace
+	 * @return String - metadata namespace
+	 */
+	public String getMetadataNamespace() {
+		return metadataNamespace;
+	}
+
+	/**
+	 * Set metadata namespace 
+	 * @param metadataNamespace Sring
+	 */
+	public void setMetadataNamespace(String metadataNamespace) {
+		this.metadataNamespace = metadataNamespace;
+	}
+	
+	/**
+	 * Construct MetadataFormat object from XML Element
+	 * @param element Element
+	 * @return MetadataFormat
+	 */
 	public static MetadataFormat fromElement(Element element) {
 		MetadataFormat metadataFormat = new MetadataFormat();
 		
@@ -38,6 +104,11 @@ public class MetadataFormat {
 		return metadataFormat;
 	}
 	
+	/**
+	 * Get all metadata format elements from the Document
+	 * @param doc XML Document
+	 * @return {@code List<MetadataFormat>}
+	 */
 	public static List<MetadataFormat> getMetadataFormats(Document doc) {
 		List<MetadataFormat> metadataFormats = new ArrayList<MetadataFormat>();
 		
@@ -53,6 +124,10 @@ public class MetadataFormat {
 		return metadataFormats;		
 	}
 	
+	/**
+	 * Converts object to string
+	 * @return String
+	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
