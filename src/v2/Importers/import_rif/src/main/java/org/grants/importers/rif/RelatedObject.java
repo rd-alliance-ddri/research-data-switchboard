@@ -3,6 +3,11 @@ package org.grants.importers.rif;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to store a RDA relation
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class RelatedObject {
 	public String key;
 	public String relatedKey;

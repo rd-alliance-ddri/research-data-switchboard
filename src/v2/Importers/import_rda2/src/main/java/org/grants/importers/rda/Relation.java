@@ -3,6 +3,11 @@ package org.grants.importers.rda;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class to store information about RDA relation
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Relation {
 	
 	public static final String FIELD_REGISTRY_OBJECT_ID = "registry_object_id";

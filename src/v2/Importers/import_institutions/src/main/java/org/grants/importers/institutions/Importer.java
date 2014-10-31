@@ -21,6 +21,11 @@ import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * Institutions Importer class
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Importer {
 	
 	private static final String LABEL_INSTITUTION = "Institution";
@@ -44,8 +49,12 @@ public class Importer {
 	private Label labelInstitution = DynamicLabel.label(LABEL_INSTITUTION);
 	private Label labelWeb = DynamicLabel.label(LABEL_WEB);
 	
+	/**
+	 * Class constructor. 
+	 * @param neo4jUrl An URL to the Neo4J
+	 */
 	public Importer(final String neo4jUrl) {
-		graphDb = new RestAPIFacade(neo4jUrl); //"http://localhost:7474/db/data/");  
+		graphDb = new RestAPIFacade(neo4jUrl);
 		engine = new RestCypherQueryEngine(graphDb);  
 		
 		engine.query("CREATE CONSTRAINT ON (n:" + LABEL_WEB_INSTITUTION + ") ASSERT n." + PROPERTY_KEY + " IS UNIQUE", Collections.<String, Object> emptyMap());
@@ -54,6 +63,13 @@ public class Importer {
 
 	}
 
+	/**
+	 * Function to import instititions from an CSV file.
+	 * For every line in the file, except a header line, an instace of Web:Institution will be 
+	 * created. Institution URL will be used as an unique node key. The nodes with the same key 
+	 * will NOT be overwritten.
+	 * @param institutionsCsv A path to institutions.csv file
+	 */
 	public void importInstitutions(final String institutionsCsv) {
 		try 
 		{

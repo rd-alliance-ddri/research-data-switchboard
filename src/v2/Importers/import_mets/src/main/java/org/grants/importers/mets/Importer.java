@@ -39,48 +39,54 @@ import org.openarchives.oai._2.StatusType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * Mets importing library. Used by Dryad importer software
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Importer {
-	public static final String MD_TYPE_MODS = "MODS";
+	protected static final String MD_TYPE_MODS = "MODS";
 	
-	public static final String LABEL_RECORD = "Record";
-	public static final String LABEL_DRYAD = "Dryad";
-	public static final String LABEL_DRYAD_RECORD = LABEL_DRYAD + "_" + LABEL_RECORD;
+	protected static final String LABEL_RECORD = "Record";
+	protected static final String LABEL_DRYAD = "Dryad";
+	protected static final String LABEL_DRYAD_RECORD = LABEL_DRYAD + "_" + LABEL_RECORD;
 	
-	public static final String PROPERTY_OAI = "oai";
-	public static final String PROPERTY_TIMESTAMP = "timestamp";
-	public static final String PROPERTY_DOI = "doi";
-	public static final String PROPERTY_NODE_SOURCE = "node_source";
-	public static final String PROPERTY_NODE_TYPE = "node_type";
-	public static final String PROPERTY_IDENTIFIER = "identifier";
-	public static final String PROPERTY_TITLE = "title";
-	public static final String PROPERTY_DESCRIPTION = "description";
-	public static final String PROPERTY_GENRE = "genre";
-	public static final String PROPERTY_NAME = "name";
-	public static final String PROPERTY_KEYWORDS = "keywords";
-	public static final String PROPERTY_N = "n";
+	protected static final String PROPERTY_OAI = "oai";
+	protected static final String PROPERTY_TIMESTAMP = "timestamp";
+	protected static final String PROPERTY_DOI = "doi";
+	protected static final String PROPERTY_NODE_SOURCE = "node_source";
+	protected static final String PROPERTY_NODE_TYPE = "node_type";
+	protected static final String PROPERTY_IDENTIFIER = "identifier";
+	protected static final String PROPERTY_TITLE = "title";
+	protected static final String PROPERTY_DESCRIPTION = "description";
+	protected static final String PROPERTY_GENRE = "genre";
+	protected static final String PROPERTY_NAME = "name";
+	protected static final String PROPERTY_KEYWORDS = "keywords";
+	protected static final String PROPERTY_N = "n";
 	
-	public static final String NODE_IDENTIFIER = "identifier";
-	public static final String NODE_TITLE_INFO = "titleInfo";
-	public static final String NODE_ABSTRACT = "abstract";
-	public static final String NODE_NOTE = "note";
-	public static final String NODE_GENRE = "genre";
-	public static final String NODE_NAME = "name";
-	public static final String NODE_ROLE = "role";	
-	public static final String NODE_ROLE_TERM = "roleTerm";
-	public static final String NODE_NAME_PART = "namePart";
-	public static final String NODE_SUBJECT = "subject";
-	public static final String NODE_TOPIC = "topic";
-	public static final String NODE_RELATED_ITEM = "relatedItem";
+	protected static final String NODE_IDENTIFIER = "identifier";
+	protected static final String NODE_TITLE_INFO = "titleInfo";
+	protected static final String NODE_ABSTRACT = "abstract";
+	protected static final String NODE_NOTE = "note";
+	protected static final String NODE_GENRE = "genre";
+	protected static final String NODE_NAME = "name";
+	protected static final String NODE_ROLE = "role";	
+	protected static final String NODE_ROLE_TERM = "roleTerm";
+	protected static final String NODE_NAME_PART = "namePart";
+	protected static final String NODE_SUBJECT = "subject";
+	protected static final String NODE_TOPIC = "topic";
+	protected static final String NODE_RELATED_ITEM = "relatedItem";
 	
-	public static final String ATTRIBUTE_TYPE = "type";
+	protected static final String ATTRIBUTE_TYPE = "type";
 	
-	public static final String PART_DOI = "doi:";
+	protected static final String PART_DOI = "doi:";
 	
-	public static final String GENRE_UNKNOWN = "unknown";
+	protected static final String GENRE_UNKNOWN = "unknown";
 	
-	public static final String RELATION_RELATED_TO = "relatedTo";
+	protected static final String RELATION_RELATED_TO = "relatedTo";
 	
-	public static final String CYPHER_FIND_NODE_BY_DOI = "MATCH (n:Dryad:Record) WHERE has(n.doi) and any (m in n.doi WHERE m = {doi}) RETURN n";
+	protected static final String CYPHER_FIND_NODE_BY_DOI = "MATCH (n:Dryad:Record) WHERE has(n.doi) and any (m in n.doi WHERE m = {doi}) RETURN n";
 	
 	private final String folderUri;
 	
@@ -101,6 +107,13 @@ public class Importer {
 	
 	private List<DoiRelation> relations = new ArrayList<DoiRelation>();
 	
+	/**
+	 * Class constructor
+	 * 
+	 * @param folderUri path to xml folder
+	 * @param neo4jUrl Neo4J url
+	 * @throws JAXBException
+	 */
 	public Importer( final String folderUri, final String neo4jUrl ) throws JAXBException {
 		
 		graphDb = new RestAPIFacade(neo4jUrl); //"http://localhost:7474/db/data/");  
@@ -117,6 +130,9 @@ public class Importer {
 		this.folderUri = folderUri;		
 	}		
 	
+	/**
+	 * Function to perform records import
+	 */
 	public void importRecords() {
 		deletedRecords = 0;
 		brokenRecords = 0;

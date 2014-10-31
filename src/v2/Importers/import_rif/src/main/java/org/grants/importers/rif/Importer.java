@@ -45,6 +45,11 @@ import au.org.ands.standards.rif_cs.registryobjects.RelationType;
 import au.org.ands.standards.rif_cs.registryobjects.Service;
 import au.org.ands.standards.rif_cs.registryobjects.SubjectType;
 
+/**
+ * Library to import Rif XML file. Used by RDA importer
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Importer {
 
 	private static final String LABEL_COLLECTION = "Collection";
@@ -106,6 +111,12 @@ public class Importer {
 	private int createdRecords = 0;
 	private int createdRelationships = 0;
 	
+	/**
+	 * Class constructor 
+	 * @param folderUri String containing a path to XML folder
+	 * @param neo4jUrl String containing an URL to Neo4J instance
+	 * @throws JAXBException
+	 */
 	public Importer( final String folderUri, final String neo4jUrl ) throws JAXBException {
 		
 		System.out.println("Connecting to Neo4J server at: " + neo4jUrl);
@@ -131,6 +142,9 @@ public class Importer {
 		this.folderUri = folderUri;		
 	}		
 	
+	/**
+	 * Function to import all records.
+	 */
 	public void importRecords() {
 		deletedRecords = 0;
 		brokenRecords = 0;
@@ -185,89 +199,6 @@ public class Importer {
 		System.out.println("Done. Created " + createdRecords + " records and " + createdRelationships + " relationships. Detected " + deletedRecords + " deleted and " + brokenRecords + " broken records.");
 	}
 	
-	/*
-	private List<RestNode> findNodeByDoi(final String doi) {
-		List<RestNode> result = null;
-		
-		Map<String, Object> pars = new HashMap<String, Object>();
-		pars.put(PROPERTY_DOI, doi);
-		
-		QueryResult<Map<String, Object>> nodes = engine.query(CYPHER_FIND_NODE_BY_DOI, pars);
-		for (Map<String, Object> row : nodes) {
-			RestNode node = (RestNode) row.get(PROPERTY_N);
-			if (null != node) {
-				if (null == result)
-					result = new ArrayList<RestNode>();
-				
-				result.add(node);
-			}
-		}
-		
-		return result;
-	}
-	*/
-	/*
-	private static Element findXmlElement(Element xml, String name) {
-		if (xml.getLocalName().equals(name))
-			return xml;
-
-		return null;
-	}
-	*/
-	
-	/*
-	private static Element findXmlElement(List<Object> xmls, String name) {
-		for (Object xml : xmls) 
-			if (xml instanceof Element && ((Element) xml).getLocalName().equals(name))
-				return (Element) xml;
-
-		return null;
-	}
-	
-	private static Element findXmlElement(NodeList xmls, String name) {
-		if (null != xmls) {
-			int length = xmls.getLength();
-			for (int i = 0; i < length; ++i) {
-				org.w3c.dom.Node xml = xmls.item(i);
-				if (xml instanceof Element && ((Element) xml).getLocalName().equals(name))
-					return (Element) xml;
-			}
-		}
-
-		return null;
-	}	
-	
-	private static List<Element> findXmlElements(List<Object> xmls, String name) {
-		List<Element> list = null;		
-		for (Object xml : xmls) 
-			if (xml instanceof Element && ((Element) xml).getLocalName().equals(name)) {
-				if (null == list)
-					list = new ArrayList<Element>();
-				
-				list.add((Element) xml);
-			}
-
-		return list;
-	}
-	
-	private static List<Element> findXmlElements(NodeList xmls, String name) {
-		List<Element> list = null;		
-		
-		int length = xmls.getLength();
-		for (int i = 0; i < length; ++i) {
-			org.w3c.dom.Node xml = xmls.item(i);
-			if (xml instanceof Element && ((Element) xml).getLocalName().equals(name)) {
-				if (null == list)
-					list = new ArrayList<Element>();
-				
-				list.add((Element) xml);
-			}
-		}
-
-		return list;
-	}*/
-	
-	
 	@SuppressWarnings("unchecked")
 	private void importRecord(File fileXml) {
 		try {
@@ -287,14 +218,7 @@ public class Importer {
 		//	String datestamp = header.getDatestamp();
 //			System.out.println(datestamp.toString());
 //			List<String> specs = header.getSetSpec();
-			
-			/*
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put(PROPERTY_KEY, idetifier);
-			map.put(PROPERTY_TIMESTAMP, datestamp);
-			map.put(PROPERTY_NODE_SOURCE, LABEL_RDA);
-//			map.put(PROPERTY_NODE_TYPE, LABEL_RECORD);*/
-			
+						
 			if (null != record.getMetadata()) {
 				Object metadata = record.getMetadata().getAny();
 				if (metadata instanceof RegistryObjects) {

@@ -3,6 +3,11 @@ package org.grants.importers.rda;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class to store information about RDA record
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Record {
 	
 	public static final String RDA_HOST = "http://researchdata.ands.org.au/";

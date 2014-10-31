@@ -1,9 +1,32 @@
 package org.grants.importers.institutions;
 
+/**
+ * Main class for Web:Institution importer
+ * 
+ * This software design to process institutions.csv file located in the working directory
+ * and will post data into Neo4J located at http://localhost:7474/db/data/
+ * <p>
+ * The institutions.csv fomat should be:
+ * <br>
+ * country,state,institution_name,institution_url
+ * <p>
+ * The first file line will be counted as header and will be ignored. The Institution host will be 
+ * automatically extracted from an institution url
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ * @version 1.0.0
+ */
+
+
 public class App {
 	public static final String INSTITUTIONS_SCV = "institutions.csv";
-	private static final String NEO4J_URL = "http://ec2-54-69-203-235.us-west-2.compute.amazonaws.com:7476/db/data/";//"http://localhost:7474/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7476/db/data/";
 
+	/**
+	 * Main class function
+	 * @param args String[] Expected to have path to the institutions.csv file and Neo4J URL.
+	 * If missing, the default parameters will be used.
+	 */
 	public static void main(String[] args) {
 		String institutionCsv = INSTITUTIONS_SCV;
 		if (args.length > 0 && null != args[0] && !args[0].isEmpty())

@@ -25,6 +25,12 @@ import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 
+/**
+ * RDA JSON Importer class
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Importer {
 	
 	private final String folderUri;
@@ -54,6 +60,11 @@ public class Importer {
 	private int createdRecords = 0;
 	private int createdRelations = 0;
 	
+	/**
+	 * Class constructor
+	 * @param folderUri String containing path to JSON folder 
+	 * @param neo4jUrl String containing Neo4J URL
+	 */
 	public Importer( final String folderUri , final String neo4jUrl ) {
 		this.folderUri = folderUri;
 		
@@ -67,6 +78,9 @@ public class Importer {
 		index = graphDb.index().forNodes(Record.LABEL_RDA_RECORD);
 	}	
 	
+	/**
+	 * Function to import JSON data
+	 */
 	public void importRecords() {
 		createdRecords = 0;
 		createdRelations = 0;
@@ -79,24 +93,14 @@ public class Importer {
 		for (File file : files) 
 			if (!file.isDirectory()) 
 				importRelationships(file);
-			
-		
-	/*	
-		for (DoiRelation relation : relations) {
-			System.out.println("Relationship [" + relation.type + "]: " + relation.doi);
-			
-			IndexHits<Node> hits = indexDryadRecord.get(PROPERTY_DOI, relation.doi);
-			if (null != hits && hits.size() == 1) {
-				RestNode noteTo = (RestNode) hits.getSingle();
-				RestNode nodeFrom = graphDb.getNodeById(relation.nodeId);
-				
-				createUniqueRelationship(nodeFrom, noteTo, DynamicRelationshipType.withName(relation.type), null);
-			}
-		}*/
 		
 		System.out.println("Done. Created " + createdRecords + " records and " + createdRelations + " relationships.");
 	}
 	
+	/**
+	 * Function to import single node from a JSON file
+	 * @param file Link to a JSON file
+	 */
 	public void importRecord(File file) {
 		try {
 			@SuppressWarnings("unchecked")
@@ -117,6 +121,10 @@ public class Importer {
 		}
 	}
 	
+	/**
+	 * Function to import relationships from a JSON file
+	 * @param file Link to a JSON file
+	 */
 	@SuppressWarnings("unchecked")
 	public void importRelationships(File file) {
 		try {
