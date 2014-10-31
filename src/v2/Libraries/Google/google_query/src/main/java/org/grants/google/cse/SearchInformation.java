@@ -1,5 +1,10 @@
 package org.grants.google.cse;
 
+/**
+ * Class to store Google search information
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class SearchInformation {
 	private double searchTime;
 	private String formattedSearchTime;

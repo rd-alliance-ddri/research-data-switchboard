@@ -3,6 +3,11 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store Orcid History
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidHistory {
 	private String creationMethod;
 	private String completionDate;

@@ -3,6 +3,11 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store Orcid Work Information
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidWork {
 	private String putCode;
 	private WorkTitle title;

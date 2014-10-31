@@ -25,6 +25,15 @@ import org.neo4j.rest.graphdb.util.Config;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * Loader class
+ * 
+ * This class expects nhmrc/2014/grants-data.csv and nhmrc/2014/ci-roles.csv files to be 
+ * available in the working directory.
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Loader {
 	
 		
@@ -104,6 +113,10 @@ public class Loader {
 	private RestIndex<Node> indexNHMRCInstitution;
 	private RestIndex<Node> indexRDAInstitution;
 	
+	/**
+	 * Loader function
+	 * @param serverRoot String containing url of Neo4J
+	 */
 	public void Load(final String serverRoot)
 	{
 		System.setProperty(Config.CONFIG_STREAM, "true");

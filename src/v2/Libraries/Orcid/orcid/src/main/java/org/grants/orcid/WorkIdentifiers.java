@@ -4,6 +4,11 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store a List of Work Identifiers 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class WorkIdentifiers {
 	private List<WorkIdentifier> identifiers;
 	private String scope;

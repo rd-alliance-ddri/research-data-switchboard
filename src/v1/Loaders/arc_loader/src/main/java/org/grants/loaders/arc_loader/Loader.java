@@ -26,6 +26,15 @@ import org.neo4j.rest.graphdb.util.Config;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * Loader class
+ * 
+ * This class expects arc/completed_projects.csv and arc/new_projects.csv files to be avaliable in the
+ * working directory.
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Loader {
 
 	private static final String COMPLETED_GRANTS_CSV_PATH = "arc/completed_projects.csv";
@@ -94,6 +103,10 @@ public class Loader {
 	private RestIndex<Node> indexARCInstitution;
 	private RestIndex<Node> indexRDAInstitution;
     
+	/**
+	 * Function load data into Neo4J
+	 * @param serverRoot String containing address of Neo4J instance
+	 */
     public void Load(final String serverRoot)
 	{
 		System.setProperty(Config.CONFIG_STREAM, "true");
@@ -139,7 +152,12 @@ public class Loader {
 			return;
 	}
 	
-    
+    /**
+     * Function lo load data into Neo4J
+     * @param graphDb RestAPI object
+     * @param csv address of csv file
+     * @return
+     */
     public boolean LoadCsv(RestAPI graphDb,final String csv) {
     	// Imoprt Grant data
 		System.out.println("Importing Grant data");

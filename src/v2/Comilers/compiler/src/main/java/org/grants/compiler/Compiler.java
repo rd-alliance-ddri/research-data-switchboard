@@ -22,6 +22,18 @@ import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.QueryResult;
 
+/**
+ * Compiler class
+ * <p>
+ * This class designed to load data from first Neo4j Instance and populate it into second instance
+ * The instances expected to be hosted ad 4747 and 4746 ports
+ * <p>
+ * The program will automatically create all indexes and constraints on the second instance, needed 
+ * for a job.
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Compiler {
 	private static final String NEO4J1_URI = "http://localhost:7474/db/data/";
 	private static final String NEO4J2_URI = "http://localhost:7476/db/data/";
@@ -142,6 +154,11 @@ public class Compiler {
    
 	CrossRef crossref = new CrossRef();
 	
+	/**
+	 * Class constructor
+	 * 
+	 * The class could be enchanded with Neo4J instance address (no needed for this project)
+	 */
 	public Compiler() {
 		// connect to graph database
 		graphDb1 = new RestAPIFacade(NEO4J1_URI);  
@@ -176,13 +193,17 @@ public class Compiler {
 		indexCrossrefResearcher = graphDb2.index().forNodes(LABEL_CROSSREF_RESEARCHER);*/
 	}
 	
+	/**
+	 * Main function. Will subsequently create Dryad::Dataset, Dryad::Publication and RDA:Record nodes
+	 * with all relationships. The Cern:Publication node currently does not contains any relationship 
+	 * and for that job import_cern software could be used. To generate Web:Institutions please use 
+	 * import_institutions software.
+	 */
 	public void process() {
-		//importDryadDataset();
-		//importDryadPublications();
-		//importDryadRelations();		
-		
-		//importRDARecords();
-		importWebResearchers();
+		importDryadDataset();
+		importDryadPublications();
+		importDryadRelations();			
+		importRDARecords();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -466,11 +487,7 @@ public class Compiler {
 					DynamicRelationshipType.withName(r.relationName), Direction.OUTGOING, null);	
 		}
 	}
-	
-	private void importWebResearchers() {
 		
-	}
-	
 	private List<RestNode> findDryadDatasetByDoi(final String doi) {
 		List<RestNode> result = null;
 		

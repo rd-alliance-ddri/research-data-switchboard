@@ -11,6 +11,11 @@ import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
+/**
+ * Class to parse CrossRef Date object
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class CrossRefDateDeserializer  extends JsonDeserializer<Date> {
 	
 	private static final String NODE_TIMESTAMP = "timestamp";

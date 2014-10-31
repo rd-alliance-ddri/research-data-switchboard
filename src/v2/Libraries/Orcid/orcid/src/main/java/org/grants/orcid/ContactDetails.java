@@ -2,6 +2,11 @@ package org.grants.orcid;
 
 import java.util.List;
 
+/**
+ * Class to store Orcid Contact Details
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class ContactDetails {
 	private List<String> email;
 	private Address address;

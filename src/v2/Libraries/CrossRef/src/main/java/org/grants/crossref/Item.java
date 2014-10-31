@@ -10,6 +10,11 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store CorssRef Item information
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Item {
 	private String doi;

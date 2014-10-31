@@ -1,5 +1,10 @@
 package org.grants.google.cse;
 
+/**
+ * Class to store Google query context
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class QueryContext {
 	private String title;
 	

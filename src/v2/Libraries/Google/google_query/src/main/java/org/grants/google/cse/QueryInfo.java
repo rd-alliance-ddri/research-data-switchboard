@@ -2,6 +2,11 @@ package org.grants.google.cse;
 
 import java.util.List;
 
+/**
+ * Class to store Google query info
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class QueryInfo {
 	private List<QueryPage> nextPage;
 	private List<QueryPage> request;

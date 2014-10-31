@@ -3,6 +3,11 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store work identifier
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class WorkIdentifier {
 	private String type;
 	private String id;

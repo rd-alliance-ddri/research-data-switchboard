@@ -1,5 +1,10 @@
 package org.grants.google.cse;
 
+/**
+ * Class to store Google optional spelling
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Spelling {
 	private String correctedQuery;
 	private String htmlCorrectedQuery;

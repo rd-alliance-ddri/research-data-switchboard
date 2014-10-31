@@ -3,6 +3,11 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store Orcid Bio
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidBio {
 	private PersonalDetails personalDetails;
 	private String biography;

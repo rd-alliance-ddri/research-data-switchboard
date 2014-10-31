@@ -1,5 +1,10 @@
 package org.grants.google.cse;
 
+/**
+ * Class to store Google query page
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class QueryPage {
 	private long count;
 	private long startIndex;

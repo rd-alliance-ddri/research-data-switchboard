@@ -9,6 +9,11 @@ import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
+/**
+ * Class to deseralize Orcid value
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class ValueDeserializer  extends JsonDeserializer<String> {
 
 	private static final String VALUE = "value";

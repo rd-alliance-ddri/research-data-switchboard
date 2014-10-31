@@ -2,6 +2,11 @@ package org.grants.crossref;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store author information
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Author {
 	private String family;
 	private String given;

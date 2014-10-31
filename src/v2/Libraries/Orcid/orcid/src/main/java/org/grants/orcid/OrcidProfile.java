@@ -2,6 +2,11 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store Orcid Profile
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidProfile {
 	private String orcid;
 	private OrcidIdentifier identifier;

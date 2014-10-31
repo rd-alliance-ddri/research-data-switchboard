@@ -23,6 +23,14 @@ import org.neo4j.rest.graphdb.util.Config;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * Loader class
+ * 
+ * This class expects dryad/dryad.csv file to be available in the working directory.
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Loader {
 
 	private static final String CSV_PATH = "dryad/dryad.csv";
@@ -88,6 +96,10 @@ public class Loader {
     private RestIndex<Node> indexARCGrant;
     private RestIndex<Node> indexNHMRCGrant;
         
+    /**
+     * Function to load data
+     * @param serverRoot String containing address of Neo4J
+     */
 	public void Load(final String serverRoot)
 	{
 		System.setProperty(Config.CONFIG_STREAM, "true");
@@ -135,6 +147,12 @@ public class Loader {
 			return;
 	}
     
+	/**
+	 * Function to load a single csv file in the Neo4J
+	 * @param graphDb RestAPI object
+	 * @param csv path of CSV file to load
+	 * @return true if load is successfull
+	 */
     private boolean LoadCsv(RestAPI graphDb,final String csv) {
     	
     	// Obtain an index on Dryad DataSet

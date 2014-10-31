@@ -2,6 +2,11 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store Orcid Contributor Attributes
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class ContributorAttributes {
 	private String contributorRole;
 	private String contributorSequince;

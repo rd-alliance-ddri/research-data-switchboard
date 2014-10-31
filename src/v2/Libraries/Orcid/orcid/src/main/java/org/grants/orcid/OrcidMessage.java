@@ -2,6 +2,11 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store Orcid message
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidMessage {
 	private String messageVersion;
 	private OrcidProfile profile;

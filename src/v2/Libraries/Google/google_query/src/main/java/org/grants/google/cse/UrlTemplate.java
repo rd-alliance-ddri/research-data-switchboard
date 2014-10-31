@@ -1,5 +1,10 @@
 package org.grants.google.cse;
 
+/**
+ * Class to store Google Uri Template
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class UrlTemplate {
 	private String type;
 	private String template;

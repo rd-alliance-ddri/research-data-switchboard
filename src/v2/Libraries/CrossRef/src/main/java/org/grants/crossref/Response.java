@@ -2,6 +2,12 @@ package org.grants.crossref;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Template class to Store CrossRef Response. 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ * @param <T> Class to store actual message
+ */
 public class Response<T> {
 	private String status;
 	private String messageType;

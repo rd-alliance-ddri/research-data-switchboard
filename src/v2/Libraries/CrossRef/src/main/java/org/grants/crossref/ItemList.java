@@ -4,6 +4,11 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+/**
+ * Class to store List of CrossRef Items
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class ItemList {
 	private Query query;
 	private int itemsPerPage;

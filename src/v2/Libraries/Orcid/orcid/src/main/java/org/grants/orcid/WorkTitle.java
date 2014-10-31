@@ -2,6 +2,11 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * Class to store Work Title
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class WorkTitle {
 	private String title;
 	private String subtitle;

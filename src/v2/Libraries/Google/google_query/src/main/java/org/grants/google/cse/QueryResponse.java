@@ -2,6 +2,11 @@ package org.grants.google.cse;
 
 import java.util.List;
 
+/**
+ * Class to store Google query response
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class QueryResponse {
 	private String kind;
 	private UrlTemplate url;

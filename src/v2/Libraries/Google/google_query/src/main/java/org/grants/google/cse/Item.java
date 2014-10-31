@@ -2,6 +2,11 @@ package org.grants.google.cse;
 
 import java.util.Map;
 
+/**
+ * Class to store Google response item
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Item {
 	private String kind;
 	private String title;

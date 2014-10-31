@@ -1,5 +1,10 @@
 package org.grants.orcid;
 
+/**
+ * Class to store Orcid Identifier
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class OrcidIdentifier {
 	private String value;
 	private String uri;

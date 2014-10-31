@@ -13,6 +13,12 @@ import org.codehaus.jackson.type.TypeReference;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
+/**
+ * Main class for CrossRef library
+ * 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ * @version 1.0.0
+ */
 public class CrossRef {
 	private static final String URL_CROSSREF = "http://api.crossref.org/";
 
@@ -32,8 +38,7 @@ public class CrossRef {
 		
 	private static final String URL_ENCODING = "UTF-8";
 	
-	/*
-	private static final String PARAM_QUERY = "q";
+	/*private static final String PARAM_QUERY = "q";
 	private static final String PARAM_HEADER = "header";*/
 	
 	private static final String STATUS_OK = "ok";
@@ -45,6 +50,10 @@ public class CrossRef {
 	private static final TypeReference<Response<ItemList>> itemListType = new TypeReference<Response<ItemList>>() {};   
 	private static final TypeReference<Response<Item>> itemType = new TypeReference<Response<Item>>() {};   
 	
+	/**
+	 * Request all works
+	 * @return ItemList - a list of works
+	 */
 	public ItemList requestWorks() {
 		try {
 			String json = get(URL_CROSSREF_WORKDS);
@@ -61,19 +70,21 @@ public class CrossRef {
 				System.out.println("Inavlid response");
 			
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return null;
 	}
-	
+
+	/**
+	 * Request work by doi identificator
+	 * @param doi String containing doi identificator
+	 * @return Item - work information
+	 */
 	public Item requestWork(final String doi) {
 		try {
 			String json = get(URL_CROSSREF_WORKDS + "/" + URLEncoder.encode(doi, URL_ENCODING).replace("%2F", "/"));
@@ -102,7 +113,6 @@ public class CrossRef {
 		return null;
 	}
 	
-	
 	private String get( final String url ) {
 		System.out.println("Downloading: " + url);
 				
@@ -116,103 +126,4 @@ public class CrossRef {
 		
 		return null;
     } 
-	
-	/*
-	
-	public List<Item> requestDois(final String query)
-	{
-		Map<String, String> pars = new HashMap<String, String>();
-		pars.put(PARAM_QUERY, query);
-		
-		String json = requestDois(pars);
-		if (null != json) {
-			try {
-				return mapper.readValue( json, itemListReference );
-			} catch (JsonParseException e) {
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return null;
-	}
-	
-	public Header requestDoisHeader(final String query)
-	{
-		Map<String, String> pars = new HashMap<String, String>();
-		pars.put(PARAM_QUERY, query);
-		pars.put(PARAM_HEADER, "true");
-		
-		String json = requestDois(pars);
-		if (null != json) {
-			try {
-				return mapper.readValue( json, headerReference );
-			} catch (JsonParseException e) {
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return null;
-	}
-	
-	public String requestDois(Map<String, String> pars)
-	{
-		try {
-			return get(formatUrl(URL_CROSSREF_DOIS, pars));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}		
-		
-		return null;
-	}
-	
-	
-	private String get( final String url ) {
-		System.out.println("Downloading: " + url);
-				
-		ClientResponse response = Client.create()
-								  .resource( url )
-								  .accept( MediaType.APPLICATION_JSON ) 
-								  .type( MediaType.APPLICATION_JSON )
-								  .get( ClientResponse.class );
-		
-		try {
-			String entity =  response.getEntity( String.class );
-			System.out.println(entity);
-			return entity; // mapper.readValue( entity, linkedListReference );
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-    } 
-	
-	private String formatUrl(final String url, Map<String, String> pars) throws UnsupportedEncodingException {
-		if (null == pars)
-			return url;
-		
-		StringBuilder sb = null;
-		for (Map.Entry<String, String> entry : pars.entrySet()) {
-			if (null == sb) 
-				sb = new StringBuilder();
-			else
-				sb.append('&');
-			sb.append(entry.getKey());
-			sb.append('=');
-			sb.append(URLEncoder.encode(entry.getValue(), URL_ENCODING));
-		}
-		
-		if (sb != null)
-			return url + '?' + sb.toString();
-		else
-			return url;
-	}
-	*/
 }

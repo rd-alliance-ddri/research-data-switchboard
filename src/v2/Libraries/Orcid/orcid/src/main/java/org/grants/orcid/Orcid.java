@@ -11,6 +11,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
+/**
+ * Main class to query ORCID 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Orcid {
 	private static final String ORCID_URL = "http://pub.orcid.org/";
 	private static final String ORCID_HOST = "orcid.org/";
@@ -21,6 +26,12 @@ public class Orcid {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();  
 	
+	/**
+	 * Query Orcid site with an Orcid ID
+	 * @param orcidId String containing Orcid Id
+	 * @param responseType Desired response Type (Bio, Works or Record)
+	 * @return OrcidMessage
+	 */
 	public OrcidMessage queryId(String orcidId, RequestType responseType) {
 		
 		int idx = orcidId.indexOf("orcid.org/");
