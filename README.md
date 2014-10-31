@@ -6,7 +6,7 @@ Java
 
 All software are created with Java programming lanugage and requires Java SDK 1.7 to be installed on the system. To check your Java version, please execute:
 
-$ java -version
+	$ java -version
 
 from a command line. If you Java version is too low or now java could be found, please download and install the latest Java package from 
 
@@ -17,7 +17,7 @@ Maven
 
 The software also require Maven 3.x to be installed on the system. To check your Maven version, please execute:
 
-$ mvn -version
+	$ mvn -version
 
 from a command line. If your Maven version is too low or now maven could be found, please download the latest  and install Maven package from
 
@@ -43,26 +43,26 @@ http://sourceforge.net/projects/opencsv/files/opencsv/2.3/opencsv-2.3-src-with-l
 
 Please install locally as a Maven dependancy:
 
-$ tar -xcf opencsv-2.3-src-with-libs.tar.gz
-$ cd opencsv-2.3/deploy
-$ mvn install:install-file -Dfile=opencsv-2.3.jar -DgroupId=opencsv \
-    -DartifactId=opencsv -Dversion=2.3 -Dpackaging=jar
+	$ tar -xcf opencsv-2.3-src-with-libs.tar.gz
+	$ cd opencsv-2.3/deploy
+	$ mvn install:install-file -Dfile=opencsv-2.3.jar -DgroupId=opencsv \
+    		-DartifactId=opencsv -Dversion=2.3 -Dpackaging=jar
 
 neo4j-rest-graphdb-2.0.2
 ---
 
 You can download this library from github. Please install it locally as a Maven dependancy:
 
-$ git clone -b 2.0-labels-and-indexes https://github.com/neo4j-contrib/java-rest-binding.git
-$ cd java-rest-binding
-$ mvn install
+	$ git clone -b 2.0-labels-and-indexes https://github.com/neo4j-contrib/java-rest-binding.git
+	$ cd java-rest-binding
+	$ mvn install
 
 Download and Install
 ===
 
 To download latest sources, you can use git clone:
 
-$ git clone https://github.com/rd-alliance-ddri/research-data-switchboard.git
+	$ git clone https://github.com/rd-alliance-ddri/research-data-switchboard.git
 
 The project structure are:
 
@@ -81,9 +81,9 @@ V1 Package is designed to generate collapsible Grants demo. In order to use it, 
 
 Please locate Neo4J sources and copy it into project folder under v1/neo4j or in any other folder you want. To start an neo4j instance, please execute:
 
-$ cd v1/neo4j
-$ ./bin/neo4j start
-$ cd ..
+	$ cd v1/neo4j
+	$ ./bin/neo4j start
+	$ cd ..
 
 form an Neo4j instance folder.
 
