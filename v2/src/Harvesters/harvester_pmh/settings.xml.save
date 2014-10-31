@@ -1,0 +1,7 @@
+<servers>
+  <server>
+    <id>github</id>
+    <username>wizman77</username>
+    <password>GitHubPassw0rd</password>
+  </server>
+</servers>

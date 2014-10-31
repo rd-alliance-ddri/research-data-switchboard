@@ -1,0 +1,329 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<link type="text/css" rel="stylesheet" href="style.css"/>
+		<title> Grants Project Demo </title>
+	</head>
+	<style> /* set the CSS */
+		body { font: 16px times;}
+		
+		.node circle {
+			fill: #fff;
+			stroke: steelblue;
+			stroke-width: 3px;
+		}
+		
+		.node text { font: 12px sans-serif; }
+		.link {
+			fill: none;
+			stroke: #ccc;
+			stroke-width: 2px;
+		}
+		
+	</style>
+	<body>
+		 <script type="text/javascript" src="jquery/jquery.js"></script>
+		 <script type="text/javascript" src="d3/d3.js"></script>
+    	 <script type="text/javascript" src="neo4j/neo4j.js"></script>
+    	 
+    	 <script type="text/javascript"> 
+    	 
+var margin = {top: 20, right: 20, bottom: 20, left: 20}, 
+	width = 800 - margin.left - margin.right,
+	height = 600 - margin.top - margin.bottom;
+	
+var i = 0;
+var tree, diagonal, svg; 
+
+function setupForm(type) {
+  $('#queryForm').empty();
+  if (type == "institution") {
+    $('#queryForm').append(	
+      $('<input />', { id: 'institutionId', name: 'institutionId', placeholder: 'Institution ID', type: 'text', value: '171' }),
+      $('<br />'),
+      $('<input />', { id: 'institutionNla', name: 'institutionNla', placeholder: 'Institution NLA', type: 'text' }),
+      $('<br />'),
+      $('<input />', { id: 'institutionName', name: 'institutionName', placeholder: 'Institution Name', type: 'text' }),
+      $('<br />'),
+      $('<input />', { id: 'maxNodes', name: 'maxNodes', placeholder: 'Maximum nodes count', type: 'text', value: '25' }),
+      $('<br />'),
+      $('<input />', { id: 'querybutton', type: 'submit', value: 'Query', onclick: 'queryInstitution();' })
+    );
+  }
+}
+ 
+function queryInstitution() {
+	var institutionId = $("#institutionId").val();
+  var institutionNla = $("#institutionNla").val();
+  var institutionName = $("#institutionName").val();
+  var maxNodes = $("#maxNodes").val();
+  if (maxNodes < 1 )
+	maxNodes = 1;
+  if (maxNodes > 100)
+    maxNodes = 100;
+	 
+  if (institutionId) 
+	getInstitutionGraphById(institutionId, maxNodes, showGraph);
+  else if (institutionNla)
+	getInstitutionGraphByNla(institutionNla, maxNodes, showGraph);
+  else if (institutionName)
+	getInstitutionGraphByName(institutionName, maxNodes, showGraph);
+  else 
+    getAnyInstitutionGraph(maxNodes, showGraph);
+}
+ 
+function showGraph(graph) {
+	// Compute the new tree layout.
+	var nodes = tree.nodes(graph[0]).reverse(),
+		links = tree.links(nodes);
+	
+	// Normalize for fixed-depth.
+	nodes.forEach(function(d) { d.y = d.depth * 180; });
+	
+	// Declare the node¦
+	var node = svg.selectAll("g.node")
+		.data(nodes, function(d) { return d.id || (d.id = ++i); });
+	
+	// Enter the nodes.
+	var nodeEnter = node.enter().append("g")
+		.attr("class", "node")
+		.attr("transform", function(d) {
+			return "translate(" + d.y + "," + d.x + ")"; });
+	
+	nodeEnter.append("circle")
+		.attr("r", 10)
+		.style("fill", "#fff");
+	
+	nodeEnter.append("text")
+		.attr("x", function(d) {
+			return d.children || d._children ? -13 : 13; })
+		.attr("dy", ".35em")
+		.attr("text-anchor", function(d) {
+			return d.children || d._children ? "end" : "start"; })
+		.text(function(d) { return d.name; })
+		.style("fill-opacity", 1);
+	
+	// Declare the links¦
+	var link = svg.selectAll("path.link")
+		          .data(links, function(d) { return d.target.id; });
+	
+	// Enter the links.
+	link.enter().insert("path", "g")
+		.attr("class", "link")
+		.attr("d", diagonal);
+}
+
+//function resizeGraph() {
+
+	// Find the new window dimensions
+	//width = parseInt(d3.select("#graph").style("width")) - margin.right - margin.left,
+//	height = parseInt(d3.select("#graph").style("height")) - margin.top - margin.bottom;
+	
+	//alert(width + "," + height)
+	 
+	// Update the range of the scale with new width/height
+	//xScale.range([0, width]).nice(d3.time.year);
+	//yScale.range([height, 0]).nice();
+	 
+	// Update the axis with the new scale 
+/*	graph.select('.x.axis')
+	  .attr("transform", "translate(0," + height + ")")
+	  .call(xAxis);
+	 
+	graph.select('.y.axis')
+	  .call(yAxis);*/
+	 
+	// Force D3 to recalculate and update the line 
+/*	graph.selectAll('.line')
+	  .attr("d", line);*/
+	  
+	//svg.attr("width", width).attr("height", height);
+//}
+ 
+$(function(){
+	var windowWidth = parseInt(d3.select("body").style("width")),
+		windowHeight = parseInt(d3.select("body").style("height"));
+	
+	alert(windowWidth + ", " + windowHeight);
+	
+	// setup chart dimensions
+	tree = d3.layout.tree()
+ 			 .size([height, width]);
+ 	
+    diagonal = d3.svg.diagonal()
+ 			     .projection(function(d) { return [d.y, d.x]; });
+    
+    svg = d3.select("svg")
+			.attr("width", width + margin.right + margin.left)
+			.attr("height", height + margin.top + margin.bottom)
+		    .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.select(window).on('resize', resizeGraph);
+	resizeGraph();
+    
+ 	/*
+    svg = d3.select("body").append("svg")
+ 		.attr("width", width + margin.right + margin.left)
+ 		.attr("height", height + margin.top + margin.bottom)
+ 		.append("g")
+ 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 	*/
+ 	
+ 	 
+ 	
+	
+	
+	/*var margin = {top: 30, right: 20, bottom: 30, left: 50},
+		width = 600 - margin.left - margin.right,
+		height = 270 - margin.top - margin.bottom;
+
+	var force = d3.layout.force()
+		.on("tick", tick)
+		.charge(function(d) { return d._children ? -d.size : -30; })
+		.linkDistance(function(d) { return d.target._children ? 80 : 30; })
+		.size([width, height]);
+	
+/*	var vis = d3.select("#chart").append("svg")
+		.attr("width", w)
+		.attr("height", h);*/
+	
+	
+
+	
+	/*
+	// Parse the date / time
+		
+	var parseDate = d3.time.format("%d-%b-%y").parse;
+	
+	// Set the ranges
+	var x = d3.time.scale().range([0, width]);
+	var y = d3.scale.linear().range([height, 0]);
+	
+	// Define the axes
+	var xAxis = d3.svg.axis().scale(x)
+		.orient("bottom").ticks(5);
+	var yAxis = d3.svg.axis().scale(y)
+		.orient("left").ticks(5);
+	
+	// Define the line
+	var valueline = d3.svg.line()
+		.x(function(d) { return x(d.date); })
+		.y(function(d) { return y(d.close); });
+	
+	// Adds the svg canvas
+	var svg = d3.select("body")
+		.append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+			.attr("transform",
+				"translate(" + margin.left + "," + margin.top + ")");
+
+	// Get the data
+	d3.csv("data/data.csv", function(error, data) {
+		data.forEach(function(d) {
+			d.date = parseDate(d.date);
+			d.close = +d.close;
+		});
+
+		// Scale the range of the data
+		x.domain(d3.extent(data, function(d) { return d.date; }));
+		y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+		// Add the valueline path.
+		svg.append("path")
+			.attr("class", "line")
+			.attr("d", valueline(data));
+
+		// Add the X Axis
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis);
+
+		// Add the Y Axis
+		svg.append("g")
+			.attr("class", "y axis")
+			.call(yAxis);
+	});
+	*/
+	
+	
+	$('#testServerConnection').click(function(){
+		setupForm("none");
+		getVersion(function(version) {
+			alert("Neo4J server version: " + version);
+		});
+	});
+	$('#institutionDemo').click(function(){
+		setupForm("institution");
+		
+	});
+});
+    	 
+    	 
+    	 /*
+    	 
+    	 */
+    	 /*
+    	 if (!testServerConnection())
+    		 alert( "Unable to connect to Neo4J Server!" );
+    	 else
+    		 alert( "Connection succfull" );
+    	 /*
+    	document.write("test");
+  */
+    	/*
+(function() {
+var flickerAPI = "http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
+$.get( flickerAPI, {
+	tags: "mount rainier",
+	tagmode: "any",
+	format: "json"
+}, null, "json")
+	.done(function( data ) {
+	//	alert( "Data Loaded: " + data );
+		$.each( data.items, function( i, item ) {
+			$( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
+			if ( i === 3 ) {
+				return false;
+			}
+		});
+		});
+	})();
+
+  /*  	var response = cypher("MATCH (n:ARC_Grant) RETURN n LIMIT 1", null);
+    	document.write(response);
+    */	
+    	/*
+var req = createRequest(); // defined above
+// Create the callback:
+req.onreadystatechange = function() {
+	if (req.readyState != 4) return; // Not there yet
+	if (req.status != 200) {
+	// Handle request failure here...
+		return;
+	}
+    	  // Request successful, read the response
+   var resp = req.responseText;
+   // ... and use it as needed by your app.
+}
+
+req.open("GET", url, true);
+req.send();
+
+req.open("POST", url, true);
+req.setRequestHeader("Content-Type",
+                     "application/x-www-form-urlencoded");
+req.send(form-encoded request body);*/
+
+    	 </script>	
+		 <input id="testServerConnection" type="button" value="Get Version" />
+		 <input id="institutionDemo" type="button" value="Institution Demo" />
+		 <br>	 
+		 <div id="queryForm"></div> 	 	
+		 <br>	
+		 <svg id="graph"></svg> 	 	
+	 </body>
+</html>
