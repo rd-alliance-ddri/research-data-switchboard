@@ -1,7 +1,9 @@
 package org.grants.connectors.web_researcher_connector;
 
-/*
- * Main class for the project
+/**
+ * Main class of the project
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
  */
 public class App {
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";

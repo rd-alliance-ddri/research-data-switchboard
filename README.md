@@ -66,21 +66,21 @@ To download latest sources, you can use git clone:
 
 The project structure are:
 
-jar/opencsv - an opencsv-2.3.jar Library
-v1 - V1 Package - generate grants collapsible demo
-v1/data - data, required for V1 Package
-v1/src - V1 Package sources
-v2 - V2 Package - generate RDA, Dryad and CERN database
-v2/data - data, required for V2 Package
-v2/src - V2 Package sources
+	jars/opencsv - an opencsv-2.3.jar Library
+	v1 - V1 Package - generate grants collapsible demo
+	v1/data - data, required for V1 Package
+	v1/src - V1 Package sources
+	v2 - V2 Package - generate RDA, Dryad and CERN database
+	v2/data - data, required for V2 Package
+	v2/src - V2 Package sources
 
 V1 Package
 ===
 
 V1 Package is designed to generate collapsible Grants demo. In order to use it, you will need to start a fresh Neo4j instance.
 
-Please locate Neo4J sources and copy it into project folder under v1/neo4j or in any other folder you want. To start an neo4j instance, please execute:
-
+Please locate Neo4J sources and copy it into folder v1/neo4j under procect root folder or in any other folder you want. To start an neo4j instance, please execute:
+	
 	$ cd v1/neo4j
 	$ ./bin/neo4j start
 	$ cd ..
@@ -92,47 +92,62 @@ The instance should be avaliable as http://localhost:7474/browser/
 Installing the libraryes 
 ---
 
-To install REST and ResearchData libraries:
+To install REST and ResearchData libraries, please execute (from a v1 folder)
 
-$ cd v1
-$ mkdir jars
-$ cd v1/src
-$ cd Libraries/rest
-$ mvn install
-$ cd ../researchdata
-$ mvn install
-$ cd ../..
+		$ mkdir jars
+		$ cd v1/src
+		$ cd Libraries/rest
+		$ mvn install
+		$ cd ../researchdata
+		$ mvn install
+		$ cd ../..
 
 Compiling and Running loaders
 ---
 
 There is three Loader projects, and they all need to be compiled and runned once from project folder. To do that, please execute:
 
-$ cd v1
-$ mkdir jars
-$ cd Loaders/arc_loader
-$ mvn package 
-$ cp target/jars/* ../../../jars/
-$ cp target/arc_loader-1.0.0.jar ../../../
-$ cd ..
+	$ cd v1
+	$ mkdir jars
+	$ cd Loaders/arc_loader
+	$ mvn package 
+	$ cp target/jars/* ../../../jars/
+	$ cp target/arc_loader-1.0.0.jar ../../../
+	$ cd ..
 
-$ cd dryad_loader
-$ mvn package 
-$ cp target/jars/* ../../../jars/
-$ cp target/dryad_loader-1.0.0.jar ../../../
-$ cd ..
+	$ cd dryad_loader
+	$ mvn package 
+	$ cp target/jars/* ../../../jars/
+	$ cp target/dryad_loader-1.0.0.jar ../../../
+	$ cd ..
 
-$ cd nhmrc_loader
-$ mvn package 
-$ cp target/jars/* ../../../jars/
-$ cp target/nhmrc_loader-1.0.0.jar ../../../
-$ cd ../../../
+	$ cd nhmrc_loader
+	$ mvn package 
+	$ cp target/jars/* ../../../jars/
+	$ cp target/nhmrc_loader-1.0.0.jar ../../../
+	$ cd ../../../
 
 To run the programs, please execute (fom v1 folder)
 
-$ java -jar arc_loader-1.0.0.jar
-$ java -jar dryad_loader-1.0.0.jar
-$ java -jar nhmrc_loader-1.0.0.jar
+	$ java -jar arc_loader-1.0.0.jar
+	$ java -jar dryad_loader-1.0.0.jar
+	$ java -jar nhmrc_loader-1.0.0.jar
+
+Compiling and running connector
+---
+
+After data has been loaded, there are missing connections between Dryad, ARC and NHMRC data. web_researcher_connector application is used to crerate them.
+
+To compile and run this appycation, please execute (from a v1 folder)
+
+	$ cd src/Connectors/web_researcher_connector
+	$ mvn package 
+	$ cp target/jars/* ../../../jars/
+	$ cp target/web_researcher_connector-1.0.0.jar ../../../
+	$ cd ../../../
+
+	$ java -jar web_researcher_connector-1.0.0.jar
+
 
 Documentation
 ===

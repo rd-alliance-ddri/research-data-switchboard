@@ -65,6 +65,10 @@ public class Connector {
         Investigator
     }
 	
+	/**
+	 * Function to create connection between Web:Researcher and other nodes
+	 * @param serverRoot
+	 */
 	public void Connect(final String serverRoot) {
 		System.setProperty(Config.CONFIG_STREAM, "true");
 		
@@ -199,7 +203,14 @@ public class Connector {
 		
 	}
 	
-	public String DownloadPage(final String url, final String cookies) throws IOException {
+	/**
+	 * Function to download page by URL
+	 * @param url
+	 * @param cookies
+	 * @return
+	 * @throws IOException
+	 */
+	private String DownloadPage(final String url, final String cookies) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 		conn.setReadTimeout(5000);
 		if (null != cookies && !cookies.isEmpty())
