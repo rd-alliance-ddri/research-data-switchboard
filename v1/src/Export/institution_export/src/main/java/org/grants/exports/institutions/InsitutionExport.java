@@ -28,7 +28,7 @@ public class InsitutionExport extends Export{
 	
 	public void Export(final String serverRoot)
 	{
-		new File("json").mkdirs();
+		new File("institutions/json").mkdirs();
 		
 		System.setProperty(Config.CONFIG_STREAM, "true");
 		
@@ -94,7 +94,7 @@ public class InsitutionExport extends Export{
 				String fileName = Long.toString(insitutionNodeId) + ".json";
 				
 				Writer writer = new BufferedWriter(new OutputStreamWriter(
-				          new FileOutputStream(new File("json/" + fileName)), "utf-8"));
+				          new FileOutputStream(new File("institutions/json/" + fileName)), "utf-8"));
 				
 				writer.write(json);
 				writer.close();
@@ -118,7 +118,7 @@ public class InsitutionExport extends Export{
 			mapIndex.put("legend", CompiledNode.getLegend());
 			
 			String json = mapper.writeValueAsString(mapIndex);
-			String fileName = "json/index.json";
+			String fileName = "institutions/json/index.json";
 			
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(fileName)), "utf-8"));

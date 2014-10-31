@@ -33,7 +33,7 @@ public class GrantExport extends Export {
 	
 	public void Export(final String serverRoot)
 	{
-		new File("json").mkdirs();
+		new File("grants/json").mkdirs();
 		
 		System.setProperty(Config.CONFIG_STREAM, "true");
 		
@@ -100,7 +100,7 @@ public class GrantExport extends Export {
 				String fileName = Long.toString(grantNodeId) + ".json";
 				
 				Writer writer = new BufferedWriter(new OutputStreamWriter(
-				          new FileOutputStream(new File("json/" + fileName)), "utf-8"));
+				          new FileOutputStream(new File("grants/json/" + fileName)), "utf-8"));
 				
 				writer.write(json);
 				writer.close();
@@ -124,7 +124,7 @@ public class GrantExport extends Export {
 			mapIndex.put("legend", CompiledNode.getLegend());
 			
 			String json = mapper.writeValueAsString(mapIndex);
-			String fileName = "json/index.json";
+			String fileName = "grants/json/index.json";
 			
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(fileName)), "utf-8"));

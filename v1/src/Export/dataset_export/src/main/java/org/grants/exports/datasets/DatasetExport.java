@@ -22,14 +22,23 @@ import org.neo4j.rest.graphdb.util.QueryResult;
 import org.grants.exports.export.CompiledNode;
 import org.grants.exports.export.Export;
 
+/**
+ * Datasets Export class
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class DatasetExport extends Export {
 	
 	// Qyery all instutuions ID:
 	// MATCH (n:NHMRC:Institution) RETURN id(n) UNION MATCH (n:ARC:Institution) RETURN id(n) 
 	
+	/**
+	 * Export function
+	 * @param serverRoot
+	 */
 	public void Export(final String serverRoot)
 	{
-		new File("json").mkdirs();
+		new File("datasets/json").mkdirs();
 		
 		System.setProperty(Config.CONFIG_STREAM, "true");
 		
@@ -101,7 +110,7 @@ public class DatasetExport extends Export {
 				String fileName = Long.toString(datasetNodeId) + ".json";
 				
 				Writer writer = new BufferedWriter(new OutputStreamWriter(
-				          new FileOutputStream(new File("json/" + fileName)), "utf-8"));
+				          new FileOutputStream(new File("datasets/json/" + fileName)), "utf-8"));
 				
 				writer.write(json);
 				writer.close();

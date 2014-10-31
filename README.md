@@ -94,20 +94,19 @@ Installing the libraryes
 
 To install REST and ResearchData libraries, please execute (from a v1 folder)
 
-		$ mkdir jars
-		$ cd v1/src
-		$ cd Libraries/rest
-		$ mvn install
-		$ cd ../researchdata
-		$ mvn install
-		$ cd ../..
+	$ mkdir jars
+	$ cd v1/src
+	$ cd Libraries/rest
+	$ mvn install
+	$ cd ../researchdata
+	$ mvn install
+	$ cd ../..
 
 Compiling and Running loaders
 ---
 
-There is three Loader projects, and they all need to be compiled and runned once from project folder. To do that, please execute:
+There is three Loader projects, and they all need to be compiled and runned once from project folder. To do that, please execute (from a v1 folder):
 
-	$ cd v1
 	$ mkdir jars
 	$ cd Loaders/arc_loader
 	$ mvn package 
@@ -127,7 +126,7 @@ There is three Loader projects, and they all need to be compiled and runned once
 	$ cp target/nhmrc_loader-1.0.0.jar ../../../
 	$ cd ../../../
 
-To run the programs, please execute (fom v1 folder)
+To run the programs, please execute (fom a v1 folder):
 
 	$ java -jar arc_loader-1.0.0.jar
 	$ java -jar dryad_loader-1.0.0.jar
@@ -138,7 +137,7 @@ Compiling and running connector
 
 After data has been loaded, there are missing connections between Dryad, ARC and NHMRC data. web_researcher_connector application is used to crerate them.
 
-To compile and run this appycation, please execute (from a v1 folder)
+To compile and run this appycation, please execute (from a v1 folder):
 
 	$ cd src/Connectors/web_researcher_connector
 	$ mvn package 
@@ -148,6 +147,37 @@ To compile and run this appycation, please execute (from a v1 folder)
 
 	$ java -jar web_researcher_connector-1.0.0.jar
 
+Compiling and running exporters:
+
+To create grants collapsible demo, the data need to be exported as JSON files. The package contains four exporters, each one will generate different type of JSON file.
+
+Te compile and run all exporters, please execute (from a v1 folder):
+
+	$ cd src/Export/dataset_export
+	$ mvn package
+	$ cp target/jars/* ../../../jars/
+	$ cp target/dataset_export-1.0.0.jar ../../../
+
+	$ cd ../grant_export
+	$ mvn package
+	$ cp target/jars/* ../../../jars/
+	$ cp target/grant_export-1.0.0.jar ../../../
+
+	$ cd ../institution_export
+	$ mvn package
+	$ cp target/jars/* ../../../jars/
+	$ cp target/institution_export-1.0.0.jar ../../../
+
+	$ cd ../researcher_export
+	$ mvn package
+	$ cp target/jars/* ../../../jars/
+	$ cp target/researcher_export-1.0.0.jar ../../../
+	$ cd ../../../
+
+	$ java -jar dataset_export-1.0.0.jar
+	$ java -jar dataset_export-1.0.0.jar
+	$ java -jar dataset_export-1.0.0.jar
+	$ java -jar dataset_export-1.0.0.jar
 
 Documentation
 ===

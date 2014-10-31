@@ -28,7 +28,7 @@ public class ResearcherExport extends Export {
 	
 	public void Export(final String serverRoot)
 	{
-		new File("json").mkdirs();
+		new File("researchers/json").mkdirs();
 		
 		System.setProperty(Config.CONFIG_STREAM, "true");
 		
@@ -108,7 +108,7 @@ public class ResearcherExport extends Export {
 				String fileName = Long.toString(researcherNodeId) + ".json";
 				
 				Writer writer = new BufferedWriter(new OutputStreamWriter(
-				          new FileOutputStream(new File("json/" + fileName)), "utf-8"));
+				          new FileOutputStream(new File("researchers/json/" + fileName)), "utf-8"));
 				
 				writer.write(json);
 				writer.close();
@@ -132,7 +132,7 @@ public class ResearcherExport extends Export {
 			mapIndex.put("legend", CompiledNode.getLegend());
 			
 			String json = mapper.writeValueAsString(mapIndex);
-			String fileName = "json/index.json";
+			String fileName = "researchers/json/index.json";
 			
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(fileName)), "utf-8"));

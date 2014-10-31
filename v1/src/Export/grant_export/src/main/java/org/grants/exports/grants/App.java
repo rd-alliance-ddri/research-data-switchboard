@@ -1,5 +1,10 @@
 package org.grants.exports.grants;
 
+/**
+ * Main class for Grant graph exporter into JSON
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class App {
 
 	//private static final String SERVER_ROOT_URI = "http://54.83.73.225:7474/db/data/";
