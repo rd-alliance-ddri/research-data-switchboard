@@ -25,6 +25,11 @@ import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.Config;
 import org.neo4j.rest.graphdb.util.QueryResult;
 
+/**
+ * Connector class 
+ * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
+ *
+ */
 public class Connector {
 	
 	private static final String LABEL_GRANT = "Grant";
