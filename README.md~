@@ -147,7 +147,7 @@ To compile and run this appycation, please execute (from a v1 folder):
 
 	$ java -jar web_researcher_connector-1.0.0.jar
 
-Compiling and running exporters and create Demo sites:
+Compiling and running exporters:
 
 To create grants collapsible demo, the data need to be exported as JSON files. The package contains four exporters, each one will generate different type of JSON file.
 
@@ -175,18 +175,9 @@ Te compile and run all exporters, please execute (from a v1 folder):
 	$ cd ../../../
 
 	$ java -jar dataset_export-1.0.0.jar
-	$ java -jar grant_export-1.0.0.jar
-	$ java -jar institution_export-1.0.0.jar
-	$ java -jar researcher_export-1.0.0.jar
-
-After that, you will found four new folders in the v1 folder: datasets, grats, institutions and researchers. Each one will contains json folder with data for this demo. To deploy it on the web server, you will need to copy the sceleton of the site to it. 
-
-	$ cp -r src/web/demo/WebContent/* datasets/
-	$ cp -r src/web/demo/WebContent/* grants/
-	$ cp -r src/web/demo/WebContent/* institutions/
-	$ cp -r src/web/demo/WebContent/* researchers/
-
-The demos could be viewed locally or copied into a web server.
+	$ java -jar dataset_export-1.0.0.jar
+	$ java -jar dataset_export-1.0.0.jar
+	$ java -jar dataset_export-1.0.0.jar
 
 Documentation
 ===
