@@ -143,7 +143,7 @@ public class App {
 		// TODO Auto-generated method stub
 
 		// connect to graph database
-		RestAPI graphDb = new RestAPIFacade("http://localhost:7474/db/data/");  
+		RestAPI graphDb = new RestAPIFacade("http://localhost:7476/db/data/");  
 		RestCypherQueryEngine engine=new RestCypherQueryEngine(graphDb);  
 		
 		engine.query("CREATE CONSTRAINT ON (n:Cern_Publication) ASSERT n.doi IS UNIQUE", Collections.<String, Object> emptyMap());

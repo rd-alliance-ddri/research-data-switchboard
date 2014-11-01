@@ -134,7 +134,7 @@ public class DatasetExport extends Export {
 			mapIndex.put("legend", CompiledNode.getLegend());
 			
 			String json = mapper.writeValueAsString(mapIndex);
-			String fileName = "json/index.json";
+			String fileName = "datasets/json/index.json";
 			
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(fileName)), "utf-8"));

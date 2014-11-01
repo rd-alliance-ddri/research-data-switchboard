@@ -9,7 +9,6 @@
     <jdk.version>1.7</jdk.version>
     <class.path>jars/</class.path>
   </properties>
- 
   
   <build>
     <plugins>

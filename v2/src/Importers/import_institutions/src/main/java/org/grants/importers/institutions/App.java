@@ -19,7 +19,7 @@ package org.grants.importers.institutions;
 
 
 public class App {
-	public static final String INSTITUTIONS_SCV = "institutions.csv";
+	public static final String INSTITUTIONS_SCV = "data/institutions.csv";
 	private static final String NEO4J_URL = "http://localhost:7476/db/data/";
 
 	/**
