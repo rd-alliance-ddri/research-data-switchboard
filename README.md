@@ -1,49 +1,49 @@
 Requirements
 ===
 
-The software has been created and tests on Ubuntu 14.04.1 LTS 64-bit Linux OS. The software require this packages to be installed: 
+The software has been created and tested on Ubuntu 14.04.1 LTS 64-bit Linux OS. The software requires this packages to be installed: 
 
 Java
 ---
 
-All software are created with Java programming lanugage and requires Java SDK 1.7 to be installed on the system. To check your Java version, please execute:
+All software are created with Java programming language and requires Java SDK 1.7 to be installed on the system. To check your Java version, please execute:
 
 	$ java -version
 
-from a command line. If you Java version is too low or now java could be found, please download and install the latest Java package from 
+from a command line. If your Java version is too low or no Java could be found, please download and install the latest Java package from: 
 
 http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 
 Maven
 ---
 
-The software also require Maven 3.x to be installed on the system. To check your Maven version, please execute:
+The software also requires Maven 3.x to be installed on the system. To check your Maven version, please execute:
 
 	$ mvn -version
 
-from a command line. If your Maven version is too low or now maven could be found, please download the latest  and install Maven package from
+from a command line. If your Maven version is too low or no Maven could be found, please download and install the latest Maven package from:
 
 http://maven.apache.org/download.cgi
 
 Neo4J
 ---
 
-This software require Neo4J instance to be installed on the system. You can download it from
+This software requires multiples Neo4J instances. You can download Neo4J sources from:
 
 http://neo4j.com/download/
 
-You can found more information about Neo4J and how to install it in the Neo4J User Manual, located at: 
+You can found more information about Neo4J in the Neo4J User Manual, located at: 
 
 http://neo4j.com/docs/2.1.5/
 
 opencsv-2.3
 ---
 
-You can download this library from:
+This software requires opensv-2.3 library. You can download this library from:
 
 http://sourceforge.net/projects/opencsv/files/opencsv/2.3/opencsv-2.3-src-with-libs.tar.gz/download
 
-Please install locally as a Maven dependancy:
+Please install locally as a Maven dependency:
 
 	$ tar -xcf opencsv-2.3-src-with-libs.tar.gz
 	$ cd opencsv-2.3/deploy
@@ -53,7 +53,7 @@ Please install locally as a Maven dependancy:
 neo4j-rest-graphdb-2.0.2
 ---
 
-You can download this library from github. Please install it locally as a Maven dependancy:
+This software requires neo4j-rest-graphdb-2.0.2 library. You can download this library from GitHub. Please install it locally as a Maven dependency:
 
 	$ git clone -b 2.0-labels-and-indexes https://github.com/neo4j-contrib/java-rest-binding.git
 	$ cd java-rest-binding
@@ -68,9 +68,9 @@ To download latest sources, you can use git clone:
 
 The project structure are:
 
-	jars - backup directory for libraries, used in the project. Currently contains only opencsv-2.3.jar Library.
+	jars - backup directory for libraries, used in the project. Currently contains only opencsv-2.3.jar library.
 	v1 - V1 Package, to generate grants collapsible demo 
-	v2 - V2 Package, generate RDA, Dryad and CERN database
+	v2 - V2 Package, to generate RDA, Dryad and CERN database
 	
 V1 Package
 ===
@@ -88,12 +88,12 @@ Package Structure:
 	v1/src/Export - Software to export final graphs into JSON files
 	v1/src/Libraries - Additional libraries sources
 	v1/src/Loaders - Software to load data into Neo4J database
-	v1/src/Web - Collapseble Grants Demo web site skeleton.
+	v1/src/Web - Collapsible Grants Demo web site skeleton.
 
-Srarting fresh Neo4J instance
+Starting a fresh Neo4J instance
 ---
 
-The package will require a fresh Neo4j instance. The connection to instance will be performed via Neo4J webservice located at localhost:7474 port. To start a fresh Neo4J instance, please locate a Neo4J sources and copy it into folder v1/neo4j. If you have Neo4J archive in the same folder, please execute:
+The package will require a fresh Neo4j instance. The connection to the instance will be performed via Neo4J web service located at localhost:7474 port. To start a fresh Neo4J instance, please locate a Neo4J sources and copy it into v1/neo4j folder. If you have Neo4J archive in the same folder, please execute:
 
 	$ tar -xvf neo4j-community-2.1.5-unix.tar.gz
 	$ mkdir research-data-switchboard/v1/neo4j
@@ -102,12 +102,12 @@ The package will require a fresh Neo4j instance. The connection to instance will
 	$ ./bin/neo4j start
 	$ cd ..
 
-After that the Neo4J instance should be avaliable and you should be able to access it by the browser via http://localhost:7474/browser/
+After that the Neo4J instance should be available and you should be able to access it by the browser via http://localhost:7474/browser/
 
-Installing the libraryes 
+Installing the libraries 
 ---
 
-To install REST and ResearchData libraries, please execute (from v1 folder)
+To install REST and ResearchData libraries, please execute (from v1 folder):
 
 	$ cd src/Libraries/rest
 	$ mvn install
@@ -118,7 +118,7 @@ To install REST and ResearchData libraries, please execute (from v1 folder)
 Compiling and Running loaders
 ---
 
-There is three Loader projects, and they all need to be compiled and runned once from project folder. To do that, please execute (from a v1 folder):
+There is three Loader projects, and they all need to be compiled and run once from project folder. To do that, please execute (from v1 folder):
 
 	$ mkdir jars
 	$ cd src/Loaders/arc_loader
@@ -139,7 +139,7 @@ There is three Loader projects, and they all need to be compiled and runned once
 	$ cp target/nhmrc_loader-1.0.0.jar ../../../
 	$ cd ../../../
 
-To run the programs, please execute (fom a v1 folder):
+To run the programs, please execute (from v1 folder):
 
 	$ java -jar arc_loader-1.0.0.jar
 	$ java -jar dryad_loader-1.0.0.jar
@@ -148,9 +148,9 @@ To run the programs, please execute (fom a v1 folder):
 Compiling and running connector
 ---
 
-After data has been loaded, there are missing connections between Dryad, ARC and NHMRC data. web_researcher_connector application is used to crerate them.
+After data has been loaded, there will be missing connections between Dryad, ARC and NHMRC data. web_researcher_connector application is used to create them.
 
-To compile and run this appycation, please execute (from v1 folder):
+To compile and run this application, please execute (from v1 folder):
 
 	$ cd src/Connectors/web_researcher_connector
 	$ mvn package 
@@ -160,11 +160,12 @@ To compile and run this appycation, please execute (from v1 folder):
 
 	$ java -jar web_researcher_connector-1.0.0.jar
 
-Compiling and running exporters and create Demo sites:
+Compiling and running exporters and create Demo sites
+---
 
-To create grants collapsible demo, the data need to be exported as JSON files. The package contains four exporters, each one will generate different type of JSON file.
+To create grants collapsible demo, the data need to be exported as a set of JSON files. The package contains four exporters, each one will generate different set of JSON files.
 
-Te compile and run all exporters, please execute (from a v1 folder):
+Te compile and run all exporters, please execute (from v1 folder):
 
 	$ cd src/Export/dataset_export
 	$ mvn package
@@ -192,7 +193,7 @@ Te compile and run all exporters, please execute (from a v1 folder):
 	$ java -jar institution_export-1.0.0.jar
 	$ java -jar researcher_export-1.0.0.jar
 
-After that, you will found four new folders in the v1 folder: datasets, grats, institutions and researchers. Each one will contains json folder with data for this demo. To deploy it on the web server, you will need to copy the sceleton of the site to it. 
+After that, you will found four new folders in the v1 folder: datasets, grats, institutions and researchers. Each one will contains json folder with data for the demo. To deploy it on the web server, you will need to copy the sceleton of the site to it. 
 
 	$ cp -r src/web/demo/WebContent/* datasets/
 	$ cp -r src/web/demo/WebContent/* grants/
@@ -212,7 +213,7 @@ To stop running Neo4J instance, please execute  (from v1 folder):
 V2 Package
 ===
 
-V2 Package is designed to create Neo4J Grant database. This package will require two Neo4J instances. The first instance will be used to load row data and the second one will be used to create a clean graph and add connections between the data sources 
+V2 Package is designed to create Neo4J Grants database. This package will require two Neo4J instances. The first instance will be used to load data, as it is, and the second one will be used to create a clean graph and add connections between the data sources 
  
 Package Structure:
 ---
@@ -222,17 +223,17 @@ Package Structure:
 	v2/data - data, required for V2 
 	v2/src - V2 Package sources
 	v2/src/Compilers - Software to copy data from the first Neo4J instance to second one, adding required connections.
-	v2/src/Harvesters - Software to harvest data from OAI:PMH and JSON webservices
+	v2/src/Harvesters - Software to harvest data from OAI:PMH and JSON web services
 	v2/src/Importers - Software to import harvested data into Neo4J
 	v2/src/Libraries - Additional libraries
 	v2/src/Libraries/CrossRef - CorssRef Library
 	v2/src/Libraries/Google - Google Library
 	v2/src/Libraries/Orcid - Orcid Library
 
-Srarting fresh Neo4J instances
+Starting a fresh Neo4J instances
 ---
 
-The package will require two fresh Neo4j instances. The connection to the instances will be performed via Neo4J webservices located at localhost:7474 and localhost:7476 ports. To start a fresh Neo4J instance, please locate a Neo4J sources and copy it into folder v1/neo4j1 and v1/neo4j2. After that, copy the configuration files provided. If you have Neo4J archive in the same folder, please execute:
+The package will require two fresh Neo4j instances. The connections to the instances will be performed via Neo4J web services located at localhost:7474 and localhost:7476 ports. To start a fresh Neo4J instance, please locate a Neo4J sources and copy it into folders v1/neo4j1 and v1/neo4j2. After that, copy the configuration files provided. If you have Neo4J archive in the same folder, please execute:
 
 	$ tar -xvf neo4j-community-2.1.5-unix.tar.gz
 	$ mkdir research-data-switchboard/v2/neo4j1
@@ -249,9 +250,9 @@ The package will require two fresh Neo4j instances. The connection to the instan
 	$ cd ..
 
 
-After that the Neo4J instances should be avaliable and you should be able to access them by the browser via http://localhost:7474/browser/ and http://localhost:7476/browser/
+After that the Neo4J instances should be available and you should be able to access them by the browser via http://localhost:7474/browser/ and http://localhost:7476/browser/
 
-Installing the libraryes 
+Installing the libraries 
 ---
 
 To install required libraries, please execute (from v2 folder):
@@ -273,14 +274,14 @@ To install required libraries, please execute (from v2 folder):
 Compiling and running harvesters
 ---
 
-So far there is four harvesters provided:
+So far there are four harvesters provided:
 
 	harvester_cern - will harvest data from CERN in OAI:PMH Dublin Core and MARCXML formats.
 	harvester_dryad - will harvest data from DRYAD in OAI:PMH Mets format
 	harvester_rda - will harvest data from RDA in OAI:PMH Rif format
-	harvester_rda2 - will harvest data from RDA by usinh JSON webservice.
+	harvester_rda2 - will harvest data from RDA by using JSON web service.
 
-All harvesters can work simultainesly, and they will store data on hard disk in XML or JSON files. If any error orccurs, each OAI:PMH harvester will leave an status file on the disk. This file will be used to pick up harvesting from the point there it was terminating. After harvesting will be done, the status file will automatically be deleted. To compile and run all harvesters, please execute (from v2 folder): 
+All harvesters can work simultaneously, and they will store data on a hard disk in XML or JSON files. If any error occurs, each OAI:PMH harvester will leave an status file on the disk. This file will be used to pick up harvesting process from the point there it was terminating. After harvesting will be finished, the status file will be automatically deleted. To compile and run all harvesters, please execute (from v2 folder): 
 
 	$ cd src/Harvesters/harvester_cern/
 	$ mvn package
@@ -308,18 +309,18 @@ All harvesters can work simultainesly, and they will store data on hard disk in 
 	$ nohup java -jar harvester_rda-1.0.1.jar >/dev/null 2>&1 &
 	$ nohup java -jar harvester_rda2-1.0.0.jar >/dev/null 2>&1 &
 
-To check harvesting processes, please execute 
+To check harvesting processes, please execute:
 	
 	$ ps aux | grep harvester
 
-Each harvester will create a folder in the working directory, where data and status file will be stored. After harvesting process will be finished, you will be able to run importing process
+Each harvester will create a folder in the working directory, where data and status file will be stored. After harvesting process will be finished, you will be able to run importing process.
 
 Compiling and run importers
 ---
 
-Importers can be run in any order. The RDA and Dryad data will be imported into first Neo4J instance (localhost:7474) while CERN data will be imported straigth into second instance (localhost:7476).
+Importers can be run in any order as soon as harvesting process for that importer will be finished. The RDA and Dryad data will be imported into first Neo4J instance (localhost:7474) while CERN data will be imported straight into second instance (localhost:7476).
 
-To compile and run all importers, please execute 
+To compile and run all importers, please execute (from v2 folder):
 	
 	$ cd src/Importers/import_cern/
 	$ mvn package
@@ -359,10 +360,10 @@ To check importing processes, please execute:
 	$ ps aux | grep import
 
 
-Copy data from first instance to the second instance
+Copy data from first instance into second instance
 ---
 
-After all data has been imported, tha data, existing in the frist Neo4J instance, need to be compiled and copied into the second Neo4J instance. To do tha, please execute (from v2 folder)
+After all data has been imported, tha data, existing in frist Neo4J instance, need to be compiled and copied into second Neo4J instance. To do that, please execute (from v2 folder):
 
 	$ cd src/Comilers/compiler/
 	$ mvn package
@@ -371,7 +372,7 @@ After all data has been imported, tha data, existing in the frist Neo4J instance
 
 	$ java -jar compiler-1.0.0.jar
 
-To stop running Neo4J instances, please execute  (from v1 folder):
+To stop running Neo4J instances, please execute  (from v2 folder):
 	
 	$ cd neo4j1
 	$ ./bin/neo4j stop
