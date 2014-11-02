@@ -193,7 +193,7 @@ Te compile and run all exporters, please execute (from v1 folder):
 	$ java -jar institution_export-1.0.0.jar
 	$ java -jar researcher_export-1.0.0.jar
 
-After that, you will found four new folders in the v1 folder: datasets, grats, institutions and researchers. Each one will contains json folder with data for the demo. To deploy it on the web server, you will need to copy the sceleton of the site to it. 
+After that, you will find four new folders in the v1 folder: datasets, grats, institutions and researchers. Each one will contains json folder with data for the demo. To deploy it on the web server, you will need to copy the sceleton of the site to it. 
 
 	$ cp -r src/web/demo/WebContent/* datasets/
 	$ cp -r src/web/demo/WebContent/* grants/
