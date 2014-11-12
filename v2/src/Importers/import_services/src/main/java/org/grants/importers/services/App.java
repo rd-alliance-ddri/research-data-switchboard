@@ -7,8 +7,7 @@ package org.grants.importers.services;
  */
 public abstract class App {
 	private static final String INSTITUTIONS_SCV = "data/services.csv";
-	private static final String NEO4J_URL = "http://ec2-54-69-203-235.us-west-2.compute.amazonaws.com:7474/db/data/"; 
-	//"http://localhost:7476/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7476/db/data/";
 
 	/**
 	 * Main class function
