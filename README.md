@@ -347,14 +347,19 @@ To compile and run all importers, please execute (from v2 folder):
 	$ cp target/jars/* ../../../jars/
 	$ cp target/import_rda2-1.0.1.jar ../../../
 
+	$ cd ../import_services/
+	$ mvn package
+	$ cp target/jars/* ../../../jars/
+	$ cp target/import_services-1.0.0.jar ../../../
+
 	$ cd ../../../
 	$ nohup java -jar import_cern-1.0.0.jar >/dev/null 2>&1 &
 	$ nohup java -jar import_dryad-1.0.2.jar >/dev/null 2>&1 &
 	$ nohup java -jar import_institutions-1.0.0.jar >/dev/null 2>&1 &
 	$ nohup java -jar import_rda-1.0.3.jar >/dev/null 2>&1 &
 	$ nohup java -jar import_rda2-1.0.1.jar >/dev/null 2>&1 &
+	$ nohup java -jar import_services-1.0.1.jar >/dev/null 2>&1 &
 	
-
 To check importing processes, please execute:
 	
 	$ ps aux | grep import
