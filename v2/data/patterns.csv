@@ -16,7 +16,7 @@ imperial.ac.uk,^http://www\.imperial\.ac\.uk/people/[a-z.]+$
 jcu.edu.au,^https://research\.jcu\.edu\.au/portfolio/[a-z.]+/$
 manchester.ac.uk,^http://www\.manchester\.ac\.uk/research/[a-z.]+/publications$
 monash.edu.au,^http://www\.monash\.edu\.au/research/people/profiles/profile.html?sid=[0-9]+&pid=[0-9]+$
-sydney.edu.au,^http://sydney\.edu\.au/vetscience/about/staff/profiles/[v-z.]+\.php$
+sydney.edu.au,^http://sydney\.edu\.au/vetscience/about/staff/profiles/[a-z.]+\.php$
 sydney.edu.au,^http://sydney\.edu\.au/science/people/[a-z.]+\.php$
 ubc.ca,^http://profiles\.forestry\.ubc\.ca/person/[a-z-]+/$
 unimelb.edu.au,^http://www\.findanexpert\.unimelb\.edu\.au/display/person[0-9]+$
