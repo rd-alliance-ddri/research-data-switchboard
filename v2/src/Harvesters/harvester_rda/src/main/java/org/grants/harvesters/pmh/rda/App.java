@@ -39,7 +39,7 @@ public class App {
 			}
 			
 			// harvest data
-			harvester.harvest(MetadataPrefix.rif);
+			harvester.harvestSimple(MetadataPrefix.rif);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

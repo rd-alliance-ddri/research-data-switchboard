@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.importers</groupId>
   <artifactId>import_rif</artifactId>
-  <version>1.0.4</version>
+  <version>2.0.1</version>
   <name>OAI-PMH RIF format importer</name>
   
    <properties>

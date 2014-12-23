@@ -130,10 +130,9 @@ public class Importer {
 					map.put(PROPERTY_NODE_SOURCE, LABEL_WEB);
 					map.put(PROPERTY_NODE_TYPE, LABEL_PATTERN);
 					map.put(PROPERTY_PATTERN, pat);
-					map.put(PROPERTY_URL, url);
 					map.put(PROPERTY_HOST, host);
 					
-					RestNode nodePattern = graphDb.getOrCreateNode(indexWebPattern, PROPERTY_KEY, url, map);
+					RestNode nodePattern = graphDb.getOrCreateNode(indexWebPattern, PROPERTY_KEY, key, map);
 					if (!nodePattern.hasLabel(labelPattern))
 						nodePattern.addLabel(labelPattern); 
 					if (!nodePattern.hasLabel(labelWeb))
@@ -141,8 +140,10 @@ public class Importer {
 					
 					Map<String, Object> pars = new HashMap<String, Object>();
 					pars.put("host", host);
-										
-					QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_WEB + ":" + LABEL_WEB_INSTITUTION + ") WHERE n.host={host} RETURN n", pars);
+						
+			
+					
+					QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_WEB + ":" + LABEL_INSTITUTION + ") WHERE n.host={host} RETURN n", pars);
 					for (Map<String, Object> row : articles) {
 						RestNode institutionNode = (RestNode) row.get("n");
 						if (null != institutionNode) {

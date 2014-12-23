@@ -28,7 +28,10 @@ import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.QueryResult;
+import org.openarchives.oai._2.GetRecordType;
 import org.openarchives.oai._2.HeaderType;
+import org.openarchives.oai._2.ListRecordsType;
+import org.openarchives.oai._2.OAIPMHtype;
 import org.openarchives.oai._2.RecordType;
 import org.openarchives.oai._2.StatusType;
 
@@ -145,7 +148,7 @@ public class Importer {
 	/**
 	 * Function to import all records.
 	 */
-	public void importRecords() {
+	public void importSets() {
 		deletedRecords = 0;
 		brokenRecords = 0;
 		createdRecords = 0;
@@ -157,7 +160,7 @@ public class Importer {
 				File[] files = folder.listFiles();
 				for (File file : files)  
 					if (!file.isDirectory()) 				
-						importRecord(file);
+						importRecords(file);
 			}
 		
 		for (RelatedObject relatedObject : relatedObjects) {
@@ -199,65 +202,69 @@ public class Importer {
 		System.out.println("Done. Created " + createdRecords + " records and " + createdRelationships + " relationships. Detected " + deletedRecords + " deleted and " + brokenRecords + " broken records.");
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void importRecord(File fileXml) {
+	private void importRecords(File fileXml) {
 		try {
 			JAXBElement<?> element = (JAXBElement<?>) unmarshaller.unmarshal( new FileInputStream( fileXml ) );
 			
-			RecordType record = (RecordType) element.getValue();	
-			HeaderType header = record.getHeader();
-			
-			StatusType status = header.getStatus();
-			if (status == StatusType.DELETED) {
-				++deletedRecords;
-				return;
-			}
-			
-			String idetifier = header.getIdentifier();
-			System.out.println("Record: " + idetifier.toString());
-		//	String datestamp = header.getDatestamp();
-//			System.out.println(datestamp.toString());
-//			List<String> specs = header.getSetSpec();
-						
-			if (null != record.getMetadata()) {
-				Object metadata = record.getMetadata().getAny();
-				if (metadata instanceof RegistryObjects) {
-					RegistryObjects registryObjects = (RegistryObjects) metadata;
-					if (registryObjects.getRegistryObject() != null && registryObjects.getRegistryObject().size() > 0) {
-						for (RegistryObjects.RegistryObject registryObject : registryObjects.getRegistryObject()) {
-							String key = registryObject.getKey();
-							
-							if (registryObject.getCollection() != null) 
-								importCollection(idetifier, key, registryObject.getCollection());
-							else if (registryObject.getActivity() != null)
-								importActivity(idetifier, key, registryObject.getActivity());
-							else if (registryObject.getService() != null) 
-								importService(idetifier, key, registryObject.getService());
-							else if (registryObject.getParty() != null) 
-								importParty(idetifier, key, registryObject.getParty());
-							else
-								System.out.println("The record is empty!");
-							
-							++createdRecords;
-
-						}
-						
-						// at this point all registry objects should be imported, abort the function
-						return;
+			OAIPMHtype root = (OAIPMHtype) element.getValue();
+			ListRecordsType records = root.getListRecords();
+			if (null != records &&  null != records.getRecord()) {
+				for (RecordType record : records.getRecord()) {
+					HeaderType header = record.getHeader();
+					
+					StatusType status = header.getStatus();
+					if (status == StatusType.DELETED) {
+						++deletedRecords;
+						continue;
+					}
+					
+					String idetifier = header.getIdentifier();
+					System.out.println("Record: " + idetifier.toString());
+				//	String datestamp = header.getDatestamp();
+		//			System.out.println(datestamp.toString());
+		//			List<String> specs = header.getSetSpec();
+								
+					if (null != record.getMetadata()) {
+						Object metadata = record.getMetadata().getAny();
+						if (metadata instanceof RegistryObjects) {
+							RegistryObjects registryObjects = (RegistryObjects) metadata;
+							if (registryObjects.getRegistryObject() != null && registryObjects.getRegistryObject().size() > 0) {
+								for (RegistryObjects.RegistryObject registryObject : registryObjects.getRegistryObject()) {
+									String key = registryObject.getKey();
+									
+									if (registryObject.getCollection() != null) 
+										importCollection(idetifier, key, registryObject.getCollection());
+									else if (registryObject.getActivity() != null)
+										importActivity(idetifier, key, registryObject.getActivity());
+									else if (registryObject.getService() != null) 
+										importService(idetifier, key, registryObject.getService());
+									else if (registryObject.getParty() != null) 
+										importParty(idetifier, key, registryObject.getParty());
+									else
+										System.out.println("The record is empty!");
+									
+									++createdRecords;
+		
+								}
+								
+								// at this point all registry objects should be imported, abort the function
+								continue;
+							} else
+								System.out.println("Metadata does not contains any records");
+						} else
+							System.out.println("Metadata is not in rif format");
 					} else
-						System.out.println("Metadata does not contains any records");
-				} else
-					System.out.println("Metadata is not in rif format");
+						System.out.println("Unable to find metadata");
+					
+					++brokenRecords;
+				}
 			} else
-				System.out.println("Unable to find metadata");
-			
+				System.out.println("Unable to find records");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
 			e.printStackTrace();
-		}
-		
-		++brokenRecords;
+		}		
 	}
 	
 	private void importCollection(final String idetifier, final String key, Collection collection) {

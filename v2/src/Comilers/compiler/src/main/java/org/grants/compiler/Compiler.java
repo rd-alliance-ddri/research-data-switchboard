@@ -186,6 +186,8 @@ public class Compiler {
 		createConstraint(Labels.RDA, Labels.Service);
 		createConstraint(Labels.RDA, Labels.AdministrativePosition);
 		
+		engine2.query("CREATE INDEX ON :RDA(key)", Collections.<String, Object> emptyMap());
+		
 		// get indexes
 	/*	indexDryadPublication = graphDb2.index().forNodes(LABEL_DRYAD_PUBLICATION);
 		indexDryadDataset = graphDb2.index().forNodes(LABEL_DRYAD_DATASET);
