@@ -96,7 +96,7 @@ public class Harvester {
 	
 	@SuppressWarnings("unchecked")
 	public void harvestGrants() {
-		QueryResult<Map<String, Object>> nodes = engine.query("MATCH (n:RDA:Grant) RETURN ID(n) AS id, n.key AS key, n.name_primary AS primary, n.name_alternative AS alternative", null);
+		QueryResult<Map<String, Object>> nodes = engine.query("MATCH (n:RDA:Grant) WHERE has (n.identifier_purl) RETURN ID(n) AS id, n.key AS key, n.name_primary AS primary, n.name_alternative AS alternative", null);
 		for (Map<String, Object> row : nodes) {
 			int nodeId = (int) row.get("id");
 			String nodeKey = (String) row.get("key");
@@ -119,6 +119,8 @@ public class Harvester {
 					nameAlternative = ((List<String>)alternative).get(0);
 			}			
 			
+			
+			// queryCache for cache search
 			
 			if (null != namePrimary && !namePrimary.isEmpty()) {
 				QueryResponse response = query.query(nameGrant = namePrimary);

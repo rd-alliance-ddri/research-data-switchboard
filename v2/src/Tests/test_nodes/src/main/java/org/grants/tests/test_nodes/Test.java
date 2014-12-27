@@ -77,6 +77,7 @@ public class Test {
 			
 			String[] lines;
 			boolean header = false;
+			boolean failed = false;
 			while ((lines = reader.readNext()) != null) 
 			{
 				if (!header)
@@ -99,11 +100,13 @@ public class Test {
 					if (0 == nodesCnt) {
 						log ("Unable to find any Start node, the test is FAILED");
 						
-						return;
+						failed = true;
+						break;
 					} else if (nodesCnt > 1) {
 						log ("Too many Start nodes has been found by this request, the test is FAILED");
 						
-						return;
+						failed = true;
+						break;
 					}
 					
 					nodeStart = nodes.get(0);
@@ -123,7 +126,8 @@ public class Test {
 				log ("Unable to find any End node, the test is FAILED");
 				
 				return;
-			}
+			} else if (failed)
+				return;
 			
 			++nodesTested;
 			

@@ -13,8 +13,9 @@ public class Publication implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7269541738423606147L;
+	private static final long serialVersionUID = 1582106469908751156L;
 	private int nodeId;
+	private String nodeKey;
 	private String title;
 	private String self;
 	private Set<String> links = new HashSet<String>();
@@ -22,8 +23,9 @@ public class Publication implements Serializable {
 	public Publication() {		
 	}	
 	
-	public Publication(int nodeId, final String title, final String link) {
+	public Publication(int nodeId, final String nodeKey, final String title, final String link) {
 		this.nodeId = nodeId;
+		this.nodeKey = nodeKey;
 		this.title = title;
 		links.add(link);
 	}
@@ -58,6 +60,15 @@ public class Publication implements Serializable {
 	public void setNodeId(int nodeId) {
 		this.nodeId = nodeId;
 	}
+	
+	public String getNodeKey() {
+		return nodeKey;
+	}
+
+	@XmlElement
+	public void setNodeKey(final String nodeKey) {
+		this.nodeKey = nodeKey;
+	}
 
 	public String getSelf() {
 		return self;
@@ -69,7 +80,7 @@ public class Publication implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Grant [nodeId=" + nodeId + ", title=" + title + ", self=" + self
+		return "Grant [nodeId=" + nodeId + ", nodeKey=" + nodeKey + ", title=" + title + ", self=" + self
 				+ ", links=" + links + "]";
 	}
 }

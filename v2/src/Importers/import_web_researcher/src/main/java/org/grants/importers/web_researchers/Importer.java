@@ -29,6 +29,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -37,6 +38,9 @@ import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.QueryResult;
 
 public class Importer {
+	private static final String FOLDER_PUBLICATIONS = "publications";
+	private static final String FOLDER_GRANTS = "grants";
+	
 	private static final String LABEL_PUBLICATION = "Publication";
 	private static final String LABEL_RESEARCHER = "Researcher";
 	private static final String LABEL_PATTERN = "Pattern";
@@ -64,9 +68,6 @@ public class Importer {
 	
 	private static final String PART_DATA_FROM = "Data from: ";
 	
-	
-	private final String dataFolder;
-	
 	private RestAPI graphDb;
 	private RestCypherQueryEngine engine;
 	
@@ -78,10 +79,8 @@ public class Importer {
 	private RelationshipType relRelatedTo = DynamicRelationshipType.withName(RELATIONSHIP_RELATED_TO);
 	
 	private List<Pattern> webPatterns = new ArrayList<Pattern>();
-	private List<RdaGrant> rdaGrants = new ArrayList<RdaGrant>();
-	private List<DryadPublication> dryadPublications = new ArrayList<DryadPublication>();
-	
-	private Map<String, Integer> grantCounter = new HashMap<String, Integer>();
+	private Map<String, LinkingNode> rdaGrants = new HashMap<String, LinkingNode>();
+	private Map<String, DryadPublication> dryadPublications = new HashMap<String, DryadPublication>();
 	
 	private JAXBContext jaxbContext;
 	private Unmarshaller jaxbUnmarshaller;
@@ -95,20 +94,19 @@ public class Importer {
 	 * @param neo4jUrl An URL to the Neo4J
 	 * @throws JAXBException 
 	 */
-	public Importer(final String neo4jUrl, final String dataFolder) throws JAXBException {
-		this.dataFolder = dataFolder;
-		
+	public Importer(final String neo4jUrl) throws JAXBException {
 		graphDb = new RestAPIFacade(neo4jUrl);
 		engine = new RestCypherQueryEngine(graphDb);  
 		
 		engine.query("CREATE CONSTRAINT ON (n:" + LABEL_WEB_RESEARCHER + ") ASSERT n." + PROPERTY_KEY + " IS UNIQUE", Collections.<String, Object> emptyMap());
 		indexWebResearcher = graphDb.index().forNodes(LABEL_WEB_RESEARCHER);
 				
-		jaxbContext = JAXBContext.newInstance(Publication.class, Page.class);
+		jaxbContext = JAXBContext.newInstance(Publication.class, Grant.class, Page.class);
 		jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		
+		// Do not need to setup query engine, the data must came only from cache at this stage
 		googleQuery = new Query(null, null); 
-		googleQuery.setJsonFolder(dataFolder + "/json");
+		//googleQuery.setJsonFolder(dataFolder + "/json");
 		
 		try {
 			logger = new PrintWriter("import_web_researcher.log", "UTF-8");
@@ -129,7 +127,10 @@ public class Importer {
 		loadDryadPublications();
 		loadRdaGrants();
 
-		processPages();
+		/*processPages();*/
+		
+	//	processPublications();
+		processGrants();
 	}
 	
 	private boolean isLinkFollowAPattern(String link) {
@@ -168,7 +169,11 @@ public class Importer {
 				if (title.contains(PART_DATA_FROM))
 					title = title.substring(PART_DATA_FROM.length());
 				
-				dryadPublications.add(new DryadPublication(title, nodeId));			
+				if (dryadPublications.containsKey(title)) {
+					log ("Found duplicated page name: " + title);
+					dryadPublications.get(title).incCounter();
+				} else
+					dryadPublications.put(title, new DryadPublication(nodeId, title));			
 			}
 		}
 	}
@@ -176,26 +181,32 @@ public class Importer {
 	private void loadRdaGrants() {
 		log ("loaging RDA:Grant's");
 		
-		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_RDA + ":" + LABEL_GRANT + ") RETURN id(n) AS id, n.name_primary AS name", null);
+		// We only interesting in Grants, that has PURL
+		
+		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_RDA + ":" + LABEL_GRANT + ") WHERE has (n.identifier_purl) RETURN id(n) AS id, n.name_primary AS primary, n.name_alternative AS alternative", null);
 		for (Map<String, Object> row : articles) {
 			long nodeId = (long) (Integer) row.get("id");
-			String name = (String) row.get("name");
-			if (null != name) {
-				RdaGrant rdaGrant = new RdaGrant(name, nodeId);
-				
-				Integer counter = grantCounter.get(rdaGrant.getTitleLoverCase());
-				if (counter == null)
-					grantCounter.put(rdaGrant.getTitleLoverCase(), 0);
-				else
-					grantCounter.put(rdaGrant.getTitleLoverCase(), counter + 1);
-				
-				rdaGrants.add(rdaGrant);
+			String primary = (String) row.get("primary");
+			String alternative = (String) row.get("alternative");
+			if (null != primary) {				
+				if (rdaGrants.containsKey(primary)) {
+					log ("Found duplicated grant name: " + primary);
+					rdaGrants.get(primary).incCounter();
+				} else
+					rdaGrants.put(primary, new LinkingNode(nodeId, primary));	
+			}
+			if (null != alternative && !alternative.equals(primary)) {
+				if (rdaGrants.containsKey(alternative)) {
+					log ("Found duplicated grant name: " + alternative);
+					rdaGrants.get(alternative).incCounter();
+				} else
+					rdaGrants.put(alternative, new LinkingNode(nodeId, alternative));	
 			}
 		}
 	}
 	
-	private String getAuthor(String link, String publication) {
-		QueryResponse response = googleQuery.queryCache(publication);
+	private String getAuthor(String link, String searchString) {
+		QueryResponse response = googleQuery.queryCache(searchString);
 		
 		String author = null;
 		
@@ -238,6 +249,98 @@ public class Importer {
 		return author;
 	}
 	
+	private void processPublications() {
+		log ("Processing cached publications");
+		
+		googleQuery.setJsonFolder(FOLDER_PUBLICATIONS + "/json");
+		
+		String path = FOLDER_PUBLICATIONS + "/cache/publication/";
+		
+		File[] files = new File(path).listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					Publication publication = (Publication) jaxbUnmarshaller.unmarshal(file);
+					if (publication != null) {
+						DryadPublication dryadPublication = dryadPublications.get(publication.getTitle());
+						if (null != dryadPublication && dryadPublication.isUnique()) 
+							for (String link : publication.getLinks()) 
+								if (isLinkFollowAPattern(link)) {
+									log ("Found matching URL: " + link);
+									
+									RestNode nodeResearcher = getOrCreateWebResearcher(link, publication.getTitle());
+									RestNode nodePublication = graphDb.getNodeById(dryadPublication.getNodeId());
+									
+									createUniqueRelationship(graphDb, nodePublication, nodeResearcher, 
+											relRelatedTo, Direction.OUTGOING, null);								
+								}
+					}							
+				} catch (JAXBException e) {
+					e.printStackTrace();
+				}
+		
+	}	
+	
+	private void processGrants() {
+		log ("Processing cached grants");
+		
+		googleQuery.setJsonFolder(FOLDER_GRANTS + "/json");
+		
+		String path = FOLDER_GRANTS + "/cache/grant/";
+		
+		File[] files = new File(path).listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					Grant grant = (Grant) jaxbUnmarshaller.unmarshal(file);
+					if (grant != null) {
+						LinkingNode rdaGrant = rdaGrants.get(grant.getName());
+						if (null != rdaGrant && rdaGrant.isUnique()) 
+							for (String link : grant.getLinks()) 
+								if (isLinkFollowAPattern(link)) {
+									log ("Found matching URL: " + link);
+									
+									RestNode nodeResearcher = getOrCreateWebResearcher(link, grant.getName());
+									RestNode nodeGrant = graphDb.getNodeById(rdaGrant.getNodeId());
+									
+									createUniqueRelationship(graphDb, nodeGrant, nodeResearcher, 
+											relRelatedTo, Direction.OUTGOING, null);								
+								}
+					}							
+				} catch (JAXBException e) {
+					e.printStackTrace();
+				}
+		
+	}	
+	
+	private RestNode getOrCreateWebResearcher(String link, String searchString) {
+		IndexHits<Node> hits = indexWebResearcher.get(PROPERTY_KEY, link);
+		if (null != hits && hits.hasNext())
+			return (RestNode) hits.getSingle();
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(PROPERTY_KEY, link);
+		map.put(PROPERTY_NODE_SOURCE, LABEL_WEB);
+		map.put(PROPERTY_NODE_TYPE, LABEL_RESEARCHER);
+		map.put(PROPERTY_URL, link);
+		
+		String author = getAuthor(link, searchString);
+		if (null != author)
+			map.put(PROPERTY_NAME, author);
+		
+		RestNode node = graphDb.createNode(map);
+		
+		if (!node.hasLabel(labelResearcher))
+			node.addLabel(labelResearcher); 
+		if (!node.hasLabel(labelWeb))
+			node.addLabel(labelWeb);	
+	
+		indexWebResearcher.add(node, PROPERTY_KEY, link);	
+			
+		return node;
+	}
+	
+	/*
 	private void processPages() {
 		log ("Processing cached pages");
 		
@@ -259,12 +362,19 @@ public class Importer {
 								author = getAuthor(page.getLink(), publications.iterator().next());
 							
 							processPage(page.getLink(), page.getCache(), author, publications);
+							
+							RestNode nodePublication = graphDb.getNodeById(publication.getNodeId());
+							
+							createUniqueRelationship(graphDb, nodePublication, nodeResearcher, 
+									relRelatedTo, Direction.OUTGOING, null);
 						}
 					}							
 				} catch (JAXBException e) {
 					e.printStackTrace();
 				}
 	}
+	
+
 	
 	private void processPage(String link, String cache, String author, Set<String> publications) {
 		log ("Creating Web:Researcher: url=" + link + ", author=" + link);
@@ -314,8 +424,10 @@ public class Importer {
 			}
 		}
 	}
+
+	*/
 	
-	private static void createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
+	private void createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
 			RelationshipType type, Direction direction, Map<String, Object> data) {
 
 		// get all node relationships. They should be empty for a new node

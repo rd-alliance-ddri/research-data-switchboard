@@ -17,6 +17,7 @@ public class Page implements Serializable {
 	private String cache;
 	private String self;
 	private Set<String> data = new HashSet<String>(); 
+	//private Map<String, Object> metadata;
 	
 	public Page() {		
 	}
@@ -25,6 +26,7 @@ public class Page implements Serializable {
 		this.link = link;
 		this.cache = cache;
 		this.data.add(data);
+		/*this.metadata = metadata;*/
 	}
 	
 	public String getLink() {
@@ -65,10 +67,19 @@ public class Page implements Serializable {
 	public void setSelf(String self) {
 		this.self = self;
 	}
+	
+	/*
+	public Map<String, Object> getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(Map<String, Object> metadata) {
+		this.metadata = metadata;
+	}*/
 
 	@Override
 	public String toString() {
 		return "Page [link=" + link + ", cache=" + cache + ", self=" + self
-				+ ", data=" + data + "]";
+				+ ", data=" + data + /*", metadata=" + metadata +*/ "]";
 	}
 }

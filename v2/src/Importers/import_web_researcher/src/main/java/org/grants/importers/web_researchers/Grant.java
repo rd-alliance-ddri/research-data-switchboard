@@ -1,4 +1,4 @@
-package org.grants.harvesters.publications;
+package org.grants.importers.web_researchers;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,35 +8,34 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class Publication implements Serializable {
-	
+public class Grant implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1582106469908751156L;
+	private static final long serialVersionUID = 8189673735254750595L;
 	private int nodeId;
 	private String nodeKey;
-	private String title;
+	private String name;
 	private String self;
 	private Set<String> links = new HashSet<String>();
 	
-	public Publication() {		
+	public Grant() {		
 	}	
 	
-	public Publication(int nodeId, final String nodeKey, final String title, final String link) {
+	public Grant(int nodeId, final String nodeKey, final String name, final String link) {
 		this.nodeId = nodeId;
 		this.nodeKey = nodeKey;
-		this.title = title;
+		this.name = name;
 		links.add(link);
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 	
 	@XmlElement
-	public void setTitle(final String title) {
-		this.title = title;
+	public void setName(final String name) {
+		this.name = name;
 	}
 	
 	public Set<String> getLinks() {
@@ -60,11 +59,11 @@ public class Publication implements Serializable {
 	public void setNodeId(int nodeId) {
 		this.nodeId = nodeId;
 	}
-	
+
 	public String getNodeKey() {
 		return nodeKey;
 	}
-
+	
 	@XmlElement
 	public void setNodeKey(final String nodeKey) {
 		this.nodeKey = nodeKey;
@@ -80,7 +79,7 @@ public class Publication implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Grant [nodeId=" + nodeId + ", nodeKey=" + nodeKey + ", title=" + title + ", self=" + self
+		return "Grant [nodeId=" + nodeId + ", nodeKey=" + nodeKey + ", name=" + name + ", self=" + self
 				+ ", links=" + links + "]";
 	}
 }

@@ -14,16 +14,12 @@ public class App {
 	 * If missing, the default parameters will be used.
 	 */
 	public static void main(String[] args) {
-		String dataFolder = DATA_FOLDER;
-		if (args.length > 0 && null != args[0] && !args[0].isEmpty())
-			dataFolder = args[0];
-		
 		String neo4jUrl = NEO4J_URL;
-		if (args.length > 1 && null != args[1] && !args[1].isEmpty())
-			neo4jUrl = args[1];
+		if (args.length > 0 && null != args[0] && !args[0].isEmpty())
+			neo4jUrl = args[0];
 		
 		try {
-			Importer importer = new Importer(neo4jUrl, dataFolder);
+			Importer importer = new Importer(neo4jUrl);
 			importer.process();
 		} catch (JAXBException e) {
 			e.printStackTrace();
