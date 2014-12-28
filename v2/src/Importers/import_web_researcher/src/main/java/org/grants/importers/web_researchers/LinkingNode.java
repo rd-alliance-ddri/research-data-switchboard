@@ -4,14 +4,16 @@ import java.util.regex.Pattern;
 
 public class LinkingNode {
 	private final String title;
+	private final String type;
 	private final String titleLowerCase;
 	private final Pattern pattern;
 	private final long nodeId;
 	private int counter;
 	
-	public LinkingNode(long nodeId, String title) {
+	public LinkingNode(long nodeId, String title, String type) {
 		this.nodeId = nodeId;
 		this.title = title;
+		this.type = type;
 		
 		titleLowerCase = title.toLowerCase();
 		pattern = Pattern.compile(titleLowerCase.replaceAll("[^a-z0-9]", "."));
@@ -30,6 +32,9 @@ public class LinkingNode {
 		return title;
 	}
 	
+	public String getType() {
+		return type;
+	}
 	public String getTitleLowerCase() {
 		return titleLowerCase;
 	}	
@@ -44,7 +49,9 @@ public class LinkingNode {
 	
 	@Override
 	public String toString() {
-		return "RDA:Grant [title=" + title + ", pattern=" + pattern + ", nodeId="
-				+ nodeId + "]";
+		return "RDA:Grant [type=" + type 
+				+ ", title=" + title 
+				+ ", pattern=" + pattern 
+				+ ", nodeId=" + nodeId + "]";
 	}	
 }

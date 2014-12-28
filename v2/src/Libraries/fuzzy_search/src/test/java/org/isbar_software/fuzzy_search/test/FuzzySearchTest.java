@@ -33,6 +33,8 @@ public class FuzzySearchTest {
 			assertEquals("Substitution", FuzzySearch.find("Helol World", DATA, 1), 3);
 			assertEquals("Substitution 2", FuzzySearch.find("Heoll World", DATA, 2), 3);
 			assertEquals("Invalid string", FuzzySearch.find("Heoll World", DATA, 1), -1);
+			assertEquals("Begin search", FuzzySearch.find("11   Hello World", DATA, 2), 0);
+			assertEquals("End search", FuzzySearch.find("Hellx World ...", DATA, 3), 16);
 		} catch (FuzzySearchException e) {
 			e.printStackTrace();
 			fail("Exception");

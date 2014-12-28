@@ -76,6 +76,12 @@
       <artifactId>google_query</artifactId>
       <version>1.0.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.isbar_software</groupId>
+      <artifactId>fuzzy_search</artifactId>
+      <version>1.0.0</version>
+    </dependency>    
+    
   </dependencies>
   
 </project>

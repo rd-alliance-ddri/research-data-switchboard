@@ -19,9 +19,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.grants.google.cse.Item;
 import org.grants.google.cse.Query;
 import org.grants.google.cse.QueryResponse;
+import org.isbar_software.fuzzy_search.FuzzySearch;
+import org.isbar_software.fuzzy_search.FuzzySearchException;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -40,6 +43,10 @@ import org.neo4j.rest.graphdb.util.QueryResult;
 public class Importer {
 	private static final String FOLDER_PUBLICATIONS = "publications";
 	private static final String FOLDER_GRANTS = "grants";
+	
+	private static final int MIN_TITLE_LENGTH = 10;
+	private static final int MIN_DISTANCE = 1;
+	private static final double TITLE_DISTANCE = 0.05;
 	
 	private static final String LABEL_PUBLICATION = "Publication";
 	private static final String LABEL_RESEARCHER = "Researcher";
@@ -68,6 +75,11 @@ public class Importer {
 	
 	private static final String PART_DATA_FROM = "Data from: ";
 	
+	private static final String TYPE_TITLE = "title";
+	private static final String TYPE_SIMPLEFIED = "simplfied";
+	private static final String TYPE_SCIENTIFIC = "scientific";
+	private static final String TYPE_SIMPLIFIED = null;
+	
 	private RestAPI graphDb;
 	private RestCypherQueryEngine engine;
 	
@@ -80,7 +92,8 @@ public class Importer {
 	
 	private List<Pattern> webPatterns = new ArrayList<Pattern>();
 	private Map<String, LinkingNode> rdaGrants = new HashMap<String, LinkingNode>();
-	private Map<String, DryadPublication> dryadPublications = new HashMap<String, DryadPublication>();
+	private Map<String, LinkingNode> dryadPublications = new HashMap<String, LinkingNode>();
+	private Map<String, Page> pages = new HashMap<String, Page>();
 	
 	private JAXBContext jaxbContext;
 	private Unmarshaller jaxbUnmarshaller;
@@ -126,11 +139,13 @@ public class Importer {
 		loadWebPatterns();
 		loadDryadPublications();
 		loadRdaGrants();
-
-		/*processPages();*/
 		
 	//	processPublications();
-		processGrants();
+	//	processGrants();
+		
+		loadPublicationsPages();
+		loadGrantsPages();
+		processPages();
 	}
 	
 	private boolean isLinkFollowAPattern(String link) {
@@ -138,6 +153,11 @@ public class Importer {
 			if (pattern.matcher(link).find())
 				return true;
 		return false;
+	}
+	
+	private int getDistance(int length) {
+		int distance = (int) ((double) length * TITLE_DISTANCE + 0.5);
+		return distance < MIN_DISTANCE ? MIN_DISTANCE : distance;			
 	}
 	
 	/*
@@ -173,7 +193,7 @@ public class Importer {
 					log ("Found duplicated page name: " + title);
 					dryadPublications.get(title).incCounter();
 				} else
-					dryadPublications.put(title, new DryadPublication(nodeId, title));			
+					dryadPublications.put(title, new LinkingNode(nodeId, title, TYPE_TITLE));			
 			}
 		}
 	}
@@ -193,14 +213,14 @@ public class Importer {
 					log ("Found duplicated grant name: " + primary);
 					rdaGrants.get(primary).incCounter();
 				} else
-					rdaGrants.put(primary, new LinkingNode(nodeId, primary));	
+					rdaGrants.put(primary, new LinkingNode(nodeId, primary, TYPE_SIMPLIFIED));	
 			}
 			if (null != alternative && !alternative.equals(primary)) {
 				if (rdaGrants.containsKey(alternative)) {
 					log ("Found duplicated grant name: " + alternative);
 					rdaGrants.get(alternative).incCounter();
 				} else
-					rdaGrants.put(alternative, new LinkingNode(nodeId, alternative));	
+					rdaGrants.put(alternative, new LinkingNode(nodeId, alternative, TYPE_SCIENTIFIC));	
 			}
 		}
 	}
@@ -262,7 +282,7 @@ public class Importer {
 				try {
 					Publication publication = (Publication) jaxbUnmarshaller.unmarshal(file);
 					if (publication != null) {
-						DryadPublication dryadPublication = dryadPublications.get(publication.getTitle());
+						LinkingNode dryadPublication = dryadPublications.get(publication.getTitle());
 						if (null != dryadPublication && dryadPublication.isUnique()) 
 							for (String link : publication.getLinks()) 
 								if (isLinkFollowAPattern(link)) {
@@ -313,10 +333,126 @@ public class Importer {
 		
 	}	
 	
-	private RestNode getOrCreateWebResearcher(String link, String searchString) {
+	private void loadPublicationsPages() {
+		log ("Loading cached publication pages");
+		
+		//googleQuery.setJsonFolder(FOLDER_PUBLICATIONS + "/json");
+		
+		String path = FOLDER_PUBLICATIONS + "/cache/page/";
+		
+		File[] files = new File(path).listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					Page page = (Page) jaxbUnmarshaller.unmarshal(file);
+					if (page != null && isLinkFollowAPattern(page.getLink()))
+						pages.put(page.getLink(), page);
+				} catch (JAXBException e) {
+					e.printStackTrace();
+				}
+	}
+	
+	private void loadGrantsPages() {
+		log ("Loading cached grants pages");
+		
+	//	googleQuery.setJsonFolder(FOLDER_GRANTS + "/json");
+		
+		String path = FOLDER_GRANTS + "/cache/page/";
+		
+		File[] files = new File(path).listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					Page page = (Page) jaxbUnmarshaller.unmarshal(file);
+					if (page != null && isLinkFollowAPattern(page.getLink()))
+						pages.put(page.getLink(), page);
+				} catch (JAXBException e) {
+					e.printStackTrace();
+				}
+	}
+		
+	private void processPages() {
+		log ("Processing cached pages");
+		
+		for (Page page : pages.values()) {
+			log ("Processing URL: " + page.getLink());
+			File cacheFile = new File(page.getCache());
+			if (cacheFile.exists() && !cacheFile.isDirectory()) {
+				try {
+					// Load the data
+					String cacheData = FileUtils.readFileToString(cacheFile);
+					// unescape HTML codes
+					cacheData = StringEscapeUtils.unescapeHtml(cacheData)
+									.toLowerCase()				// convert to lower case
+									.replaceAll("\u00A0", " "); // replace all long spaces with simple space
+					
+					// convert to char array to save time
+					final char[] data = FuzzySearch.stringToCharArray(cacheData);
+					
+					// enumerate all publications
+					for (LinkingNode dryadPublication : dryadPublications.values()) 
+						if (dryadPublication.isUnique()) {
+							String title = dryadPublication.getTitle();
+							if (title.length() > MIN_TITLE_LENGTH) {
+								if (FuzzySearch.find(
+										FuzzySearch.stringToCharArray(title), 
+											data, 
+											getDistance(title.length())) >= 0) {
+									
+									log ("Found matching Publication: " + title);
+								
+									RestNode nodeResearcher = findWebResearcher(page.getLink());
+									if (null != nodeResearcher) {
+										RestNode nodePublicaton = graphDb.getNodeById(dryadPublication.getNodeId());
+										
+										createUniqueRelationship(graphDb, nodePublicaton, nodeResearcher, 
+												relRelatedTo, Direction.OUTGOING, null);
+									}
+								}
+							}
+					}	
+					
+					// enumerate all grans
+					for (LinkingNode rdaGrant : rdaGrants.values()) 
+						if (rdaGrant.isUnique()) {
+							String title = rdaGrant.getTitle();
+							if (title.length() > MIN_TITLE_LENGTH) {
+								if (FuzzySearch.find(
+										FuzzySearch.stringToCharArray(title), 
+											data, 
+											getDistance(title.length())) >= 0) {
+									
+									log ("Found matching Grant: " + title);
+								
+									RestNode nodeResearcher = findWebResearcher(page.getLink());
+									if (null != nodeResearcher) {
+										RestNode nodeGrant = graphDb.getNodeById(rdaGrant.getNodeId());
+										
+										createUniqueRelationship(graphDb, nodeGrant, nodeResearcher, 
+												relRelatedTo, Direction.OUTGOING, null);
+									}
+								}
+							}
+					}	
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+			}
+		}
+	}
+	
+	private RestNode findWebResearcher(String link) {
 		IndexHits<Node> hits = indexWebResearcher.get(PROPERTY_KEY, link);
 		if (null != hits && hits.hasNext())
 			return (RestNode) hits.getSingle();
+		
+		return null;
+	}
+	
+	private RestNode getOrCreateWebResearcher(String link, String searchString) {
+		RestNode node = findWebResearcher(link);
+		if (null != node)
+			return node;
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(PROPERTY_KEY, link);
@@ -328,7 +464,7 @@ public class Importer {
 		if (null != author)
 			map.put(PROPERTY_NAME, author);
 		
-		RestNode node = graphDb.createNode(map);
+		node = graphDb.createNode(map);
 		
 		if (!node.hasLabel(labelResearcher))
 			node.addLabel(labelResearcher); 
@@ -339,6 +475,7 @@ public class Importer {
 			
 		return node;
 	}
+	
 	
 	/*
 	private void processPages() {
