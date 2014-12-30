@@ -31,7 +31,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.grants.importers.patterns.App</mainClass>
+		      <mainClass>org.grants.importers.web_researchers.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
