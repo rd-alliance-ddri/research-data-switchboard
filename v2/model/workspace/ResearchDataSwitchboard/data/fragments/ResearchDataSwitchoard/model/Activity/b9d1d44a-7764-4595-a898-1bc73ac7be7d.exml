@@ -1,0 +1,206 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Neo4j-4: Fuzzy search for Grants" version="3">
+  <DEPS>
+    <ID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+    <COMPID name="Fuzzy Search Activity diagram" mc="ActivityDiagram" uid="c8693e67-bdd9-459c-8461-3e41330fd0fc"/>
+    <EXTID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <EXTID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+    <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+    <ATTRIBUTES>
+      <ATT name="IsSingleExecution">false</ATT>
+      <ATT name="IsReadOnly">false</ATT>
+      <ATT name="IsReentrant">false</ATT>
+      <ATT name="Name"><![CDATA[Neo4j-4: Fuzzy search for Grants]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedNode">
+        <OBJECT>
+          <ID name="Fuzzy search for Grants" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
+          <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Fuzzy search for Grants]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="896b2275-30f9-4c0c-8d4c-b13e0f56e593"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-4" mc="DataStoreNode" uid="da3ad45e-7923-426b-9b9b-4137d57bddd1"/>
+                      <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="448fd640-b1ef-4378-8e5c-30913ccd8e19"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Fuzzy search for grant titles in the content of HTML pages
+]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-4" mc="DataStoreNode" uid="da3ad45e-7923-426b-9b9b-4137d57bddd1"/>
+          <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-4]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-4" mc="BindableInstance" uid="5b0ef264-b278-40d1-bb59-67f411e998e3"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="dc1ccb01-d3d5-42a3-92f0-6bb123a27012"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Retrieve Scopus ID for ORCIDs" mc="OpaqueAction" uid="73a791ab-b367-4544-bb32-5626798a7ae4"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="078fdbf7-33a8-4339-8765-d2546a570eee"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Retrieve Scopus ID for DOIs" mc="OpaqueAction" uid="e2b1d2ab-64e6-45be-8f39-e199ca8e02c2"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="224d4d07-1caf-4b1f-bd4c-4ba492de9551"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Transfer nodes and links" mc="OpaqueAction" uid="b130faaa-e439-4765-a71a-f75bf33c08ab"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedCollaboration">
+        <OBJECT>
+          <ID name="locals" mc="Collaboration" uid="aa4efc77-39e3-4789-ab32-f9ca3caa58ec"/>
+          <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+          <ATTRIBUTES>
+            <ATT name="IsConcurrent">false</ATT>
+            <ATT name="IsAbstract">false</ATT>
+            <ATT name="IsLeaf">false</ATT>
+            <ATT name="IsRoot">false</ATT>
+            <ATT name="Visibility">Public</ATT>
+            <ATT name="Name"><![CDATA[locals]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Declared">
+              <OBJECT>
+                <ID name="Neo4j-4" mc="BindableInstance" uid="5b0ef264-b278-40d1-bb59-67f411e998e3"/>
+                <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-4]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Fuzzy Search Activity diagram" mc="ActivityDiagram" uid="c8693e67-bdd9-459c-8461-3e41330fd0fc"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

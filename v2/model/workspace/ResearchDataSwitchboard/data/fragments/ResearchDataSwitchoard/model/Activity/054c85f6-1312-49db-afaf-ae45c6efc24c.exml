@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Neo4j-6: Metadata harmonisation" version="3">
+  <DEPS>
+    <ID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+    <COMPID name="Harmonization Activity diagram" mc="ActivityDiagram" uid="c979851c-d94e-4e53-bc68-3cd2dd6d6c8e"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+    <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+    <ATTRIBUTES>
+      <ATT name="IsSingleExecution">false</ATT>
+      <ATT name="IsReadOnly">false</ATT>
+      <ATT name="IsReentrant">false</ATT>
+      <ATT name="Name"><![CDATA[Neo4j-6: Metadata harmonisation]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedNode">
+        <OBJECT>
+          <ID name="Merge Author Records" mc="OpaqueAction" uid="0d268b31-3dd8-4c94-a6f7-13410791b37f"/>
+          <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Merge Author Records]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="5c36d1dd-9a15-4b89-88ce-1df03b976c95"/>
+                <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-6" mc="DataStoreNode" uid="f6fe503d-8c2f-41b5-827b-bf183aa084a2"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Merge DOIs" mc="OpaqueAction" uid="fbc0fd1d-68e3-467d-af69-648229c7feee"/>
+          <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Merge DOIs]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="f4e933eb-8bc6-4098-84da-d0c4e22586e5"/>
+                <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-6" mc="DataStoreNode" uid="f6fe503d-8c2f-41b5-827b-bf183aa084a2"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Transfer Grants" mc="OpaqueAction" uid="98cd74b5-6049-4e49-a8d1-9fa3686fd059"/>
+          <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Transfer Grants]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="3b122d9e-b5b9-44b1-a4e0-8aad45c45842"/>
+                <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-6" mc="DataStoreNode" uid="f6fe503d-8c2f-41b5-827b-bf183aa084a2"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-6" mc="DataStoreNode" uid="f6fe503d-8c2f-41b5-827b-bf183aa084a2"/>
+          <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-6]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-6" mc="BindableInstance" uid="e52dba51-89a4-47f1-9f86-a2af930736a8"/>
+                <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+              </REFOBJ>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedCollaboration">
+        <OBJECT>
+          <ID name="locals" mc="Collaboration" uid="949294d6-37d1-4834-9df5-9487a5f37f29"/>
+          <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+          <ATTRIBUTES>
+            <ATT name="IsConcurrent">false</ATT>
+            <ATT name="IsAbstract">false</ATT>
+            <ATT name="IsLeaf">false</ATT>
+            <ATT name="IsRoot">false</ATT>
+            <ATT name="Visibility">Public</ATT>
+            <ATT name="Name"><![CDATA[locals]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Declared">
+              <OBJECT>
+                <ID name="Neo4j-6" mc="BindableInstance" uid="e52dba51-89a4-47f1-9f86-a2af930736a8"/>
+                <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-6]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Harmonization Activity diagram" mc="ActivityDiagram" uid="c979851c-d94e-4e53-bc68-3cd2dd6d6c8e"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

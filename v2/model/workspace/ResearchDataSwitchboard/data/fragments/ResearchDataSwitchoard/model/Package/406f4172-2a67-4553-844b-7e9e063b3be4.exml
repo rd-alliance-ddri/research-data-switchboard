@@ -4,7 +4,17 @@
     <ID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
     <COMPID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
     <COMPID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+    <COMPID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <COMPID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+    <COMPID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <COMPID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
     <COMPID name="overview diagram" mc="ClassDiagram" uid="aba3fb30-41a0-4abe-8cad-0b58bdd58c19"/>
+    <EXTID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+    <EXTID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+    <EXTID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <EXTID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+    <EXTID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <EXTID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
   </DEPS>
   <OBJECT>
     <ID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
@@ -22,6 +32,92 @@
       <COMP relation="OwnedBehavior">
         <COMPID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
         <COMPID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+        <COMPID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+        <COMPID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+        <COMPID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+        <COMPID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+      </COMP>
+      <COMP relation="OwnedInformationFlow">
+        <OBJECT>
+          <ID name="InformationFlow" mc="InformationFlow" uid="41576b1f-ed6d-4396-b9fc-db9073d74a7f"/>
+          <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[InformationFlow]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <ID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <ID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="InformationFlow" mc="InformationFlow" uid="652374bb-266b-4d94-aed5-58256b4a7351"/>
+          <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[InformationFlow]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <ID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <ID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="InformationFlow" mc="InformationFlow" uid="1c174e00-0e93-429b-bdd4-c36007bcd340"/>
+          <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[InformationFlow]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <ID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <ID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="InformationFlow" mc="InformationFlow" uid="72126951-730e-4bd3-bc65-71091c620ddc"/>
+          <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[InformationFlow]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <ID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <ID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="InformationFlow" mc="InformationFlow" uid="393ff55e-720d-4240-bb25-f08ea1e46322"/>
+          <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[InformationFlow]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <ID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <ID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
       </COMP>
       <COMP relation="Product">
         <COMPID name="overview diagram" mc="ClassDiagram" uid="aba3fb30-41a0-4abe-8cad-0b58bdd58c19"/>
