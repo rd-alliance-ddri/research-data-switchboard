@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="ResearchDataSwitchoard" version="3">
+  <DEPS>
+    <ID name="ResearchDataSwitchoard" mc="PropertyContainer" uid="b7563c5d-58a8-4f4e-a967-4fbbd4b61238"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="ResearchDataSwitchoard" mc="PropertyContainer" uid="b7563c5d-58a8-4f4e-a967-4fbbd4b61238"/>
+    <PID name="ResearchDataSwitchoard" mc="AnalystProject" uid="40041c81-1306-4b37-8996-11a386357007"/>
+    <ATTRIBUTES>
+      <ATT name="Name"><![CDATA[ResearchDataSwitchoard]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES></DEPENDENCIES>
+  </OBJECT>
+</EXT>
