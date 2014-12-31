@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.google</groupId>
   <artifactId>google_query</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>Google CSE library</name>
   
    <repositories>

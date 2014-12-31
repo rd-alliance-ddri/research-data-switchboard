@@ -14,7 +14,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,10 +165,15 @@ public class Harvester {
 	private String granularity;
 	private String adminEmail;
 	
+	private int setSize;
+	private int setOffset;
+	
 	private JAXBContext jaxbContext;
 	private Marshaller jaxbMarshaller;
 	private Unmarshaller jaxbUnmarshaller;
 	
+	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+	private TransformerFactory transformerFactory = TransformerFactory.newInstance();
 	/**
 	 * Harvester constructor
 	 * 
@@ -271,8 +279,7 @@ public class Harvester {
 	 */
 	protected void printDocument(Document doc, OutputStream out) 
 			throws IOException, TransformerException {
-	    TransformerFactory tf = TransformerFactory.newInstance();
-	    Transformer transformer = tf.newTransformer();
+	    Transformer transformer = transformerFactory.newTransformer();
 	    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 	    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -349,6 +356,12 @@ public class Harvester {
 	 * @return true, if there is an error block, false if not.
 	 */
 	protected boolean CheckForError(Element root) {
+		if (null == root) {
+			System.out.println("Error in DOM structire, unable to extract root element");
+			
+			return false;
+		}
+		
 		NodeList nl = root.getElementsByTagName("error");
 		if (null != nl && nl.getLength() > 0)
 		{
@@ -362,7 +375,7 @@ public class Harvester {
 				System.out.println("Error in DOM structire, unable to extract error information");
 				
 			return false;
-		}	
+		}
 		
 		return true;
 	}
@@ -537,7 +550,7 @@ public class Harvester {
 			fileName +=  ".xml"; 
 			
 			transformer.transform(new DOMSource(doc), new StreamResult(new File(fileName)));*/
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		Transformer transformer = transformerFactory.newTransformer();
 			
 		List<Element> records = getChildElementsByTagName(getChildElementByTagName(root, "ListRecords"), "record");
 		if (null != records) {
@@ -592,14 +605,142 @@ public class Harvester {
 				String cursor = token.getAttribute("cursor");
 				String size = token.getAttribute("completeListSize");
 				
-				System.out.println("ResumptionToken Detected. Cursor: " + cursor + ", size: " + size);
+				try {
+					setSize = Integer.parseInt(size);
+				} catch(Exception e) {
+					setSize = 0;
+				}
+				
+				try {
+					setOffset = Integer.parseInt(cursor);
+				} catch(Exception e) {
+					++setOffset;
+				}				
+				
+				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
 				
 				return token.getTextContent();
 			}
 		}
 		
 		return null;
-	}		
+	}	
+	
+	/**
+	 * Function to download records from the server. 
+	 * If server will return resumption token, the function will return it, 
+	 * other ways it will return null. If resumption token has been returned, 
+	 * the function mast to be called again with this token, to download 
+	 * next set of records.
+	 * This function will not parse the records and store all records as one file
+	 * exactly same format as they has come from the server.
+	 * This function also will newer use record index
+	 * @param set name of the set
+	 * @param metadataPrefix one of supported metadata prefix
+	 * @param resumptionToken resuption token or null, if need to download first records from the set.
+	 * @return String - Resumption Token or null, if there is no more records in the set
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerException
+	 */
+	public String downloadRecordsSimple( final String set, final MetadataPrefix metadataPrefix, 
+			final String resumptionToken) throws ParserConfigurationException, SAXException, 
+			IOException, TransformerFactoryConfigurationError, TransformerException {
+				
+		// create set folder
+		String setName = URLEncoder.encode(set, "UTF-8");
+		
+		String url = repoUrl;	
+		if (null != resumptionToken) {
+			try {
+				url += String.format(URL_LIST_RECORDS_RESUMPTION_TOKEN, URLEncoder.encode(resumptionToken, "UTF-8"));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+		}
+		else
+			url += String.format(URL_LIST_RECORDS, set,  metadataPrefix.name());
+		System.out.println(url);
+		
+		// Get XML document and parse it
+		Document doc  = GetXml(url);
+			
+		// Extract root element
+		Element root = getDocumentElementByTagName(doc, ELEMENT_ROOT);
+		
+		// check for errors
+		if (!CheckForError(root))
+			return null;
+		
+		// Create new transformer
+		Transformer transformer = transformerFactory.newTransformer();
+			
+		// Create set path
+		String setPath = getSetPath(setName); 
+		new File(setPath).mkdirs();
+	
+		// Create file name and temporary file name
+		String filePath = setPath + "/" + setOffset + ".xml";
+		String fileTmp = setPath + "/" + setOffset + ".tmp";
+		
+		// Output file as temporary
+		transformer.transform(new DOMSource(doc), new StreamResult(fileTmp));	
+	
+		// Create file ojects
+		File fPath = new File(filePath);
+		File fTmp = new File(fileTmp);
+		
+		// Check that file already exists
+		if (fPath.exists()) {
+			// Compare file sizes
+			if (fPath.length() != fTmp.length()) 
+			{
+				// if file size are different, move old file to cache, if it is same, just delete the old file
+				String setCachePath = getCacheSetPath(setName);
+				new File(setCachePath).mkdirs();
+				
+				fPath.renameTo(new File(setCachePath + "/" + setOffset + "_" + dateFormat.format(new Date()) + ".xml"));
+			}
+			else
+				fPath.delete();
+
+			// restore path name (might be not needed)
+		//	fPath = new File(filePath);
+		}
+
+		fTmp.renameTo(fPath);
+		
+		NodeList nl = doc.getElementsByTagName("resumptionToken");
+		if (nl != null && nl.getLength() > 0)
+		{
+			Element token = (Element) nl.item(0);
+			String tokenString = token.getTextContent();
+			if (null != tokenString && !tokenString.isEmpty()) {
+				String cursor = token.getAttribute("cursor");
+				String size = token.getAttribute("completeListSize");
+				
+				try {
+					setSize = Integer.parseInt(size);
+				} catch(Exception e) {
+					setSize = 0;
+				}
+				
+				try {
+					setOffset = Integer.parseInt(cursor);
+				} catch(Exception e) {
+					++setOffset;
+				}				
+				
+				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
+			
+				return token.getTextContent();
+			}
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * Protected function to generate index file name
@@ -757,10 +898,96 @@ public class Harvester {
 		    
 		    System.out.println("Processing set: " +  URLDecoder.decode(setName, "UTF-8"));
 		    
+		    setSize = 0;
+		    setOffset = 0;
+		    
 		    int nError = 0;
 		    do {
 		    	try {
 		    		resumptionToken = downloadRecords(set, prefix, resumptionToken);		
+		    		
+		    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
+		    			status.setResumptionToken(resumptionToken);
+		    			saveStatus(status, fileStatus);
+		    		}
+		    		
+		    		nError = 0;		    		
+		    	}
+		    	catch (Exception e) {
+		    		if (++nError >= 10) {
+		    			System.out.println("Too much errors has been detected, abort download");
+		    			
+		    			throw e;
+		    		} else { 
+		    			System.out.println("Error downloading data");
+		    		
+		    			e.printStackTrace();
+		    		}
+		    	}
+		    	
+		    } while (nError > 0 || null != resumptionToken && !resumptionToken.isEmpty());		 
+		    
+		    status.addProcessedSet(set);
+		    status.setCurrentSet(null);
+		    status.setResumptionToken(null);
+		    saveStatus(status, fileStatus);
+		}
+		
+		if (fileStatus.exists())
+			fileStatus.delete();
+	}
+	
+	/**
+	 * Alternative function to organize the harvest process. The difference with another function
+	 * is in data storage. The harvest2 function will store files in the raw format as they come
+	 * from the server.
+	 * The harvesting method should never be mixed. The harvesting folder must be wiped out if 
+	 * switching to this method, or function will fail.
+	 * @param prefix A metadata prefix
+	 * @throws Exception
+	 */
+	public void harvestSimple(MetadataPrefix prefix) throws Exception {
+		
+		folderXml = folderBase + "/" + prefix.name();
+		new File(folderXml).mkdirs();
+		
+		File fileStatus = new File(folderXml + "/status.xml");
+		Status status = loadStatus(fileStatus);
+	
+		System.out.println("Downloading set list...");
+		
+		Map<String, String> mapSets = listSets();
+		if (null == mapSets )
+			throw new Exception("The sets collection is empty");
+		
+			// try to load whole database into memory
+		for (Map.Entry<String, String> entry : mapSets.entrySet()) {
+		    String set = entry.getKey();
+		    if (status.getProcessedSets().contains(set))
+		    	continue;
+		    
+		    String resumptionToken = null;
+		    
+		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set))
+		    	resumptionToken = status.getResumptionToken();
+		    else {
+		    	status.setCurrentSet(set);
+		    	status.setResumptionToken(null);
+		    
+		   // 	saveStatus(status, fileStatus);
+		    }
+		    
+		    String setName = entry.getValue();
+		    
+		    System.out.println("Processing set: " +  URLDecoder.decode(setName, "UTF-8"));
+		    
+		    setSize = 0;
+		    setOffset = 0;
+		    
+		    int nError = 0;
+		    do {
+		    	try {
+		    		resumptionToken = downloadRecordsSimple(set, prefix, resumptionToken);		
 		    		
 		    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
 		    			status.setResumptionToken(resumptionToken);

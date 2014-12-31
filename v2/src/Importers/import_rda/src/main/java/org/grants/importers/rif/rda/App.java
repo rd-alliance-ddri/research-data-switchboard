@@ -36,7 +36,7 @@ public class App {
 		try {
 			Importer importer = new Importer(folderXml, neo4jUrl);
 
-			importer.importRecords();
+			importer.importSets();
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

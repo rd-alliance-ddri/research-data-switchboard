@@ -25,7 +25,9 @@ import com.sun.jersey.api.client.ClientResponse;
  * <p>
  * To obtain it, please follow this manual: https://developers.google.com/custom-search/json-api/v1/overview
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- * @version 1.0.0
+ * @version 1.0.1
+ * 
+ * 2014-12-07: Added queryCache function
  */
 public class Query {
 
@@ -105,6 +107,45 @@ public class Query {
 			}
 			
 			//System.out.println(json);
+			
+			return mapper.readValue(json, QueryResponse.class);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+	/**
+	 * Function to query cache only. No actuall Google request will be send
+	 * therefore no cseId and apiKey will be required
+	 * 
+	 * @param queryString A query string without a quotes and non encoded.
+	 * @return QueryResponse
+	 */
+	public QueryResponse queryCache(final String queryString) {
+		try {
+			String query = URLEncoder.encode("\"" + queryString + "\"", ENCODE_UTF8);
+			File jsonFile = null;
+			String json = null;
+			if (null != jsonFolder) {
+				jsonFile = new File(jsonFolder + "/" + query + ".json");
+				if (jsonFile.exists() && !jsonFile.isDirectory())
+					json = FileUtils.readFileToString(jsonFile);
+			}
+			
+			if (null == json || json.isEmpty()) 
+				return null;
 			
 			return mapper.readValue(json, QueryResponse.class);
 		} catch (UnsupportedEncodingException e) {

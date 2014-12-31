@@ -11,7 +11,7 @@ package org.grants.importers.rda;
  */
 public class App {
 	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
-	private static final String JSON_FOLDER_URI = "rda";
+	private static final String JSON_FOLDER_URI = "rda/json";
 	
 	/**
 	 * Main class function

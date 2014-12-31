@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.harvesters</groupId>
   <artifactId>harvester_rda</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.1</version>
   <name>RDA Harvester</name>
   
   <properties>
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.grants.harvesters</groupId>
       <artifactId>harvester_pmh</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.1</version>
     </dependency>
    </dependencies>
     
