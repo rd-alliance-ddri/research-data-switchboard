@@ -54,7 +54,6 @@ public class App {
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		
 		if (args.length != 2) {
 			System.out.println("USAGE: graph2json <graph file> <json file>");
 			
@@ -175,16 +174,18 @@ public class App {
 		String endNode = (String) relationshipMap.get(FIELD_END_NODE);
 		String type = (String) relationshipMap.get(FIELD_TYPE);
 		
-		Node nodeStart = nodes.get(startNode);
-		Node nodeEnd = nodes.get(endNode);
-		if (null != nodeStart && null != nodeEnd) {
-			if (null != nodeStart.getRelationships())
-				for (Relationship relationship : nodeStart.getRelationships()) 
-					if (relationship.getType().equals(type) 
-							&& relationship.getKey().equals(nodeEnd.getKey()))
-						return;
-			
-			nodeStart.addRelationship(type, nodeEnd.getKey());
+		if (null != startNode && null != endNode) {
+			Node nodeStart = nodes.get(startNode);
+			Node nodeEnd = nodes.get(endNode);
+			if (null != nodeStart && null != nodeEnd) {
+				if (null != nodeStart.getRelationships())
+					for (Relationship relationship : nodeStart.getRelationships()) 
+						if (relationship.getType().equals(type) 
+								&& relationship.getKey().equals(nodeEnd.getKey()))
+							return;
+				
+				nodeStart.addRelationship(type, nodeEnd.getKey());
+			}
 		}
 	}
 }
