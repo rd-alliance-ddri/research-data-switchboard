@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="ResearchDataSwitchoard" version="3">
+  <DEPS>
+    <ID name="ResearchDataSwitchoard" mc="Project" uid="2aa51440-b6f0-4992-9bf2-3975f76b2cb2"/>
+    <COMPID name="ResearchDataSwitchoard" mc="DiagramSet" uid="7608e449-e66f-40cd-aa9b-89f0b2490bfa"/>
+    <COMPID name="researchdataswitchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="ResearchDataSwitchoard" mc="Project" uid="2aa51440-b6f0-4992-9bf2-3975f76b2cb2"/>
+    <ATTRIBUTES>
+      <ATT name="ProjectContext"></ATT>
+      <ATT name="ProjectDescr"></ATT>
+      <ATT name="Name"><![CDATA[ResearchDataSwitchoard]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="DiagramRoot">
+        <COMPID name="ResearchDataSwitchoard" mc="DiagramSet" uid="7608e449-e66f-40cd-aa9b-89f0b2490bfa"/>
+      </COMP>
+      <COMP relation="Model">
+        <COMPID name="researchdataswitchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

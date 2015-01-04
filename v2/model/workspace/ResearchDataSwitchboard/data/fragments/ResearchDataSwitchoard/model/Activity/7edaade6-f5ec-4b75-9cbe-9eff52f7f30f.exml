@@ -1,0 +1,287 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Neo4j-5: Scopus integration" version="3">
+  <DEPS>
+    <ID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <COMPID name="Scopus Activity diagram" mc="ActivityDiagram" uid="72ec35a1-0519-494e-af6d-dcf3d3a6962a"/>
+    <EXTID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+    <ATTRIBUTES>
+      <ATT name="IsSingleExecution">false</ATT>
+      <ATT name="IsReadOnly">false</ATT>
+      <ATT name="IsReentrant">false</ATT>
+      <ATT name="Name"><![CDATA[Neo4j-5: Scopus integration]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedNode">
+        <OBJECT>
+          <ID name="Retrieve Scopus ID for ORCIDs" mc="OpaqueAction" uid="73a791ab-b367-4544-bb32-5626798a7ae4"/>
+          <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Retrieve Scopus ID for ORCIDs]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ControlFlow" mc="ControlFlow" uid="93db6d18-c051-4e0b-9e6b-143a39d51d3e"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ControlFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Retrieve DOIs linked to ScopusIDs" mc="OpaqueAction" uid="e5568289-1b06-4354-b2d9-de9c7991caed"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-5" mc="DataStoreNode" uid="935e1d55-56f9-41af-bea6-dbc86768acac"/>
+          <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-5]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-5" mc="BindableInstance" uid="52003ec1-6c9e-424b-bbc6-ae5530f6a2db"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="85b99854-dec0-4579-b5a0-687a78bcc9a2"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Merge Author Records" mc="OpaqueAction" uid="0d268b31-3dd8-4c94-a6f7-13410791b37f"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="616ff232-6653-4bc7-beac-13f97d58029d"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Merge DOIs" mc="OpaqueAction" uid="fbc0fd1d-68e3-467d-af69-648229c7feee"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="0a07e942-8364-46cb-9512-8f2b7f9d7770"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Transfer Grants" mc="OpaqueAction" uid="98cd74b5-6049-4e49-a8d1-9fa3686fd059"/>
+                      <PID name="Neo4j-6: Metadata harmonisation" mc="Activity" uid="054c85f6-1312-49db-afaf-ae45c6efc24c"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Retrieve Scopus ID for DOIs" mc="OpaqueAction" uid="e2b1d2ab-64e6-45be-8f39-e199ca8e02c2"/>
+          <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Retrieve Scopus ID for DOIs]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ControlFlow" mc="ControlFlow" uid="b7b2266f-e009-4fae-b825-fb6439947177"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ControlFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Retrieve DOIs linked to ScopusIDs" mc="OpaqueAction" uid="e5568289-1b06-4354-b2d9-de9c7991caed"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="4adc86b5-7735-47cd-ac53-30921318c9d8"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Retrieve Scopus ID for all the DOIs in the database
+]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Retrieve DOIs linked to ScopusIDs" mc="OpaqueAction" uid="e5568289-1b06-4354-b2d9-de9c7991caed"/>
+          <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Retrieve DOIs linked to ScopusIDs]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="295aed96-e6cd-448c-969c-6a27c37efbde"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-5" mc="DataStoreNode" uid="935e1d55-56f9-41af-bea6-dbc86768acac"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="28f43be2-d1bd-4da8-9f75-f8578abb929a"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Retrieve the complete set of links between Scopus IDs and DOIs using Scopus API. The aim is to establish new connections between ScopusID and exisiting DOI in Neo4j, or add new DOIs connected to ScopusIDs. ]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedCollaboration">
+        <OBJECT>
+          <ID name="locals" mc="Collaboration" uid="b02ab096-a1cf-4ac6-baa3-fedbdd0c0acf"/>
+          <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+          <ATTRIBUTES>
+            <ATT name="IsConcurrent">false</ATT>
+            <ATT name="IsAbstract">false</ATT>
+            <ATT name="IsLeaf">false</ATT>
+            <ATT name="IsRoot">false</ATT>
+            <ATT name="Visibility">Public</ATT>
+            <ATT name="Name"><![CDATA[locals]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Declared">
+              <OBJECT>
+                <ID name="Neo4j-5" mc="BindableInstance" uid="52003ec1-6c9e-424b-bbc6-ae5530f6a2db"/>
+                <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-5]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Scopus Activity diagram" mc="ActivityDiagram" uid="72ec35a1-0519-494e-af6d-dcf3d3a6962a"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

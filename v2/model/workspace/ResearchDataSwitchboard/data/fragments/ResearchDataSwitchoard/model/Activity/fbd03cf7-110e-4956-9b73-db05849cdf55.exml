@@ -1,0 +1,295 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Neo4j-2: Compile nodes" version="3">
+  <DEPS>
+    <ID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+    <COMPID name="Compiling Activity diagram" mc="ActivityDiagram" uid="b564d2af-d85e-4a8c-9775-b1b5ebaf4ac4"/>
+    <EXTID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+    <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+    <ATTRIBUTES>
+      <ATT name="IsSingleExecution">false</ATT>
+      <ATT name="IsReadOnly">false</ATT>
+      <ATT name="IsReentrant">false</ATT>
+      <ATT name="Name"><![CDATA[Neo4j-2: Compile nodes]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedNode">
+        <OBJECT>
+          <ID name="Compile nodes" mc="OpaqueAction" uid="2ab9be10-dcbf-4d10-a3a0-20d09e439474"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Compile nodes]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="0295fc1e-33b9-47b9-8e8f-060037f01111"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-2" mc="DataStoreNode" uid="df4d3d7e-5ab6-4ea5-bec0-5fa2a4e8eec9"/>
+                      <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="3fa59cf7-e1ea-4523-8403-d60f5ff42b1e"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Remove duplicated nodes]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-2" mc="DataStoreNode" uid="df4d3d7e-5ab6-4ea5-bec0-5fa2a4e8eec9"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-2]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-2" mc="BindableInstance" uid="5c090911-3c84-45f1-8f1c-eee9443ee843"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="02176e8c-b516-44d8-b987-d8dedc28577d"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Google search" mc="OpaqueAction" uid="97a54132-cae4-401c-a874-8779ea017492"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="9b00fc3e-561b-494b-bf1e-2aedbebf263e"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Transfer nodes and links" mc="OpaqueAction" uid="b130faaa-e439-4765-a71a-f75bf33c08ab"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Import Instituions" mc="OpaqueAction" uid="b2783b8a-0790-4c06-9d15-aae08f2979b7"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Import Instituions]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="408fc098-95a3-4115-9a75-491b9ee2c284"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-2" mc="DataStoreNode" uid="df4d3d7e-5ab6-4ea5-bec0-5fa2a4e8eec9"/>
+                      <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Import Services" mc="OpaqueAction" uid="537e3c4c-0e7a-465e-9fd0-ef735ed5ed84"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Import Services]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="c02fe005-9846-4e9f-b1f2-6827e2e3d7a0"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-2" mc="DataStoreNode" uid="df4d3d7e-5ab6-4ea5-bec0-5fa2a4e8eec9"/>
+                      <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Import URL Paterns" mc="OpaqueAction" uid="fbcea430-16fb-4249-93ad-3188f6f4f532"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Import URL Paterns]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="5e8fa7b6-738a-4ad8-baf6-eddafa1a3116"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-2" mc="DataStoreNode" uid="df4d3d7e-5ab6-4ea5-bec0-5fa2a4e8eec9"/>
+                      <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedCollaboration">
+        <OBJECT>
+          <ID name="locals" mc="Collaboration" uid="04ebb3f9-a96e-4f90-940a-ae4d73ac3479"/>
+          <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+          <ATTRIBUTES>
+            <ATT name="IsConcurrent">false</ATT>
+            <ATT name="IsAbstract">false</ATT>
+            <ATT name="IsLeaf">false</ATT>
+            <ATT name="IsRoot">false</ATT>
+            <ATT name="Visibility">Public</ATT>
+            <ATT name="Name"><![CDATA[locals]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Declared">
+              <OBJECT>
+                <ID name="Neo4j-2" mc="BindableInstance" uid="5c090911-3c84-45f1-8f1c-eee9443ee843"/>
+                <PID name="Neo4j-2: Compile nodes" mc="Activity" uid="fbd03cf7-110e-4956-9b73-db05849cdf55"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-2]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Compiling Activity diagram" mc="ActivityDiagram" uid="b564d2af-d85e-4a8c-9775-b1b5ebaf4ac4"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

@@ -1,0 +1,476 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Neo4j-3: Google search for Grants" version="3">
+  <DEPS>
+    <ID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <COMPID name="Google Activity diagram" mc="ActivityDiagram" uid="43858798-da4b-479e-8644-8a10706411e9"/>
+    <EXTID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+    <EXTID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+  </DEPS>
+  <OBJECT>
+    <ID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+    <PID name="Research Data Switchoard" mc="Package" uid="406f4172-2a67-4553-844b-7e9e063b3be4"/>
+    <ATTRIBUTES>
+      <ATT name="IsSingleExecution">false</ATT>
+      <ATT name="IsReadOnly">false</ATT>
+      <ATT name="IsReentrant">false</ATT>
+      <ATT name="Name"><![CDATA[Neo4j-3: Google search for Grants]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedNode">
+        <OBJECT>
+          <ID name="Google search" mc="OpaqueAction" uid="97a54132-cae4-401c-a874-8779ea017492"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Google search]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="f3f99415-07ae-4cd4-bfb8-4bd65b91b65c"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Google Results JSON cache" mc="DataStoreNode" uid="12983343-553c-4226-a644-a1e3f3b8ca4c"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Google Results JSON cache" mc="DataStoreNode" uid="12983343-553c-4226-a644-a1e3f3b8ca4c"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Google Results JSON cache]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Google Results JSON cache" mc="BindableInstance" uid="26512d1f-a23c-4000-9f87-fde24658fe9b"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="c96d038a-e1c9-4174-adc5-7b268b05f2a6"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Retrive HTML content of Google results" mc="OpaqueAction" uid="0e3322f6-ae60-4419-a8c1-b87962b5a949"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ControlFlow" mc="ControlFlow" uid="cab16b28-5596-4189-bcb5-1e5a07e95cb1"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ControlFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Link RDA:Grants to Web:Researchers" mc="OpaqueAction" uid="88cf38c5-8a31-4830-9f3b-5b890dabfce4"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="HTML cache" mc="DataStoreNode" uid="138ac324-2824-4524-901d-877e5cd9a071"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[HTML cache]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="HTML cache" mc="BindableInstance" uid="3b9809dd-71cd-4054-b953-a1ca962b71e8"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="6aae283a-f774-4227-9ebf-67f484e82cc9"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Fuzzy search for Grants" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
+                      <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Retrive HTML content of Google results" mc="OpaqueAction" uid="0e3322f6-ae60-4419-a8c1-b87962b5a949"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Retrive HTML content of Google results]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="591543bd-af0c-43db-95cd-35dc5d705739"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="HTML cache" mc="DataStoreNode" uid="138ac324-2824-4524-901d-877e5cd9a071"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="1669905c-8b00-4b42-acb4-c37e897bcebf"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Fetch HTML content for URLs in Google Results that matches the URL paterns]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Link RDA:Grants to Web:Researchers" mc="OpaqueAction" uid="88cf38c5-8a31-4830-9f3b-5b890dabfce4"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Link RDA:Grants to Web:Researchers]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="0e065d47-70ac-4166-af07-2b51d4e49268"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-3" mc="DataStoreNode" uid="a0798909-9784-49c5-924f-c8200cb45767"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-3" mc="DataStoreNode" uid="a0798909-9784-49c5-924f-c8200cb45767"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-3]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-3" mc="BindableInstance" uid="b0f08aaf-c634-4d2d-bcb2-7c49eea2d650"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="aca7c5b2-8280-4f57-90ac-16e5726bdfdf"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Fuzzy search for Grants" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
+                      <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="182a5ed6-c29d-41d1-9620-c16497125816"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Transfer nodes and links" mc="OpaqueAction" uid="b130faaa-e439-4765-a71a-f75bf33c08ab"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Transfer nodes and links" mc="OpaqueAction" uid="b130faaa-e439-4765-a71a-f75bf33c08ab"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Transfer nodes and links]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="9506093e-40a6-45c4-96d0-57b89b463518"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-3" mc="DataStoreNode" uid="a0798909-9784-49c5-924f-c8200cb45767"/>
+                      <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="3d991bf6-fa41-427e-bba9-6b9636db0437"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-4" mc="DataStoreNode" uid="da3ad45e-7923-426b-9b9b-4137d57bddd1"/>
+                      <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="f24b5727-9098-4174-8708-5149ca112123"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-5" mc="DataStoreNode" uid="935e1d55-56f9-41af-bea6-dbc86768acac"/>
+                      <PID name="Neo4j-5: Scopus integration" mc="Activity" uid="7edaade6-f5ec-4b75-9cbe-9eff52f7f30f"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedCollaboration">
+        <OBJECT>
+          <ID name="locals" mc="Collaboration" uid="d7ac462c-d85f-4a0f-8e88-85af5737cb47"/>
+          <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+          <ATTRIBUTES>
+            <ATT name="IsConcurrent">false</ATT>
+            <ATT name="IsAbstract">false</ATT>
+            <ATT name="IsLeaf">false</ATT>
+            <ATT name="IsRoot">false</ATT>
+            <ATT name="Visibility">Public</ATT>
+            <ATT name="Name"><![CDATA[locals]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Declared">
+              <OBJECT>
+                <ID name="Google Results JSON cache" mc="BindableInstance" uid="26512d1f-a23c-4000-9f87-fde24658fe9b"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Google Results JSON cache]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="HTML cache" mc="BindableInstance" uid="3b9809dd-71cd-4054-b953-a1ca962b71e8"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[HTML cache]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="Neo4j-3" mc="BindableInstance" uid="b0f08aaf-c634-4d2d-bcb2-7c49eea2d650"/>
+                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-3]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Google Activity diagram" mc="ActivityDiagram" uid="43858798-da4b-479e-8644-8a10706411e9"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>
