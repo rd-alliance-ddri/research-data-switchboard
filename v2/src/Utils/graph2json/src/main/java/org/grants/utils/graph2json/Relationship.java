@@ -1,5 +1,5 @@
 
-package org.grants.utils.grant2json;
+package org.grants.utils.graph2json;
 
 public class Relationship {
 	private String type;

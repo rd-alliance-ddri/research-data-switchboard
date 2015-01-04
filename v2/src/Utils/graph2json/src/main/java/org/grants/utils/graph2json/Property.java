@@ -1,4 +1,4 @@
-package org.grants.utils.grant2json;
+package org.grants.utils.graph2json;
 
 /**
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info

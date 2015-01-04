@@ -29,7 +29,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.grants.utils.grant2json.App</mainClass>
+		      <mainClass>org.grants.utils.graph2json.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
