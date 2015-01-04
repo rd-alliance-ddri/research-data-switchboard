@@ -54,7 +54,7 @@ public class App {
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		/*
+		
 		if (args.length != 2) {
 			System.out.println("USAGE: graph2json <graph file> <json file>");
 			
@@ -63,11 +63,11 @@ public class App {
 		
 		File graphFile = new File(args[0]);
 		File jsonFile = new File(args[1]);
-		*/
-
+		
+		/*
 		File graphFile = new File("result.json");
 		File jsonFile = new File("output.json");
-		
+		*/
 		
 		if (!graphFile.exists() || graphFile.isDirectory()) {
 			System.out.println("Unable to open GRAPH file.");
