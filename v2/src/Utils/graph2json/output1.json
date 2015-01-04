@@ -1,0 +1,66 @@
+[
+    {
+        "id": "66940",
+        "key": "oai:datadryad.org:10255/dryad.55230",
+        "name": "Data from: Contrasting responses of pre- and post-copulatory traits to variation in mating competition",
+        "relationships": [
+            {
+                "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+                "type": "relatedTo"
+            }
+        ],
+        "type": "Publication"
+    },
+    {
+        "id": "63832",
+        "key": "oai:datadryad.org:10255/dryad.60145",
+        "name": "Data from: Correlated evolution of sexual dimorphism and male dimorphism in a clade of neotropical harvestmen",
+        "relationships": [
+            {
+                "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+                "type": "relatedTo"
+            }
+        ],
+        "type": "Publication"
+    },
+    {
+        "id": "264733",
+        "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+        "type": "Researcher"
+    },
+    {
+        "id": "76608",
+        "key": "oai:datadryad.org:10255/dryad.37317",
+        "name": "Data from: Genetic variation underlying the expression of a polyphenism",
+        "relationships": [
+            {
+                "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+                "type": "relatedTo"
+            }
+        ],
+        "type": "Publication"
+    },
+    {
+        "id": "56487",
+        "key": "oai:datadryad.org:10255/dryad.38966",
+        "name": "Data from: Paternal effects on the expression of a male polyphenism",
+        "relationships": [
+            {
+                "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+                "type": "relatedTo"
+            }
+        ],
+        "type": "Publication"
+    },
+    {
+        "id": "251783",
+        "key": "http://researchdata.ands.org.au/alternative-reproductive-tactics-and-threshold-evolution/73703",
+        "relationships": [
+            {
+                "key": "http://www.ceb.uwa.edu.au/research/researchers/bruno-buzatto",
+                "type": "relatedTo"
+            }
+        ],
+        "type": "Grant"
+    }
+]

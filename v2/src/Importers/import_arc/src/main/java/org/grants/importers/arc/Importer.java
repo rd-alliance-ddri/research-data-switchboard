@@ -18,6 +18,7 @@ import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
+import org.neo4j.rest.graphdb.util.Config;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -93,6 +94,8 @@ public class Importer {
 	private RestCypherQueryEngine engine;
 	
 	public Importer(final String neo4jUrl) {
+		System.setProperty(Config.CONFIG_STREAM, "true");
+		
 		graphDb = new RestAPIFacade(neo4jUrl);
 		engine = new RestCypherQueryEngine(graphDb);  
 		
