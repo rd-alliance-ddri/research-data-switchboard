@@ -3,18 +3,13 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-/**
- * Class to store Orcid History
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class OrcidHistory {
 	private String creationMethod;
 	private String completionDate;
 	private String submissionDate;
 	private String lastModifiedDate;
 	private String claimed;
-	private String source;
+	private Source source;
 	private String visibility;
 	
 	@JsonProperty("creation-method")
@@ -69,11 +64,11 @@ public class OrcidHistory {
 		this.claimed = claimed;
 	}
 	
-	public String getSource() {
+	public Source getSource() {
 		return source;
 	}
 	
-	public void setSource(String source) {
+	public void setSource(Source source) {
 		this.source = source;
 	}
 	

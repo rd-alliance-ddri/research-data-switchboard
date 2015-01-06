@@ -95,9 +95,7 @@ public class App {
 									if (null != relationshipsArray)
 										for (Object relationshipMap : relationshipsArray)
 											parseRelationship((Map<String, Object>) relationshipMap);
-									
-								}
-								
+								}								
 							}						
 					}					
 				}

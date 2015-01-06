@@ -2,11 +2,6 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-/**
- * Class to store Orcid Activities
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class OrcidActivities {
 	private String affiliations;
 	private OrcidWorks works;

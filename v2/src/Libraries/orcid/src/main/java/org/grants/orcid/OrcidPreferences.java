@@ -1,10 +1,5 @@
 package org.grants.orcid;
 
-/**
- * Class to store Orcid Preferences
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class OrcidPreferences {
 	private String locale;
 

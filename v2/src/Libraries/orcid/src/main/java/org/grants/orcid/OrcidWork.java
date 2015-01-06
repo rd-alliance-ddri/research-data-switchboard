@@ -4,10 +4,12 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 /**
- * Class to store Orcid Work Information
+ * History:
+ * 1.0.9: added shortDescription
+ * 
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
  */
+
 public class OrcidWork {
 	private String putCode;
 	private WorkTitle title;
@@ -21,6 +23,7 @@ public class OrcidWork {
 	private OrcidIdentifier workSource;
 	private String languageCode;
 	private String country;
+	private String shortDescription;
 	private String visibility;
 	
 	@JsonProperty("put-code")
@@ -84,6 +87,14 @@ public class OrcidWork {
 		this.publicationDate = publicationDate;
 	}
 
+	public String getPublicationDateString() {
+		if (null != publicationDate)
+			return publicationDate.getDate();
+		else
+			return null;
+	}
+	
+	
 	@JsonProperty("work-external-identifiers")
 	public WorkIdentifiers getWorlIdentifiers() {
 		return worlIdentifiers;
@@ -149,16 +160,32 @@ public class OrcidWork {
 	public void setCountry(String country) {
 		this.country = country;
 	}
+	
+	@JsonProperty("short-description")
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	@JsonProperty("short-description")
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
 
 	@Override
 	public String toString() {
-		return "OrcidWork [putCode=" + putCode + ", title=" + title
-				+ ", journalTitle=" + journalTitle + ", citation=" + citation
-				+ ", workType=" + workType + ", publicationDate="
-				+ publicationDate + ", worlIdentifiers=" + worlIdentifiers
-				+ ", url=" + url + ", workContributors=" + workContributors
-				+ ", workSource=" + workSource + ", languageCode="
-				+ languageCode + ", country=" + country + ", visibility="
-				+ visibility + "]";
+		return "OrcidWork [putCode=" + putCode 
+				+ ", title=" + title
+				+ ", journalTitle=" + journalTitle 
+				+ ", citation=" + citation
+				+ ", workType=" + workType 
+				+ ", publicationDate=" + publicationDate 
+				+ ", worlIdentifiers=" + worlIdentifiers
+				+ ", url=" + url 
+				+ ", workContributors=" + workContributors
+				+ ", workSource=" + workSource 
+				+ ", languageCode=" + languageCode 
+				+ ", country=" + country 
+				+ ", shortDescription=" + shortDescription
+				+ ", visibility=" + visibility + "]";
 	}
 }

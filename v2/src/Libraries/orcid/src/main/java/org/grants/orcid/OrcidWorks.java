@@ -4,11 +4,6 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-/**
- * Class to store Orcid Works List
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class OrcidWorks {
 	private List<OrcidWork> works;
 	private String scope;

@@ -2,11 +2,6 @@ package org.grants.orcid;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-/**
- * Class to store Orcid work citation information
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class WorkCitation {
 	private String type;
 	private String citation;

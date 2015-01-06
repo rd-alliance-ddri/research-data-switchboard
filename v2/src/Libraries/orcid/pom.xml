@@ -2,8 +2,28 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.orcid</groupId>
   <artifactId>orcid</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.11</version>
   <name>ORCID library</name>
+  
+  <properties>
+    <jdk.version>1.7</jdk.version>
+    <class.path>jars/</class.path>
+  </properties>
+  
+  <build>
+	<plugins>
+	  
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>3.1</version>
+		<configuration>
+			<source>${jdk.version}</source>
+			<target>${jdk.version}</target>
+		</configuration>
+	  </plugin>
+ 	</plugins>
+  </build>
   
   <repositories>
     <repository>

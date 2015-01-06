@@ -3,11 +3,6 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-/**
- * Class to store Publication Date
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class PublicationDate {
 	private String year;
 	private String month;
@@ -39,6 +34,28 @@ public class PublicationDate {
 	@JsonDeserialize(using = ValueDeserializer.class)
 	public void setDay(String day) {
 		this.day = day;
+	}
+	
+	public String getDate() {
+		StringBuilder sb = new StringBuilder();
+		
+		if (null != year && !year.isEmpty()) 
+			sb.append(year);
+		if (null != month && !month.isEmpty()) {
+			if (sb.length() > 0)
+				sb.append("-");
+			sb.append(month);
+		}
+		if (null != day && !day.isEmpty()) {
+			if (sb.length() > 0)
+				sb.append("-");
+			sb.append(day);
+		}	
+
+		if (sb.length() > 0)
+			return sb.toString();
+		else
+			return null;
 	}
 
 	@JsonProperty("media-type")

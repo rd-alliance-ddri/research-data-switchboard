@@ -3,19 +3,16 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-/**
- * Class to store Orcid Bio
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class OrcidBio {
 	private PersonalDetails personalDetails;
 	private String biography;
 	private ContactDetails contactDetails;
-	private String keywords;
+	private Keywords keywords;
 	private String delegation;
 	private String applications;
 	private String scope;
+	private ExternalIdentifiers externalIdentifiers;
+	private ResearcherUrls researcherUrls;
 
 	@JsonProperty("personal-details")
 	public PersonalDetails getPersonalDetails() {
@@ -46,11 +43,11 @@ public class OrcidBio {
 		this.contactDetails = contactDetails;
 	}
 
-	public String getKeywords() {
+	public Keywords getKeywords() {
 		return keywords;
 	}
 
-	public void setKeywords(String keywords) {
+	public void setKeywords(Keywords keywords) {
 		this.keywords = keywords;
 	}
 
@@ -78,11 +75,37 @@ public class OrcidBio {
 		this.scope = scope;
 	}
 	
+	@JsonProperty("external-identifiers")
+	public ExternalIdentifiers getExternalIdentifiers() {
+		return externalIdentifiers;
+	}
+
+	@JsonProperty("external-identifiers")
+	public void setExternalIdentifiers(ExternalIdentifiers externalIdentifiers) {
+		this.externalIdentifiers = externalIdentifiers;
+	}
+	
+	@JsonProperty("researcher-urls")
+	public ResearcherUrls getResearcherUrls() {
+		return researcherUrls;
+	}
+
+	@JsonProperty("researcher-urls")
+	public void setResearcherUrls(ResearcherUrls researcherUrls) {
+		this.researcherUrls = researcherUrls;
+	}
+	
 	@Override
 	public String toString() {
-		return "OrcidBio [personalDetails=" + personalDetails + ", biography="
-				+ biography + ", contactDetails=" + contactDetails
-				+ ", keywords=" + keywords + ", delegations=" + delegation
-				+ ", applications=" + applications + ", scope=" + scope + "]";
+		return "OrcidBio [personalDetails=" + personalDetails 
+				+ ", biography=" + biography 
+				+ ", contactDetails=" + contactDetails
+				+ ", keywords=" + keywords 
+				+ ", delegations=" + delegation
+				+ ", applications=" + applications 
+				+ ", scope=" + scope 
+				+ ", externalIdentifiers=" + externalIdentifiers 
+				+ ", researcherUrls=" + researcherUrls
+				+ "]";
 	}
 }

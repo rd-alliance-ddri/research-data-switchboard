@@ -4,14 +4,29 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 /**
- * Class to store Orcid Contributor
+ * History
+ * 
+ * 1.0.10: added orcidId
+ * 
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
  *
  */
+
 public class Contributor {
+	private OrcidIdentifier orcidId;
 	private String creditName;
 	private ContributorAttributes contributorAttributes;
 
+	@JsonProperty("contributor-orcid")
+	public OrcidIdentifier getOrcidId() {
+		return orcidId;
+	}
+
+	@JsonProperty("contributor-orcid")
+	public void setOrcidId(OrcidIdentifier orcidId) {
+		this.orcidId = orcidId;
+	}
+	
 	@JsonProperty("credit-name")
 	public String getCreditName() {
 		return creditName;
@@ -35,7 +50,9 @@ public class Contributor {
 
 	@Override
 	public String toString() {
-		return "Contributor [creditName=" + creditName
-				+ ", contributorAttributes=" + contributorAttributes + "]";
+		return "Contributor [orcidId=" + orcidId 
+				+ ", creditName=" + creditName
+				+ ", contributorAttributes=" + contributorAttributes 
+				+ "]";
 	}
 }

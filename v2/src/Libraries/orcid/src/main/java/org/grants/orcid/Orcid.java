@@ -1,5 +1,6 @@
 package org.grants.orcid;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
@@ -11,11 +12,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
-/**
- * Main class to query ORCID 
- * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- *
- */
 public class Orcid {
 	private static final String ORCID_URL = "http://pub.orcid.org/";
 	private static final String ORCID_HOST = "orcid.org/";
@@ -26,15 +22,13 @@ public class Orcid {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();  
 	
-	/**
-	 * Query Orcid site with an Orcid ID
-	 * @param orcidId String containing Orcid Id
-	 * @param responseType Desired response Type (Bio, Works or Record)
-	 * @return OrcidMessage
-	 */
 	public OrcidMessage queryId(String orcidId, RequestType responseType) {
+		return parseJson(queryIdString(orcidId, responseType));
+	}
+	
+	public String queryIdString(String orcidId, RequestType responseType) {
 		
-		int idx = orcidId.indexOf("orcid.org/");
+		int idx = orcidId.indexOf(ORCID_HOST);
 		if (idx >= 0)
 			orcidId = orcidId.substring(idx + ORCID_HOST.length());
 		
@@ -44,21 +38,23 @@ public class Orcid {
 		else if (responseType == RequestType.record)
 			url += ORCID_RECORD;
 			
-			
-		String json = get(url);
-		
-		System.out.println(json);
-		
+		return get(url);
+	}
+	
+	public OrcidMessage parseJson(String json) {
 		try {
 			return mapper.readValue(json, OrcidMessage.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+
+		return null;
+	}
+	
+	public OrcidMessage parseJson(File fileJson) {
+		try {
+			return mapper.readValue(fileJson, OrcidMessage.class);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

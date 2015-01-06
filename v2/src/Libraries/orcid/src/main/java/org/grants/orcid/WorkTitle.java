@@ -1,16 +1,21 @@
 package org.grants.orcid;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 /**
- * Class to store Work Title
+ * History:
+ * 1.0.9: added translatedTitle
+ * 
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
  *
  */
+
 public class WorkTitle {
 	private String title;
 	private String subtitle;
-	
+	private String translatedTitle;
+
 	public String getTitle() {
 		return title;
 	}
@@ -28,9 +33,23 @@ public class WorkTitle {
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
 	}
+	
+	@JsonProperty("translated-title")
+	public String getTranslatedTitle() {
+		return translatedTitle;
+	}
+
+	@JsonProperty("translated-title")
+	@JsonDeserialize(using = ValueDeserializer.class)
+	public void setTranslatedTitle(String translatedTitle) {
+		this.translatedTitle = translatedTitle;
+	}
 
 	@Override
 	public String toString() {
-		return "WorkTitle [title=" + title + ", subtitle=" + subtitle + "]";
+		return "WorkTitle [title=" + title 
+				+ ", subtitle=" + subtitle 
+				+ ", translatedTitle=" + translatedTitle
+				+ "]";
 	}
 }
