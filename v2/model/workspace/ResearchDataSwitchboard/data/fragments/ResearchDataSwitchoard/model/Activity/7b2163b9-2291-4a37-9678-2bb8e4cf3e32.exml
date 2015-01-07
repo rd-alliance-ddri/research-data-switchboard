@@ -156,7 +156,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Fuzzy search for Grants" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
+                      <ID name="Fuzzy search" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
                       <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
                     </REFOBJ>
                   </LINK>
@@ -276,29 +276,6 @@
               </REFOBJ>
             </LINK>
             <COMP relation="Outgoing">
-              <OBJECT>
-                <ID name="ObjectFlow" mc="ObjectFlow" uid="aca7c5b2-8280-4f57-90ac-16e5726bdfdf"/>
-                <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
-                <ATTRIBUTES>
-                  <ATT name="TransformationBehavior"></ATT>
-                  <ATT name="SelectionBehavior"></ATT>
-                  <ATT name="IsMultiCast">false</ATT>
-                  <ATT name="IsMultiReceive">false</ATT>
-                  <ATT name="Effect">ReadFlow</ATT>
-                  <ATT name="Guard"></ATT>
-                  <ATT name="Weight"><![CDATA[1]]></ATT>
-                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
-                  <ATT name="status">1970354901745664</ATT>
-                </ATTRIBUTES>
-                <DEPENDENCIES>
-                  <LINK relation="Target">
-                    <REFOBJ>
-                      <ID name="Fuzzy search for Grants" mc="OpaqueAction" uid="64572165-47ae-4b79-adfe-3d75cc193865"/>
-                      <PID name="Neo4j-4: Fuzzy search for Grants" mc="Activity" uid="b9d1d44a-7764-4595-a898-1bc73ac7be7d"/>
-                    </REFOBJ>
-                  </LINK>
-                </DEPENDENCIES>
-              </OBJECT>
               <OBJECT>
                 <ID name="ObjectFlow" mc="ObjectFlow" uid="182a5ed6-c29d-41d1-9620-c16497125816"/>
                 <PID name="Neo4j-3: Google search for Grants" mc="Activity" uid="7b2163b9-2291-4a37-9678-2bb8e4cf3e32"/>
