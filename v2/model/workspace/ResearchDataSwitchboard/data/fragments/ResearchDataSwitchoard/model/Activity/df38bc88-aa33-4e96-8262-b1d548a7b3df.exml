@@ -20,20 +20,20 @@
     <DEPENDENCIES>
       <COMP relation="OwnedNode">
         <OBJECT>
-          <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+          <ID name="Neo4j-1-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
           <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
           <ATTRIBUTES>
             <ATT name="IsControlType">false</ATT>
             <ATT name="Ordering">FIFO</ATT>
             <ATT name="SelectionBehavior"></ATT>
             <ATT name="UpperBound"><![CDATA[1]]></ATT>
-            <ATT name="Name"><![CDATA[Neo4j-1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-1-1]]></ATT>
             <ATT name="status">1970354901745664</ATT>
           </ATTRIBUTES>
           <DEPENDENCIES>
             <LINK relation="Represented">
               <REFOBJ>
-                <ID name="Neo4j-1" mc="BindableInstance" uid="d4c97c07-76c1-4fbd-a8fe-838afa9a6782"/>
+                <ID name="Neo4j-1-1" mc="BindableInstance" uid="d4c97c07-76c1-4fbd-a8fe-838afa9a6782"/>
                 <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
               </REFOBJ>
             </LINK>
@@ -109,7 +109,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+                      <ID name="Neo4j-1-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
                       <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                     </REFOBJ>
                   </LINK>
@@ -316,7 +316,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+                      <ID name="Neo4j-1-2" mc="DataStoreNode" uid="e73df996-64f0-48e0-b001-e329d994cf62"/>
                       <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                     </REFOBJ>
                   </LINK>
@@ -392,7 +392,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+                      <ID name="Neo4j-1-2" mc="DataStoreNode" uid="e73df996-64f0-48e0-b001-e329d994cf62"/>
                       <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                     </REFOBJ>
                   </LINK>
@@ -513,7 +513,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+                      <ID name="Neo4j-1-3" mc="DataStoreNode" uid="680d92c9-79a9-4bd1-8310-1e87d8fabaeb"/>
                       <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                     </REFOBJ>
                   </LINK>
@@ -551,7 +551,7 @@
                 <DEPENDENCIES>
                   <LINK relation="Target">
                     <REFOBJ>
-                      <ID name="Neo4j-1" mc="DataStoreNode" uid="f0a4787e-c358-4b58-8013-3987f2818502"/>
+                      <ID name="Neo4j-1-2" mc="DataStoreNode" uid="e73df996-64f0-48e0-b001-e329d994cf62"/>
                       <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                     </REFOBJ>
                   </LINK>
@@ -705,7 +705,275 @@
             <ATT name="Name"><![CDATA[Import NHMRC grant]]></ATT>
             <ATT name="status">1970354901745664</ATT>
           </ATTRIBUTES>
-          <DEPENDENCIES></DEPENDENCIES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="0c8099f1-02e3-4da9-b3a3-9fb4a8e20472"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-1-2" mc="DataStoreNode" uid="e73df996-64f0-48e0-b001-e329d994cf62"/>
+                      <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-1-2" mc="DataStoreNode" uid="e73df996-64f0-48e0-b001-e329d994cf62"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-1-2]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-1-2" mc="BindableInstance" uid="bbae898e-2f93-4e68-9779-f5ededdad47c"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+              </REFOBJ>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="CERN Data dump files" mc="DataStoreNode" uid="fbce5ef2-487b-4218-bec1-c69ca4f3bf7f"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[CERN Data dump files]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="CERN Data dump files" mc="BindableInstance" uid="1963a5fe-fa87-4b7c-ac7b-69bb55a47432"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="6d18a389-d63c-4f6a-986c-2235102e6c2e"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Import CERN dump files" mc="OpaqueAction" uid="cee287d7-f59b-4b8d-8ab0-46292eb4215f"/>
+                      <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+            <COMP relation="Descriptor">
+              <OBJECT>
+                <ID name="" mc="Note" uid="c9d3b6a4-bb76-4139-9b20-9f463546cb8c"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="Content"><![CDATA[Including three files: records.json, all_data.xml, all_hepnames.xml]]></ATT>
+                  <ATT name="Name"></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Model">
+                    <FOREIGNID name="description" mc="NoteType" uid="00000000-0000-3e81-0000-000000000000"/>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Import CERN dump files" mc="OpaqueAction" uid="cee287d7-f59b-4b8d-8ab0-46292eb4215f"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Import CERN dump files]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="dcb2f6d2-7c2b-4159-a0e7-de99aac3d1c2"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-1-3" mc="DataStoreNode" uid="680d92c9-79a9-4bd1-8310-1e87d8fabaeb"/>
+                      <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-1-3" mc="DataStoreNode" uid="680d92c9-79a9-4bd1-8310-1e87d8fabaeb"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-1-3]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-1-3" mc="BindableInstance" uid="d5e87b44-3b92-497a-b8d9-df9faeeeaa88"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+              </REFOBJ>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="ORCID public files" mc="DataStoreNode" uid="b58f669d-befe-413e-960a-ce5df0b3ee89"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[ORCID public files]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="ORCID public files" mc="BindableInstance" uid="92e5bac3-98d1-47ce-95eb-e9e2ecb4418b"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+              </REFOBJ>
+            </LINK>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="db76b3bb-97c1-4508-8a4b-45f0fcf32a4c"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Import ORCID public files" mc="OpaqueAction" uid="782baa41-a468-48ee-a226-d247c3789926"/>
+                      <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Import ORCID public files" mc="OpaqueAction" uid="782baa41-a468-48ee-a226-d247c3789926"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="Body"></ATT>
+            <ATT name="IsMultipleInstance">false</ATT>
+            <ATT name="IsCompensation">false</ATT>
+            <ATT name="Name"><![CDATA[Import ORCID public files]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <COMP relation="Outgoing">
+              <OBJECT>
+                <ID name="ObjectFlow" mc="ObjectFlow" uid="bbb28086-0b02-4077-b26e-05e7200a5382"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="TransformationBehavior"></ATT>
+                  <ATT name="SelectionBehavior"></ATT>
+                  <ATT name="IsMultiCast">false</ATT>
+                  <ATT name="IsMultiReceive">false</ATT>
+                  <ATT name="Effect">ReadFlow</ATT>
+                  <ATT name="Guard"></ATT>
+                  <ATT name="Weight"><![CDATA[1]]></ATT>
+                  <ATT name="Name"><![CDATA[ObjectFlow]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES>
+                  <LINK relation="Target">
+                    <REFOBJ>
+                      <ID name="Neo4j-1-4" mc="DataStoreNode" uid="69c17be8-45de-428b-89d6-d70bb21e9482"/>
+                      <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                    </REFOBJ>
+                  </LINK>
+                </DEPENDENCIES>
+              </OBJECT>
+            </COMP>
+          </DEPENDENCIES>
+        </OBJECT>
+        <OBJECT>
+          <ID name="Neo4j-1-4" mc="DataStoreNode" uid="69c17be8-45de-428b-89d6-d70bb21e9482"/>
+          <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+          <ATTRIBUTES>
+            <ATT name="IsControlType">false</ATT>
+            <ATT name="Ordering">FIFO</ATT>
+            <ATT name="SelectionBehavior"></ATT>
+            <ATT name="UpperBound"><![CDATA[1]]></ATT>
+            <ATT name="Name"><![CDATA[Neo4j-1-4]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="Represented">
+              <REFOBJ>
+                <ID name="Neo4j-1-4" mc="BindableInstance" uid="9155bcdd-8a17-4e34-a5bf-4263fc8bd080"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+              </REFOBJ>
+            </LINK>
+          </DEPENDENCIES>
         </OBJECT>
       </COMP>
       <COMP relation="OwnedCollaboration">
@@ -737,14 +1005,14 @@
                 <DEPENDENCIES></DEPENDENCIES>
               </OBJECT>
               <OBJECT>
-                <ID name="Neo4j-1" mc="BindableInstance" uid="d4c97c07-76c1-4fbd-a8fe-838afa9a6782"/>
+                <ID name="Neo4j-1-1" mc="BindableInstance" uid="d4c97c07-76c1-4fbd-a8fe-838afa9a6782"/>
                 <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
                 <ATTRIBUTES>
                   <ATT name="IsConstant">false</ATT>
                   <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
                   <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
                   <ATT name="Value"></ATT>
-                  <ATT name="Name"><![CDATA[Neo4j-1]]></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-1-1]]></ATT>
                   <ATT name="status">1970354901745664</ATT>
                 </ATTRIBUTES>
                 <DEPENDENCIES></DEPENDENCIES>
@@ -862,6 +1130,71 @@
                   <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
                   <ATT name="Value"></ATT>
                   <ATT name="Name"><![CDATA[CERN MARCXML cache]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="Neo4j-1-2" mc="BindableInstance" uid="bbae898e-2f93-4e68-9779-f5ededdad47c"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-1-2]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="CERN Data dump files" mc="BindableInstance" uid="1963a5fe-fa87-4b7c-ac7b-69bb55a47432"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[CERN Data dump files]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="Neo4j-1-3" mc="BindableInstance" uid="d5e87b44-3b92-497a-b8d9-df9faeeeaa88"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-1-3]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="ORCID public files" mc="BindableInstance" uid="92e5bac3-98d1-47ce-95eb-e9e2ecb4418b"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[ORCID public files]]></ATT>
+                  <ATT name="status">1970354901745664</ATT>
+                </ATTRIBUTES>
+                <DEPENDENCIES></DEPENDENCIES>
+              </OBJECT>
+              <OBJECT>
+                <ID name="Neo4j-1-4" mc="BindableInstance" uid="9155bcdd-8a17-4e34-a5bf-4263fc8bd080"/>
+                <PID name="Neo4j-1: Harvest Raw Data" mc="Activity" uid="df38bc88-aa33-4e96-8262-b1d548a7b3df"/>
+                <ATTRIBUTES>
+                  <ATT name="IsConstant">false</ATT>
+                  <ATT name="MultiplicityMin"><![CDATA[1]]></ATT>
+                  <ATT name="MultiplicityMax"><![CDATA[1]]></ATT>
+                  <ATT name="Value"></ATT>
+                  <ATT name="Name"><![CDATA[Neo4j-1-4]]></ATT>
                   <ATT name="status">1970354901745664</ATT>
                 </ATTRIBUTES>
                 <DEPENDENCIES></DEPENDENCIES>
