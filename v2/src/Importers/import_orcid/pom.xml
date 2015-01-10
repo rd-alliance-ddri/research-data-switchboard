@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.importers</groupId>
   <artifactId>import_orcid</artifactId>
-  <version>1.0.0</version>
+  <version>1.2.0</version>
   
   <properties>
     <jdk.version>1.7</jdk.version>
@@ -73,7 +73,7 @@
     <dependency>
       <groupId>org.grants.orcid</groupId>
   	  <artifactId>orcid</artifactId>
-	  <version>1.0.11</version>
+	  <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

@@ -1,5 +1,13 @@
 package org.grants.orcid;
 
+/**
+ * History
+ * 1.1.0: replaced `record` with `profile`
+ * 
+ * @author dima
+ *
+ */
+
 public enum RequestType {
-	bio, works, record
+	bio, works, profile
 }

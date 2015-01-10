@@ -52,6 +52,11 @@ import au.org.ands.standards.rif_cs.registryobjects.SubjectType;
  * Library to import Rif XML file. Used by RDA importer
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
  *
+ * History
+ * 2.1.0 Added RDA_GROUP and INSTITUTION properties.
+ * 	     RDA_KEY has been renamed to RDA_ID
+ * 		 a new RDK_KEY property has been added to store actual key value
+ *
  */
 public class Importer {
 
@@ -70,6 +75,8 @@ public class Importer {
 	
 	private static final String PROPERTY_KEY = "key";
 	private static final String PROPERTY_RDA_KEY = "rda_key";
+	private static final String PROPERTY_RDA_GROUP = "rda_group";
+	private static final String PROPERTY_RDA_ID = "rda_id";
 	private static final String PROPERTY_NODE_SOURCE = "node_source";
 	private static final String PROPERTY_NODE_TYPE = "node_type";
 	private static final String PROPERTY_TYPE = "type";
@@ -81,6 +88,7 @@ public class Importer {
 	private static final String PROPERTY_SUBJECT = "subject";
 	private static final String PROPERTY_DESCRIPTION = "subject";
 	private static final String PROPERTY_URL = "url";
+	private static final String PROPERTY_INSTITUTION = "institution";
 	
 	private static final String NAME_PART_FAMILY = "family";
 	private static final String NAME_PART_GIVEN = "given";
@@ -230,16 +238,17 @@ public class Importer {
 							RegistryObjects registryObjects = (RegistryObjects) metadata;
 							if (registryObjects.getRegistryObject() != null && registryObjects.getRegistryObject().size() > 0) {
 								for (RegistryObjects.RegistryObject registryObject : registryObjects.getRegistryObject()) {
+									String group = registryObject.getGroup();
 									String key = registryObject.getKey();
 									
 									if (registryObject.getCollection() != null) 
-										importCollection(idetifier, key, registryObject.getCollection());
+										importCollection(idetifier, group, key, registryObject.getCollection());
 									else if (registryObject.getActivity() != null)
-										importActivity(idetifier, key, registryObject.getActivity());
+										importActivity(idetifier, group, key, registryObject.getActivity());
 									else if (registryObject.getService() != null) 
-										importService(idetifier, key, registryObject.getService());
+										importService(idetifier, group, key, registryObject.getService());
 									else if (registryObject.getParty() != null) 
-										importParty(idetifier, key, registryObject.getParty());
+										importParty(idetifier, group, key, registryObject.getParty());
 									else
 										System.out.println("The record is empty!");
 									
@@ -267,11 +276,14 @@ public class Importer {
 		}		
 	}
 	
-	private void importCollection(final String idetifier, final String key, Collection collection) {
+	private void importCollection(final String idetifier, final String group, final String key, Collection collection) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		map.put(PROPERTY_KEY, key);
-		map.put(PROPERTY_RDA_KEY, idetifier);
+		map.put(PROPERTY_RDA_ID, idetifier);
+		map.put(PROPERTY_RDA_KEY, key);
+		map.put(PROPERTY_RDA_GROUP, group);
+		map.put(PROPERTY_INSTITUTION, group);
 		map.put(PROPERTY_NODE_SOURCE, LABEL_RDA);
 		map.put(PROPERTY_NODE_TYPE, LABEL_COLLECTION);
 		
@@ -364,11 +376,14 @@ public class Importer {
 			node.addLabel(Labels.RDA);
 	}
 	
-	private void importActivity(final String idetifier, final String key, Activity activity) {
+	private void importActivity(final String idetifier, final String group, final String key, Activity activity) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+	
 		map.put(PROPERTY_KEY, key);
-		map.put(PROPERTY_RDA_KEY, idetifier);
+		map.put(PROPERTY_RDA_ID, idetifier);
+		map.put(PROPERTY_RDA_KEY, key);
+		map.put(PROPERTY_RDA_GROUP, group);
+		map.put(PROPERTY_INSTITUTION, group);
 		map.put(PROPERTY_NODE_SOURCE, LABEL_RDA);
 		map.put(PROPERTY_NODE_TYPE, LABEL_ACTIVITY);
 		
@@ -450,11 +465,14 @@ public class Importer {
 			node.addLabel(Labels.RDA);
 	}
 	
-	private void importService(final String idetifier, final String key, Service service) {
+	private void importService(final String idetifier, final String group, final String key, Service service) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		map.put(PROPERTY_KEY, key);
-		map.put(PROPERTY_RDA_KEY, idetifier);
+		map.put(PROPERTY_RDA_ID, idetifier);
+		map.put(PROPERTY_RDA_KEY, key);
+		map.put(PROPERTY_RDA_GROUP, group);
+		map.put(PROPERTY_INSTITUTION, group);
 		map.put(PROPERTY_NODE_SOURCE, LABEL_RDA);
 		map.put(PROPERTY_NODE_TYPE, LABEL_SERVICE);
 		
@@ -536,11 +554,14 @@ public class Importer {
 			node.addLabel(Labels.RDA);
 	}
 	
-	private void importParty(final String idetifier, final String key, Party party) {
+	private void importParty(final String idetifier, final String group, final String key, Party party) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		map.put(PROPERTY_KEY, key);
-		map.put(PROPERTY_RDA_KEY, idetifier);
+		map.put(PROPERTY_RDA_ID, idetifier);
+		map.put(PROPERTY_RDA_KEY, key);
+		map.put(PROPERTY_RDA_GROUP, group);
+		map.put(PROPERTY_INSTITUTION, group);
 		map.put(PROPERTY_NODE_SOURCE, LABEL_RDA);
 		map.put(PROPERTY_NODE_TYPE, LABEL_PARTY);
 		

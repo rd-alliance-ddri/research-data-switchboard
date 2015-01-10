@@ -7,10 +7,13 @@ package org.grants.importers.rda;
  * and will post data into Neo4J located at http://localhost:7474/db/data/
  * 
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
- * @version 1.0.1
+ * @version 1.0.2
+ * 
+ * History
+ * 1.0.2: Updated code to work with server neo4j-1.1
  */
 public class App {
-	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7472/db/data/";
 	private static final String JSON_FOLDER_URI = "rda/json";
 	
 	/**

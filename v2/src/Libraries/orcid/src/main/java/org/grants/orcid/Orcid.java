@@ -12,13 +12,22 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
+/**
+ * History
+ * 1.1.0: Update API URL's
+ * 
+ * @author dima
+ *
+ */
+
 public class Orcid {
-	private static final String ORCID_URL = "http://pub.orcid.org/";
+	private static final String ORCID_URL = "http://pub.orcid.org/v1.1/";
 	private static final String ORCID_HOST = "orcid.org/";
 	
-	//private static final String ORCID_BIO = "/orcid-bio";
+	private static final String ORCID_BIO = "/orcid-bio";
 	private static final String ORCID_WORKS = "/orcid-works";
-	private static final String ORCID_RECORD = "/orcid-record";
+	private static final String ORCID_PROFILE = "/orcid-profile";
+	//private static final String ORCID_RECORD = "/orcid-record";
 	
 	private static final ObjectMapper mapper = new ObjectMapper();  
 	
@@ -33,10 +42,12 @@ public class Orcid {
 			orcidId = orcidId.substring(idx + ORCID_HOST.length());
 		
 		String url = ORCID_URL + orcidId;
+		if (responseType == RequestType.bio)
+			url += ORCID_BIO;
 		if (responseType == RequestType.works)
 			url += ORCID_WORKS;
-		else if (responseType == RequestType.record)
-			url += ORCID_RECORD;
+		else if (responseType == RequestType.profile)
+			url += ORCID_PROFILE;
 			
 		return get(url);
 	}

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.importers</groupId>
   <artifactId>import_rda2</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>RDA JSON importer</name>
   
   <properties>
