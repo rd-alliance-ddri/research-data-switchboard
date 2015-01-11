@@ -5,12 +5,21 @@ import java.util.List;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+/**
+ * History
+ * 1.0.2: Added `extra` property
+ * 
+ * @author dima
+ *
+ */
+
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Node {
 	private String id;
 	private String key;
 	private String name;
 	private String type;
+	private String extra;
 	
 	private List<Property> properties;
 	private List<Relationship> relationships;
@@ -47,6 +56,13 @@ public class Node {
 		this.name = name;
 	}
 	
+	public String getExtra() {
+		return extra;
+	}
+	public void setExtra(String extra) {
+		this.extra = extra;
+	}
+		
 	public List<Property> getProperties() {
 		return properties;
 	}
@@ -83,11 +99,17 @@ public class Node {
 	
 	public void addRelationship(String type, String key) {
 		addRelationship(new Relationship(type, key));
-	}
-	
+	}		
+
 	@Override
 	public String toString() {
-		return "Node [type=" + type + ", key=" + key + ", id=" + id + ", name="
-				+ name + ", properties=" + properties + ", relationships=" + relationships + "]";
+		return "Node [type=" + type 
+				+ ", key=" + key 
+				+ ", id=" + id 
+				+ ", name=" + name 
+				+ ", extra=" + extra
+				+ ", properties=" + properties 
+				+ ", relationships=" + relationships 
+				+ "]";
 	}	
 }

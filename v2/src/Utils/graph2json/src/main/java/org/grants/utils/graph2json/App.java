@@ -14,6 +14,14 @@ import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
+/**
+ * History
+ * 1.0.2: Marked first node as root
+ * 
+ * @author dima
+ *
+ */
+
 public class App {
 
 	private static final ObjectMapper mapper = new ObjectMapper();   
@@ -161,6 +169,10 @@ public class App {
 					node.setName((String) properties.get(FIELD_NAME));
 					break;									
 				}
+				
+				// only first node will be root node
+				if (nodes.isEmpty())
+					node.setExtra("root");
 				
 				nodes.put(id, node);
 			}
