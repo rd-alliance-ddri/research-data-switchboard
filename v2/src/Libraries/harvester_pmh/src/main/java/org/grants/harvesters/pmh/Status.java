@@ -16,6 +16,8 @@ public class Status {
 	private Set<String> processedSets;
 	private String currentSet;
 	private String resumptionToken;
+	private int setSize;
+	private int setOffset;
 	
 	/**
 	 * Return collecton of processed sets
@@ -76,6 +78,24 @@ public class Status {
 	@XmlElement
 	public void setResumptionToken(String resumptionToken) {
 		this.resumptionToken = resumptionToken;
+	}
+	
+	public int getSetSize() {
+		return setSize;
+	}
+
+	@XmlElement
+	public void setSetSize(int setSize) {
+		this.setSize = setSize;
+	}
+
+	public int getSetOffset() {
+		return setOffset;
+	}
+
+	@XmlElement
+	public void setSetOffset(int setOffset) {
+		this.setOffset = setOffset;
 	}
 
 	@Override

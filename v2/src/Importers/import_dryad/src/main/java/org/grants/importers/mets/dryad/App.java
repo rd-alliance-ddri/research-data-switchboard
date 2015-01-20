@@ -18,6 +18,7 @@ import org.grants.importers.mets.Importer;
 public class App {
 	
 	private static final String XML_FOLDER_URI = "dryad/xml/mets";
+	//private static final String XML_FOLDER_URI = "dryad-1";
 	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
 	
 	/**

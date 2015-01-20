@@ -1,17 +1,32 @@
 package org.grants.scopus;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.grants.scopus.response.SearchResults;
+import org.grants.scopus.response.facet.Facet;
+import org.grants.scopus.type.AbstractType;
+import org.grants.scopus.type.AcceptType;
+import org.grants.scopus.type.AuthorFormatType;
+import org.grants.scopus.type.ContentType;
+import org.grants.scopus.type.ResourceType;
+import org.grants.scopus.type.SortType;
+import org.grants.scopus.type.VersionType;
+import org.grants.scopus.type.ViewType;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class Scopus {
-	private static final String URL_API = "https://api.elsevier.com/content/search/";
+	private static final String URL_SEARCH_API = "https://api.elsevier.com/content/search/";
+	private static final String URL_ABSTRACT_API = "http://api.elsevier.com/content/abstract/";
 	
 	private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
 	private static final String HTTP_HEADER_API_KEY = "X-ELS-APIKey";
@@ -22,6 +37,13 @@ public class Scopus {
 	
 	private static final String SEPARATOR = ";";
 	private static final String SEPARATOR2 = ",";
+	
+	private static final ObjectMapper mapper = new ObjectMapper();   
+	
+	static {
+		mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+		//mapper.configure(Feature.UNWRAP_ROOT_VALUE, true);
+	}
 	
 	/**
 	 * This represents a unique application developer key providing access to API resources. 
@@ -156,7 +178,7 @@ public class Scopus {
 	/**
 	 * The type of resource (scopus is default)
 	 */
-	private ResourceType resourceType = ResourceType.resourceTypeScopus;
+	//private ResourceType resourceType = ResourceType.resourceTypeScopus;
 	
 	/**
 	 * This represents the acceptable mime type format in which the response can be generated. 
@@ -235,7 +257,7 @@ public class Scopus {
 	public Scopus(String apiKey, String instToken, ResourceType resourceType) {
 		this.apiKey = apiKey;
 		this.instToken = instToken;
-		this.resourceType = resourceType;
+	//	this.resourceType = resourceType;
 	}
 
 	/**
@@ -246,16 +268,201 @@ public class Scopus {
 	public Scopus(String apiKey, String instToken) {
 		this.apiKey = apiKey;
 		this.instToken = instToken;
-		this.resourceType = ResourceType.resourceTypeScopus;
+	//	this.resourceType = ResourceType.resourceTypeScopus;
 	}
 	
-	public String query(String query) {
+	public SearchResults parseJson(String json) {
+		try {
+			return mapper.readValue(json, SearchResults.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+	public SearchResults parseJson(File fileJson) {
+		try {
+			return mapper.readValue(fileJson, SearchResults.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+		
+	public SearchResults search(ResourceType resourceType, String query) {
+		return parseJson(searchString(resourceType, query));
+	}
+	
+	public String searchString(ResourceType resourceType, String query) {
 		StringBuilder q = new StringBuilder();
 		
-		q.append(URL_API);
+		q.append(URL_SEARCH_API);
 		q.append(resourceType.toString());
 		q.append("?query=");
 		q.append(query);
+		
+		if (null != fields && !fields.isEmpty()) {
+			StringBuilder sb = null;
+			for (String field : fields) {
+				if (null == sb)
+					sb = new StringBuilder();
+				else
+					sb.append(SEPARATOR2);
+				sb.append(field);
+			}
+			
+			if (null != sb) {
+				q.append("&field=");
+				q.append(sb.toString());
+			}				
+		} else if (null != viewType) {
+			q.append("&view=");
+			q.append(viewType.toString());
+		}
+		
+		if (null != suppressNavLinks) {
+			q.append("&suppressNavLinks=");
+			q.append(suppressNavLinks);
+		}
+		
+		if (null != date) {
+			q.append("&date=");
+			q.append(date);
+		}
+
+		if (null != start) {
+			q.append("&start=");
+			q.append(start);
+		}
+		
+		if (null != count) {
+			q.append("&count=");
+			q.append(count);
+		}
+		
+		if (null != sortOptions) {
+			StringBuilder sb = null;
+			for (SortType sortType : sortOptions) {
+				if (null == sb)
+					sb = new StringBuilder();
+				else
+					sb.append(SEPARATOR2);
+				
+				sb.append(sortType.toString());
+			}
+			
+			if (null != sb) {
+				q.append("&sort=");
+				q.append(sb.toString());
+			}
+		}
+		
+		if (null != contentType) {
+			q.append("&content=");
+			q.append(contentType.toString());
+		}
+		
+		if (null != subj) {
+			q.append("&subj=");
+			q.append(subj);
+		}
+		
+		if (null != enableAlias) {
+			q.append("&alias=");
+			q.append(enableAlias);
+		}
+
+		if (null != resolveGroups) {
+			q.append("&resolveGroups=");
+			q.append(resolveGroups);
+		}
+		
+		if (null != authorFormatType) {
+			q.append("&authorFormat=");
+			q.append(authorFormatType.toString());
+		}
+			
+		if (null != facets) {
+			StringBuilder sb = null;
+			for (Facet facet : facets) {
+				if (null == sb)
+					sb = new StringBuilder();
+				else
+					sb.append(SEPARATOR);
+				
+				sb.append(facet.toString());
+			}
+			
+			if (null != sb) {
+				q.append("&facets=");
+				q.append(sb.toString());
+			}
+		}
+		
+		String url = q.toString();
+		System.out.println("Downloading: "+ url);
+		
+		Builder builder = Client
+				.create()
+				.resource( url )
+				.type( MediaType.APPLICATION_JSON );
+		// set accept type
+		if (null != acceptType) {
+			switch (acceptType) {
+			case acceptTypeJson:
+				builder = builder.accept( MediaType.APPLICATION_JSON );
+				break;
+				
+			case acceptTypeXml:
+				builder = builder.accept( MediaType.APPLICATION_XML );
+				break;
+				
+			case acceptTypeAtomXml:
+				builder = builder.accept( MediaType.APPLICATION_ATOM_XML );
+				break;
+			}
+		} else
+			builder = builder.accept( MediaType.APPLICATION_JSON );
+				
+		// set authorization (if any)
+		if (null != authorization)
+			builder = builder.header(HTTP_HEADER_AUTHORIZATION, authorization);
+		if (null != apiKey)
+			builder = builder.header(HTTP_HEADER_API_KEY, apiKey);
+		if (null != instToken)
+			builder = builder.header(HTTP_HEADER_INSTTOKEN, instToken);
+		if (null != reqId)
+			builder = builder.header(HTTP_HEADER_REQ_ID, reqId);
+		if (null != resourceVersion && !resourceVersion.isEmpty()) {
+			StringBuilder sb = null;
+			for (VersionType versionType : resourceVersion) {
+				if (null == sb)
+					sb = new StringBuilder();
+				else
+					sb.append(SEPARATOR);
+				sb.append(versionType.toString());
+			}
+			builder = builder.header(HTTP_HEADER_RESOURCE_VERSION, sb.toString());
+		}
+		
+				
+		ClientResponse response = builder.get( ClientResponse.class );
+		
+		if (response.getStatus() == 200) 
+			return response.getEntity( String.class );
+		else
+			return null;
+	}
+	
+	public String abstractString(AbstractType abstractType, String id) {
+		StringBuilder q = new StringBuilder();
+		
+		q.append(URL_ABSTRACT_API);
+		q.append(abstractType.toString());
+		q.append("/");
+		q.append(id);
 		
 		if (null != fields && !fields.isEmpty()) {
 			StringBuilder sb = null;
@@ -569,6 +776,5 @@ public class Scopus {
 	public void setFacets(List<Facet> facets) {
 		this.facets = facets;
 	}
-	
 	
 }

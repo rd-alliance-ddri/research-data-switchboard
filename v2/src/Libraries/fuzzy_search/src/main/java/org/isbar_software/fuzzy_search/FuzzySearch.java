@@ -5,8 +5,6 @@ package org.isbar_software.fuzzy_search;
  * 
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 

@@ -44,6 +44,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
 /**
  * OAI:PMH Harvester Library
  * 
@@ -119,6 +120,8 @@ public class Harvester {
 	protected static final String URL_LIST_RECORDS_RESUMPTION_TOKEN = "?verb=ListRecords&resumptionToken=%s";
 
 	protected static final String ELEMENT_ROOT = "OAI-PMH";
+	
+	protected static final String XPATH_RESUMPTION_TOKEN = "/OAI-PMH/ListRecords/resumptionToken";
 
 	/**
 	 * variable to store repo URL. Can not be null.
@@ -155,6 +158,11 @@ public class Harvester {
 	 * Document builder factory to load and parse XML documents
 	 */
 	protected DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	
+	/**
+	 * xPath processor
+	 */
+	//protected XPath xPath = XPathFactory.newInstance().newXPath();
 	
 //	private String responseDate;
 	private String repositoryName;
@@ -269,6 +277,18 @@ public class Harvester {
 		
 		return doc;
 	}
+
+	/*
+	protected String getString( final String url ) {	
+		ClientResponse response = Client.create()
+								  .resource( url )
+								  .get( ClientResponse.class );
+		
+		if (response.getStatus() == 200) 
+			return response.getEntity( String.class );
+		
+		return null;
+    } */
 	
 	/**
 	 * Protected function to print Document
@@ -644,15 +664,15 @@ public class Harvester {
 	 * @throws IOException
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws TransformerException
+	 * @throws XPathExpressionException 
 	 */
-	public String downloadRecordsSimple( final String set, final MetadataPrefix metadataPrefix, 
-			final String resumptionToken) throws ParserConfigurationException, SAXException, 
+	public String downloadRecordsSimple( final String set, final MetadataPrefix metadataPrefix,
+			final String resumptionToken) throws ParserConfigurationException, SAXException,
 			IOException, TransformerFactoryConfigurationError, TransformerException {
-				
+	
 		// create set folder
 		String setName = URLEncoder.encode(set, "UTF-8");
-		
-		String url = repoUrl;	
+		String url = repoUrl;
 		if (null != resumptionToken) {
 			try {
 				url += String.format(URL_LIST_RECORDS_RESUMPTION_TOKEN, URLEncoder.encode(resumptionToken, "UTF-8"));
@@ -661,12 +681,13 @@ public class Harvester {
 			}
 		}
 		else
-			url += String.format(URL_LIST_RECORDS, set,  metadataPrefix.name());
+			url += String.format(URL_LIST_RECORDS, set, metadataPrefix.name());
+		
 		System.out.println(url);
 		
 		// Get XML document and parse it
-		Document doc  = GetXml(url);
-			
+		Document doc = GetXml(url);
+		
 		// Extract root element
 		Element root = getDocumentElementByTagName(doc, ELEMENT_ROOT);
 		
@@ -676,18 +697,18 @@ public class Harvester {
 		
 		// Create new transformer
 		Transformer transformer = transformerFactory.newTransformer();
-			
+		
 		// Create set path
-		String setPath = getSetPath(setName); 
+		String setPath = getSetPath(setName);
 		new File(setPath).mkdirs();
-	
+		
 		// Create file name and temporary file name
 		String filePath = setPath + "/" + setOffset + ".xml";
 		String fileTmp = setPath + "/" + setOffset + ".tmp";
 		
 		// Output file as temporary
-		transformer.transform(new DOMSource(doc), new StreamResult(fileTmp));	
-	
+		transformer.transform(new DOMSource(doc), new StreamResult(fileTmp));
+		
 		// Create file ojects
 		File fPath = new File(filePath);
 		File fTmp = new File(fileTmp);
@@ -695,23 +716,21 @@ public class Harvester {
 		// Check that file already exists
 		if (fPath.exists()) {
 			// Compare file sizes
-			if (fPath.length() != fTmp.length()) 
+			if (fPath.length() != fTmp.length())
 			{
 				// if file size are different, move old file to cache, if it is same, just delete the old file
 				String setCachePath = getCacheSetPath(setName);
 				new File(setCachePath).mkdirs();
-				
+		
 				fPath.renameTo(new File(setCachePath + "/" + setOffset + "_" + dateFormat.format(new Date()) + ".xml"));
 			}
 			else
 				fPath.delete();
-
+			
 			// restore path name (might be not needed)
-		//	fPath = new File(filePath);
+			// fPath = new File(filePath);
 		}
-
 		fTmp.renameTo(fPath);
-		
 		NodeList nl = doc.getElementsByTagName("resumptionToken");
 		if (nl != null && nl.getLength() > 0)
 		{
@@ -720,25 +739,20 @@ public class Harvester {
 			if (null != tokenString && !tokenString.isEmpty()) {
 				String cursor = token.getAttribute("cursor");
 				String size = token.getAttribute("completeListSize");
-				
 				try {
 					setSize = Integer.parseInt(size);
 				} catch(Exception e) {
 					setSize = 0;
 				}
-				
 				try {
 					setOffset = Integer.parseInt(cursor);
 				} catch(Exception e) {
 					++setOffset;
-				}				
-				
+				}
 				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
-			
 				return token.getTextContent();
 			}
 		}
-		
 		return null;
 	}
 	
@@ -883,13 +897,21 @@ public class Harvester {
 		    if (status.getProcessedSets().contains(set))
 		    	continue;
 		    
-		    String resumptionToken = null;
+		    setSize = 0;
+		    setOffset = 0;
 		    
-		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set))
+		    String resumptionToken = null;
+		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set)) {
+
+		    	setSize = status.getSetSize();
+		    	setOffset = status.getSetOffset();
+		    	
 		    	resumptionToken = status.getResumptionToken();
-		    else {
+		    } else {
 		    	status.setCurrentSet(set);
 		    	status.setResumptionToken(null);
+		    	status.setSetSize(0);
+		    	status.setSetOffset(0);
 		    
 		   // 	saveStatus(status, fileStatus);
 		    }
@@ -898,9 +920,6 @@ public class Harvester {
 		    
 		    System.out.println("Processing set: " +  URLDecoder.decode(setName, "UTF-8"));
 		    
-		    setSize = 0;
-		    setOffset = 0;
-		    
 		    int nError = 0;
 		    do {
 		    	try {
@@ -908,6 +927,8 @@ public class Harvester {
 		    		
 		    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
 		    			status.setResumptionToken(resumptionToken);
+		    			status.setSetSize(setSize);
+		    			status.setSetOffset(setOffset);
 		    			saveStatus(status, fileStatus);
 		    		}
 		    		
@@ -930,6 +951,8 @@ public class Harvester {
 		    status.addProcessedSet(set);
 		    status.setCurrentSet(null);
 		    status.setResumptionToken(null);
+		    status.setSetSize(0);
+		    status.setSetOffset(0);
 		    saveStatus(status, fileStatus);
 		}
 		
@@ -968,11 +991,19 @@ public class Harvester {
 		    
 		    String resumptionToken = null;
 		    
-		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set))
+		    setSize = 0;
+		    setOffset = 0;
+		    
+		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set)) {
 		    	resumptionToken = status.getResumptionToken();
-		    else {
+		    	
+		    	setSize = status.getSetSize();
+		    	setOffset = status.getSetOffset();
+		    } else {
 		    	status.setCurrentSet(set);
 		    	status.setResumptionToken(null);
+		    	status.setSetSize(0);
+		    	status.setSetOffset(0);
 		    
 		   // 	saveStatus(status, fileStatus);
 		    }
@@ -981,8 +1012,7 @@ public class Harvester {
 		    
 		    System.out.println("Processing set: " +  URLDecoder.decode(setName, "UTF-8"));
 		    
-		    setSize = 0;
-		    setOffset = 0;
+		
 		    
 		    int nError = 0;
 		    do {
@@ -991,6 +1021,8 @@ public class Harvester {
 		    		
 		    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
 		    			status.setResumptionToken(resumptionToken);
+		    			status.setSetSize(setSize);
+		    			status.setSetOffset(setOffset);
 		    			saveStatus(status, fileStatus);
 		    		}
 		    		
@@ -1013,6 +1045,8 @@ public class Harvester {
 		    status.addProcessedSet(set);
 		    status.setCurrentSet(null);
 		    status.setResumptionToken(null);
+		    status.setSetSize(0);
+		    status.setSetOffset(0);
 		    saveStatus(status, fileStatus);
 		}
 		

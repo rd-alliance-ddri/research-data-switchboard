@@ -65,7 +65,7 @@ public class Importer {
 	private static final String LABEL_SERVICE = "Service";
 	private static final String LABEL_PARTY = "Party";
 	
-	private static final String LABEL_RDA = "Dryad";
+	private static final String LABEL_RDA = "RDA";
 	private static final String LABEL_RDA_COLLECTION = LABEL_RDA + "_" + LABEL_COLLECTION;
 	private static final String LABEL_RDA_ACTIVITY = LABEL_RDA + "_" + LABEL_ACTIVITY;
 	private static final String LABEL_RDA_SERVICE = LABEL_RDA + "_" + LABEL_SERVICE;

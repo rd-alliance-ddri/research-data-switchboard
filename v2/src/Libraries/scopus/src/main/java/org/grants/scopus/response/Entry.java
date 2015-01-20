@@ -2,6 +2,9 @@ package org.grants.scopus.response;
 
 import java.util.List;
 
+import org.grants.scopus.deserilaize.AuthorArrayDeserializer;
+import org.grants.scopus.deserilaize.DateArrayDeserializer;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,7 +25,9 @@ public class Entry extends ScopusObject {
 	private String doi;
 	private String isbn;
 	private String issn;
+	private String eIssn;
 	private String volume;
+	private String pageRange;
 	private String startingPage;
 	private String endingPage;
 	private String issueIdentifier;
@@ -31,11 +36,15 @@ public class Entry extends ScopusObject {
 	private String teaser;
 	private String url;
 	private String pubType;
+	private String citedbyCount;
+	private String subtype;
+	private String subtypeDescription;
 	private boolean openaccessFlag;
 	private List<Author> authors;
 	private List<Link> links;
 	private List<Date> coverDates;
-	
+	private List<Affiliation> affiliations;
+
 	@JsonCreator
 	public Entry(
 			@JsonProperty("@_fa") final boolean _fa) {
@@ -51,6 +60,13 @@ public class Entry extends ScopusObject {
 		this.scopusEid = scopusEid;
 	}
 
+	// aliase for scopusEid
+	@JsonProperty("eid")
+	public void setEid(String eid) {
+		this.scopusEid = eid;
+	}
+
+	
 	public String getScopusId() {
 		return scopusId;
 	}
@@ -174,6 +190,15 @@ public class Entry extends ScopusObject {
 		this.issn = issn;
 	}
 	
+	public String geteIssn() {
+		return eIssn;
+	}
+
+	@JsonProperty("prism:eIssn")
+	public void seteIssn(String eIssn) {
+		this.eIssn = eIssn;
+	}
+	
 	public String getVolume() {
 		return volume;
 	}
@@ -183,6 +208,15 @@ public class Entry extends ScopusObject {
 		this.volume = volume;
 	}
 	
+	public String getPageRange() {
+		return pageRange;
+	}
+
+	@JsonProperty("prism:pageRange")
+	public void setPageRange(String pageRange) {
+		this.pageRange = pageRange;
+	}
+
 	public String getStartingPage() {
 		return startingPage;
 	}
@@ -254,6 +288,31 @@ public class Entry extends ScopusObject {
 		this.pubType = pubType;
 	}
 	
+	public String getCitedbyCount() {
+		return citedbyCount;
+	}
+
+	@JsonProperty("citedby-count")
+	public void setCitedbyCount(String citedbyCount) {
+		this.citedbyCount = citedbyCount;
+	}
+	
+	public String getSubtype() {
+		return subtype;
+	}
+
+	public void setSubtype(String subtype) {
+		this.subtype = subtype;
+	}
+
+	public String getSubtypeDescription() {
+		return subtypeDescription;
+	}
+
+	public void setSubtypeDescription(String subtypeDescription) {
+		this.subtypeDescription = subtypeDescription;
+	}
+
 	public boolean isOpenaccessFlag() {
 		return openaccessFlag;
 	}
@@ -285,8 +344,18 @@ public class Entry extends ScopusObject {
 	}
 
 	@JsonProperty("prism:coverDate")
+	@JsonDeserialize(using = DateArrayDeserializer.class)
 	public void setCoverDates(List<Date> coverDates) {
 		this.coverDates = coverDates;
+	}
+	
+	public List<Affiliation> getAffiliations() {
+		return affiliations;
+	}
+
+	@JsonProperty("affiliation")
+	public void setAffiliations(List<Affiliation> affiliations) {
+		this.affiliations = affiliations;
 	}
 
 	@Override

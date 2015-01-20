@@ -3,12 +3,20 @@ package org.grants.orcid;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
+/**
+ * History:
+ * 1.1.1 Added deactivationDate property
+ * @author dima
+ *
+ */
+
 public class OrcidHistory {
 	private String creationMethod;
 	private String completionDate;
 	private String submissionDate;
 	private String lastModifiedDate;
 	private String claimed;
+	private String deactivationDate;
 	private Source source;
 	private String visibility;
 	
@@ -63,7 +71,18 @@ public class OrcidHistory {
 	public void setClaimed(String claimed) {
 		this.claimed = claimed;
 	}
-	
+		
+	public String getDeactivationDate() {
+		return deactivationDate;
+	}
+
+	@JsonProperty("deactivation-date")
+	@JsonDeserialize(using = ValueDeserializer.class)
+	public void setDeactivationDate(String deactivationDate) {
+		this.deactivationDate = deactivationDate;
+	}
+
+
 	public Source getSource() {
 		return source;
 	}
@@ -83,9 +102,12 @@ public class OrcidHistory {
 	@Override
 	public String toString() {
 		return "OrcidHistory [creationMethod=" + creationMethod
-				+ ", completionDate=" + completionDate + ", submissionDate="
-				+ submissionDate + ", lastModifiedDate=" + lastModifiedDate
-				+ ", claimed=" + claimed + ", source=" + source
+				+ ", completionDate=" + completionDate 
+				+ ", submissionDate=" + submissionDate 
+				+ ", lastModifiedDate=" + lastModifiedDate
+				+ ", claimed=" + claimed 
+				+ ", deactivationDate=" + deactivationDate 
+				+ ", source=" + source
 				+ ", visibility=" + visibility + "]";
 	}
 }

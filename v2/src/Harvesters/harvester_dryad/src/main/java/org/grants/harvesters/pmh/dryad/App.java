@@ -41,7 +41,8 @@ public class App {
 			}
 			
 			// harvest
-			harvester.harvest(MetadataPrefix.mets);
+			harvester.harvestSimple(MetadataPrefix.oai_dc);
+			harvester.harvestSimple(MetadataPrefix.mets);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
