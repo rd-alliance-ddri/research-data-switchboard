@@ -105,6 +105,8 @@ public class Compiler {
 			int id = (Integer) row.get("id");
 			Object doi = row.get("doi");
 			
+			System.out.println(id);
+			
 			if (doi != null) {
 				RestNode nodePublication = graphDb2.getNodeById(id);
 				if (doi instanceof String) {
@@ -130,6 +132,8 @@ public class Compiler {
 			
 			int id = (Integer) row.get("id");
 			Object doi = row.get("doi");
+			
+			System.out.println(id);
 			
 			if (doi != null) {
 				RestNode nodeDataset = graphDb2.getNodeById(id);

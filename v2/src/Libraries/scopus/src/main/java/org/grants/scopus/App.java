@@ -7,7 +7,7 @@ import org.grants.scopus.response.SearchResults;
 public class App {
 
 	public static void main(String[] args) {
-		Scopus scopus = new Scopus(null, null);
+		Scopus scopus = new Scopus();
 		
 		// Parse test
 		SearchResults results = scopus.parseJson(new File("/home/dima/response-1.json"));
