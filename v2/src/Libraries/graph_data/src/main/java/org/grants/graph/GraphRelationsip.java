@@ -1,4 +1,4 @@
-package org.grants.exporters.graph;
+package org.grants.graph;
 
 import java.util.Map;
 

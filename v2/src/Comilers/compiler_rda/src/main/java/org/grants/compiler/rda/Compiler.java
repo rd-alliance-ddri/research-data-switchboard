@@ -147,8 +147,8 @@ public class Compiler {
 	}
 	
 	public void process() {
-	//	importRDA();
-	//	importARC();
+		importRDA();
+		importARC();
 		importNHMRC();
 	}
 	

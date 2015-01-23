@@ -223,4 +223,36 @@ public class Neo4jUtils {
 		
 		return createUniqueNode(graphDb, index, labelSource, labelType, PROPERTY_KEY, value, props);
 	}
+	
+	public static RestNode mergeNode(RestCypherQueryEngine engine, 
+			String labelType, String labelSource, Map<String, Object> props) {
+				
+		StringBuilder cypher = new StringBuilder();
+		cypher.append("MERGE (n:");
+		cypher.append(labelSource);
+		cypher.append(":");
+		cypher.append(labelType);
+		cypher.append(" { ");
+		boolean bInit = false;
+		
+		for (String key : props.keySet()) {
+		    if (bInit)
+		    	cypher.append(", ");
+		    else
+		    	bInit = true;
+		    
+		    cypher.append(key);
+		    cypher.append(": { " + key + " }");
+		    //cypher.append(key);
+		}
+		
+		cypher.append(" }) RETURN n");
+		
+	//	System.out.println(cypher.toString());
+		
+		engine.query(cypher.toString(), props);
+		
+		return null;
+		
+	}
 }

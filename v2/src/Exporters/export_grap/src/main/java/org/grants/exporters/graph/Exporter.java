@@ -8,6 +8,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import org.grants.graph.GraphNode;
+import org.grants.graph.GraphRelationsip;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -61,15 +63,18 @@ public class Exporter {
 			
 			System.out.println("Node: " + node.getId());
 			
-			String fileName = Long.toString(node.getId()) + ".xml";
+			String fileName = Long.toString(node.getId()) + ".json";
 			GraphNode nodeGraph = new GraphNode(node);
 			
+			mapper.writeValue(new File(folder, fileName), nodeGraph);
+			
+			/*
 			String jsonString = mapper.writeValueAsString(nodeGraph);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(folder, fileName)), "utf-8"));
 			
 			writer.write(jsonString);
-			writer.close();
+			writer.close();*/
 		}
 	}
 	
@@ -83,15 +88,18 @@ public class Exporter {
 			
 			System.out.println("Relationship: " + relationship.getId());
 			
-			String fileName = Long.toString(relationship.getId()) + ".xml";
+			String fileName = Long.toString(relationship.getId()) + ".json";
 			GraphRelationsip relationshipGraph = new GraphRelationsip(relationship);
-					
+				
+			mapper.writeValue(new File(folder, fileName), relationshipGraph);
+			/*
+			
 			String jsonString = mapper.writeValueAsString(relationshipGraph);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(new File(folder, fileName)), "utf-8"));
 			
 			writer.write(jsonString);
-			writer.close();
+			writer.close();*/
 		}
 	}
 }

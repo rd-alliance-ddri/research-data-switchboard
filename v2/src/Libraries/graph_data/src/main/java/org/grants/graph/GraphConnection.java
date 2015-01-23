@@ -1,4 +1,4 @@
-package org.grants.exporters.graph;
+package org.grants.graph;
 
 import org.grants.neo4j.Neo4jUtils;
 import org.neo4j.rest.graphdb.entity.RestNode;

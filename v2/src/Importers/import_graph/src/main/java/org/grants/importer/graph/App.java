@@ -1,9 +1,9 @@
-package org.grants.exporters.graph;
+package org.grants.importer.graph;
 
 import java.io.IOException;
 
 public class App {
-	private static final String SOURCE_NEO4J_URL = "http://localhost:7484/db/data/";	
+	private static final String SOURCE_NEO4J_URL = "http://localhost:7492/db/data/";	
 	private static final String OUTPUT_FOLDER = "graph";	
 	
 	public static void main(String[] args) {
@@ -18,8 +18,8 @@ public class App {
 			outputFolder = args[1];
 		
 		try {
-			Exporter expoter = new Exporter(sourceNeo4jUrl, outputFolder);
-			expoter.process();
+			Importer importer = new Importer(sourceNeo4jUrl, outputFolder);
+			importer.process();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
