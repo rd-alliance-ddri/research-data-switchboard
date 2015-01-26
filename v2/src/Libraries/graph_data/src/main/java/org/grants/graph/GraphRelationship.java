@@ -6,19 +6,21 @@ import org.grants.neo4j.Neo4jUtils;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 
-public class GraphRelationsip {
+public class GraphRelationship {
 	private GraphConnection start;
 	private GraphConnection end;
+	private String relationship;
 	private Map<String, Object> properties;
 
-	public GraphRelationsip() {
+	public GraphRelationship() {
 		
 	}
 	
-	public GraphRelationsip(RestRelationship relationship) {
+	public GraphRelationship(RestRelationship relationship, GraphConnection start, GraphConnection end) {
+		this.relationship = relationship.getType().name();
 		this.properties = Neo4jUtils.getProperties(relationship);
-		this.start = new GraphConnection((RestNode) relationship.getStartNode());
-		this.end = new GraphConnection((RestNode) relationship.getEndNode());
+		this.start = start;
+		this.end = end;		
 	}
 	
 	public GraphConnection getStart() {
@@ -36,6 +38,14 @@ public class GraphRelationsip {
 	public void setEnd(GraphConnection end) {
 		this.end = end;
 	}
+	
+	public String getRelationship() {
+		return relationship;
+	}
+
+	public void setRelationship(String relationship) {
+		this.relationship = relationship;
+	}
 
 	public Map<String, Object> getProperties() {
 		return properties;
@@ -48,7 +58,8 @@ public class GraphRelationsip {
 	@Override
 	public String toString() {
 		return "GraphRelationsip [start=" + start
-				+ ", end=" + end + ", properties="
-				+ properties + "]";
+				+ ", end=" + end 
+				+ ", relationship=" + relationship
+				+ ", properties=" + properties + "]";
 	}
 }

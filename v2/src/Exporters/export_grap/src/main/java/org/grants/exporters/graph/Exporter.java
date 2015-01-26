@@ -1,17 +1,21 @@
 package org.grants.exporters.graph;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.grants.graph.GraphConnection;
 import org.grants.graph.GraphNode;
-import org.grants.graph.GraphRelationsip;
+import org.grants.graph.GraphRelationship;
+import org.grants.neo4j.Neo4jUtils;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestAPIFacade;
+import org.neo4j.rest.graphdb.batch.BatchCallback;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
@@ -23,6 +27,7 @@ public class Exporter {
 	
 	private static final String FOLDER_NODE = "node";
 	private static final String FOLDER_RELATIONSHIP = "relationship";
+	private static final int MAX_COMMANDS = 256;
 	
 	private File outputFolder;
 	private RestAPI graphDb;
@@ -56,50 +61,89 @@ public class Exporter {
 		File folder = new File (outputFolder, FOLDER_NODE);
 		folder.mkdirs();
 		
-		/* Query all JSON records */
-		QueryResult<Map<String, Object>> nodes = engine.query("MATCH (n) RETURN n", null);
-		for (Map<String, Object> row : nodes) {
-			RestNode node = (RestNode) row.get("n");
+		int offset = 0;
+		int counter = 0;
+		long beginTime = System.currentTimeMillis();
+		
+		for (;;) {
+			String cypher = "MATCH (n) RETURN n";
+			if (offset > 0)
+				cypher += " SKIP " + offset;
+			cypher += " LIMIT " + MAX_COMMANDS;
 			
-			System.out.println("Node: " + node.getId());
+			offset += MAX_COMMANDS;
 			
-			String fileName = Long.toString(node.getId()) + ".json";
-			GraphNode nodeGraph = new GraphNode(node);
+			QueryResult<Map<String, Object>> nodes = engine.query(cypher, null);
+			if (!nodes.iterator().hasNext()) 
+				break;
 			
-			mapper.writeValue(new File(folder, fileName), nodeGraph);
-			
-			/*
-			String jsonString = mapper.writeValueAsString(nodeGraph);
-			Writer writer = new BufferedWriter(new OutputStreamWriter(
-			          new FileOutputStream(new File(folder, fileName)), "utf-8"));
-			
-			writer.write(jsonString);
-			writer.close();*/
-		}
+			for (Map<String, Object> row : nodes) {
+				RestNode node = (RestNode) row.get("n");
+				
+			//	System.out.println("Node: " + node.getId());
+				
+				String fileName = Long.toString(node.getId()) + ".json";
+				GraphNode nodeGraph = new GraphNode(node);
+				
+				mapper.writeValue(new File(folder, fileName), nodeGraph);
+				++counter;
+			}
+		}	
+		
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println(String.format("Done. Exported %d nodes over %d ms. Average %f ms per node", 
+				counter, endTime - beginTime, (float)(endTime - beginTime) / (float)counter));
 	}
 	
 	private void exportRelationships() throws IOException {
 		File folder = new File (outputFolder, FOLDER_RELATIONSHIP);
 		folder.mkdirs();
 		
-		QueryResult<Map<String, Object>> nodes = engine.query("MATCH ()-[r]-() RETURN DISTINCT r", null);
-		for (Map<String, Object> row : nodes) {
-			RestRelationship relationship = (RestRelationship) row.get("r");
+		int offset = 0;
+		int counter = 0;
+		long beginTime = System.currentTimeMillis();
+		
+		for (;;) {
+			String cypher = "MATCH (n1)-[r]->(n2) RETURN DISTINCT r, n1.node_source, n1.node_type, n1.key, n2.node_source, n2.node_type, n2.key";
+			if (offset > 0)
+				cypher += " SKIP " + offset;
+			cypher += " LIMIT " + MAX_COMMANDS;
 			
-			System.out.println("Relationship: " + relationship.getId());
+			offset += MAX_COMMANDS;
+		
+			QueryResult<Map<String, Object>> relationships = engine.query(cypher, null);
+			if (!relationships.iterator().hasNext()) 
+				break;
 			
-			String fileName = Long.toString(relationship.getId()) + ".json";
-			GraphRelationsip relationshipGraph = new GraphRelationsip(relationship);
+			for (Map<String, Object> row : relationships) {
+				RestRelationship relationship = (RestRelationship) row.get("r");
 				
-			mapper.writeValue(new File(folder, fileName), relationshipGraph);
-			/*
-			
-			String jsonString = mapper.writeValueAsString(relationshipGraph);
-			Writer writer = new BufferedWriter(new OutputStreamWriter(
-			          new FileOutputStream(new File(folder, fileName)), "utf-8"));
-			
-			writer.write(jsonString);
-			writer.close();*/
+				String startSource = (String) row.get("n1.node_source");
+				String startType = (String) row.get("n1.node_type");
+				String startKey = (String) row.get("n1.key");
+				
+				String endSource = (String) row.get("n2.node_source");
+				String endType = (String) row.get("n2.node_type");
+				String endKey = (String) row.get("n2.key");
+				
+			//	System.out.println("Relationship: " + relationship.getId());
+				
+				String fileName = Long.toString(relationship.getId()) + ".json";
+				GraphConnection start = new GraphConnection(startSource, startType, startKey);
+				GraphConnection end = new GraphConnection(endSource, endType, endKey);
+				
+				GraphRelationship relationshipGraph = new GraphRelationship(relationship, start, end);
+					
+				mapper.writeValue(new File(folder, fileName), relationshipGraph);	
+				++counter;
+			}
 		}
+		
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println(String.format("Done. Exported %d relationsips over %d ms. Average %f ms per relationsip", 
+				counter, endTime - beginTime, (float)(endTime - beginTime) / (float)counter));
+
 	}
 }

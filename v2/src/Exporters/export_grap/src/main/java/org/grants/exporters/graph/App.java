@@ -3,7 +3,7 @@ package org.grants.exporters.graph;
 import java.io.IOException;
 
 public class App {
-	private static final String SOURCE_NEO4J_URL = "http://localhost:7484/db/data/";	
+	private static final String SOURCE_NEO4J_URL = "http://localhost:7474/db/data/";	
 	private static final String OUTPUT_FOLDER = "graph";	
 	
 	public static void main(String[] args) {

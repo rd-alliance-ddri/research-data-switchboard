@@ -1,9 +1,9 @@
-package org.grants.importer.graph;
+package org.grants.importers.graph;
 
 import java.io.IOException;
 
 public class App {
-	private static final String SOURCE_NEO4J_URL = "http://localhost:7492/db/data/";	
+	private static final String SOURCE_NEO4J_URL = "http://localhost:7474/db/data/";	
 	private static final String OUTPUT_FOLDER = "graph";	
 	
 	public static void main(String[] args) {

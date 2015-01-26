@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.batch.CypherResult;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.neo4j.rest.graphdb.index.RestIndex;
@@ -224,6 +225,7 @@ public class Neo4jUtils {
 		return createUniqueNode(graphDb, index, labelSource, labelType, PROPERTY_KEY, value, props);
 	}
 	
+	/*
 	public static RestNode mergeNode(RestCypherQueryEngine engine, 
 			String labelType, String labelSource, Map<String, Object> props) {
 				
@@ -253,6 +255,113 @@ public class Neo4jUtils {
 		engine.query(cypher.toString(), props);
 		
 		return null;
+		
+	}
+	*/
+	
+	public static CypherResult mergeNode(RestAPI graphDb, 
+			String labelType, String labelSource, Map<String, Object> props) {
+				
+		StringBuilder cypher = new StringBuilder();
+		cypher.append("MERGE (n:");
+		cypher.append(labelSource);
+		cypher.append(":");
+		cypher.append(labelType);
+		cypher.append("{");
+		boolean bInit = false;
+		
+		for (String key : props.keySet()) {
+		    if (bInit)
+		    	cypher.append(",");
+		    else
+		    	bInit = true;
+		    
+		    cypher.append("`");
+		    cypher.append(key);
+		    cypher.append("`:{`");
+		    cypher.append(key);
+		    cypher.append("`}");
+		    //cypher.append(key);
+		}
+		
+		cypher.append("})");
+		
+	//	System.out.println(cypher.toString());
+		
+		CypherResult result = graphDb.query(cypher.toString(), props);
+		
+		return result;		
+	}
+	
+	public static CypherResult createUniqueRelationship(RestAPI graphDb, 
+			String labelFrom, String keyFrom, String valueFrom,
+			String labelTo, String keyTo, String valueTo,
+			String relationship, Map<String, Object> props) {
+				
+		StringBuilder cypher = new StringBuilder();
+		
+		cypher.append("MATCH (from:");
+		cypher.append(labelFrom);
+		cypher.append("{");
+		cypher.append(keyFrom);
+		cypher.append(":{key_from}}),(to:");
+		cypher.append(labelTo);
+		cypher.append("{");
+		cypher.append(keyTo);
+		cypher.append(":{key_to}}) CREATE UNIQUE (from)-[:`");
+		cypher.append(relationship);
+		cypher.append("`");
+		if (null != props) 
+			cypher.append("{props}");
+		cypher.append("]->(to)");
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key_from", valueFrom);
+		map.put("key_to", valueTo);
+		if (null != props)
+			map.put("props", props);		
+		
+	//	System.out.println(cypher.toString());
+		
+		CypherResult result = graphDb.query(cypher.toString(), map);
+			
+		return result;
+		
+	}
+	
+	public static CypherResult mergeRelationship(RestAPI graphDb, 
+			String labelFrom, String keyFrom, String valueFrom,
+			String labelTo, String keyTo, String valueTo,
+			String relationship, Map<String, Object> props) {
+				
+		StringBuilder cypher = new StringBuilder();
+		
+		cypher.append("MATCH (from:");
+		cypher.append(labelFrom);
+		cypher.append("{");
+		cypher.append(keyFrom);
+		cypher.append(":{key_from}}),(to:");
+		cypher.append(labelTo);
+		cypher.append("{");
+		cypher.append(keyTo);
+		cypher.append(":{key_to}) MERGE (from)-[:`");
+		cypher.append(relationship);
+		cypher.append("`");
+		if (null != props) 
+			cypher.append("{props}");
+		cypher.append("]->(to)");
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key_from", valueFrom);
+		map.put("key_to", valueTo);
+		if (null != props)
+			map.put("props", props);		
+
+	//	System.out.println(cypher.toString());
+		
+		CypherResult result = graphDb.query(cypher.toString(), map);
+			
+		return result;
 		
 	}
 }

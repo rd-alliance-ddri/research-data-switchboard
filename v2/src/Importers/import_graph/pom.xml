@@ -30,7 +30,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.grants.exporters.graph.App</mainClass>
+		      <mainClass>org.grants.importers.graph.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>

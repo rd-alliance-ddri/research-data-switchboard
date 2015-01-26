@@ -1,8 +1,5 @@
 package org.grants.graph;
 
-import org.grants.neo4j.Neo4jUtils;
-import org.neo4j.rest.graphdb.entity.RestNode;
-
 public class GraphConnection {
 	private String source;
 	private String type;
@@ -12,13 +9,10 @@ public class GraphConnection {
 		
 	}
 	
-	public GraphConnection(RestNode node) {
-		if (node.hasProperty(Neo4jUtils.PROPERTY_NODE_SOURCE))
-			source = (String) node.getProperty(Neo4jUtils.PROPERTY_NODE_SOURCE);
-		if (node.hasProperty(Neo4jUtils.PROPERTY_NODE_TYPE))
-			type = (String) node.getProperty(Neo4jUtils.PROPERTY_NODE_TYPE);
-		if (node.hasProperty(Neo4jUtils.PROPERTY_KEY))
-			key = (String) node.getProperty(Neo4jUtils.PROPERTY_KEY);
+	public GraphConnection(String source, String type, String key) {
+		this.source = source;
+		this.type = type;
+		this.key = key;
 	}
 	
 	public String getSource() {
