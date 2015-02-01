@@ -34,14 +34,18 @@ public class Neo4jUtils {
 		return label1.name() + ":" + label2.name();
 	}
 	
-	public static void createConstraint(RestCypherQueryEngine engine, Label label1, Label label2) {
-		createConstraint(engine, combineLabel(label1, label2), PROPERTY_KEY);
-	}
-	
 	public static void createConstraint(RestCypherQueryEngine engine, String label, String key) {
 		engine.query("CREATE CONSTRAINT ON (n:" +  label + ") ASSERT n." + key + " IS UNIQUE", null);
 	}
+
+	public static void createConstraint(RestCypherQueryEngine engine, Label label) {
+		createConstraint(engine, label.name(), PROPERTY_KEY);
+	}
 	
+	public static void createConstraint(RestCypherQueryEngine engine, Label label1, Label label2) {
+		createConstraint(engine, combineLabel(label1, label2), PROPERTY_KEY);
+	}
+		
 	public static void createIndex(RestCypherQueryEngine engine, String label, String key) {
 		engine.query("CREATE INDEX ON :"+ label + "(" + key + ")", null);
 	}
@@ -89,6 +93,13 @@ public class Neo4jUtils {
 		graphDb.createRelationship(nodeStart, nodeEnd, type, data);
 	}
 	
+	public static void copyMisingProperties(Relationship rel, Map<String, Object> data) {
+		if (data != null) 
+			for (Map.Entry<String, Object> entity : data.entrySet()) 
+				if (!rel.hasProperty(entity.getKey()))
+					rel.setProperty(entity.getKey(), entity.getValue());
+	}
+	
 	public static void createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
 			RelationshipType type, Direction direction, Map<String, Object> data) {
 
@@ -97,15 +108,21 @@ public class Neo4jUtils {
 		for (Relationship rel : rels) {
 			switch (direction) {
 			case INCOMING:
-				if (rel.getStartNode().getId() == nodeEnd.getId())
+				if (rel.getStartNode().getId() == nodeEnd.getId()) {
+					copyMisingProperties(rel, data);
 					return;
+				}
 			case OUTGOING:
-				if (rel.getEndNode().getId() == nodeEnd.getId())
-					return;				
+				if (rel.getEndNode().getId() == nodeEnd.getId()){
+					copyMisingProperties(rel, data);
+					return;
+				}
 			case BOTH:
 				if (rel.getStartNode().getId() == nodeEnd.getId() || 
-				    rel.getEndNode().getId() == nodeEnd.getId())
+				    rel.getEndNode().getId() == nodeEnd.getId()){
+					copyMisingProperties(rel, data);
 					return;
+				}
 			}
 		}
 		

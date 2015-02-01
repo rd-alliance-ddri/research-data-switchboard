@@ -1,15 +1,20 @@
 package org.grants.crossref;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.sql.Date;
 
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import org.apache.commons.io.FileUtils;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -45,10 +50,22 @@ public class CrossRef {
 	
 	private static final String MESSAGE_WORK = "work";
 	private static final String MESSAGE_WORK_LIST = "work-list";
-		
+	
+	private static final String EXT_JSON = ".json";
+	
+	private File cacheFolder;
+	private File cacheWorksFolder;
+	
 	private static final ObjectMapper mapper = new ObjectMapper();   
 	private static final TypeReference<Response<ItemList>> itemListType = new TypeReference<Response<ItemList>>() {};   
 	private static final TypeReference<Response<Item>> itemType = new TypeReference<Response<Item>>() {};   
+	
+	/*
+	static {
+		SimpleModule module = new SimpleModule("DateModule");
+		module = module.addDeserializer(Date.class, new CrossRefDateDeserializer());
+		mapper.registerModule(module);
+	}*/
 	
 	/**
 	 * Request all works
@@ -87,7 +104,21 @@ public class CrossRef {
 	 */
 	public Item requestWork(final String doi) {
 		try {
-			String json = get(URL_CROSSREF_WORKDS + "/" + URLEncoder.encode(doi, URL_ENCODING).replace("%2F", "/"));
+			String json = null;
+			String encodedDoi = URLEncoder.encode(doi, URL_ENCODING);
+			File jsonFile = null;
+			if (null != cacheWorksFolder) {
+				jsonFile = new File (cacheWorksFolder, encodedDoi + EXT_JSON);
+				if (jsonFile.exists() && !jsonFile.isDirectory())
+					json = FileUtils.readFileToString(jsonFile);
+			}
+			
+			if (null == json) {
+				json = get(URL_CROSSREF_WORKDS + "/" + encodedDoi.replace("%2F", "/"));
+				if (json != null && !json.isEmpty())
+					FileUtils.write(jsonFile, json);
+			}
+			
 			if (null != json) {			
 				Response<Item> response = mapper.readValue(json, itemType);
 				
@@ -126,4 +157,21 @@ public class CrossRef {
 		
 		return null;
     } 
+	
+	public File getCacheFolder() {
+		return cacheFolder;
+	}
+
+	public void setCacheFolder(File cacheFolder) {
+		this.cacheFolder = cacheFolder;
+		this.cacheFolder.mkdirs();
+		
+		this.cacheWorksFolder = new File(this.cacheFolder, FUNCTION_WORKS);
+		this.cacheWorksFolder.mkdirs();
+	}
+
+	public void setCacheFolder(String cacheFolder) {
+		setCacheFolder(new File(cacheFolder));
+	}
+
 }

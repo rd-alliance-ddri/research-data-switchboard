@@ -21,7 +21,7 @@ package org.grants.importers.institutions;
 public class App {
 	public static final String INSTITUTIONS_SCV = "data/institutions.csv";
 	//private static final String NEO4J_URL = "http://ec2-54-69-203-235.us-west-2.compute.amazonaws.com:7476/db/data/"; 
-	private static final String NEO4J_URL = "http://localhost:7476/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
 
 	/**
 	 * Main class function

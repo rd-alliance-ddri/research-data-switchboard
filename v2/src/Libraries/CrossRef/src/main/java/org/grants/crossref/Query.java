@@ -1,6 +1,6 @@
 package org.grants.crossref;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class to store Query information

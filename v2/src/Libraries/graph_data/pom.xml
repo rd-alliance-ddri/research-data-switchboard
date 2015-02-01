@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.libraryes</groupId>
   <artifactId>graph_data</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,14 +24,5 @@
 	  
  	</plugins>
   </build>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.grants.neo4j</groupId>
-      <artifactId>neo4j</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-  </dependencies>  
-  
-  
+   
 </project>

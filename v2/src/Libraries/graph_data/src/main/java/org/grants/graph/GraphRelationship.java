@@ -2,10 +2,6 @@ package org.grants.graph;
 
 import java.util.Map;
 
-import org.grants.neo4j.Neo4jUtils;
-import org.neo4j.rest.graphdb.entity.RestNode;
-import org.neo4j.rest.graphdb.entity.RestRelationship;
-
 public class GraphRelationship {
 	private GraphConnection start;
 	private GraphConnection end;
@@ -16,9 +12,10 @@ public class GraphRelationship {
 		
 	}
 	
-	public GraphRelationship(RestRelationship relationship, GraphConnection start, GraphConnection end) {
-		this.relationship = relationship.getType().name();
-		this.properties = Neo4jUtils.getProperties(relationship);
+	public GraphRelationship(String relationship, Map<String, Object> properties, 
+			GraphConnection start, GraphConnection end) {
+		this.relationship = relationship;
+		this.properties = properties;
 		this.start = start;
 		this.end = end;		
 	}

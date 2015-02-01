@@ -2,9 +2,6 @@ package org.grants.graph;
 
 import java.util.Map;
 
-import org.grants.neo4j.Neo4jUtils;
-import org.neo4j.rest.graphdb.entity.RestNode;
-
 public class GraphNode {
 	private Map<String, Object> properties;
 
@@ -12,8 +9,8 @@ public class GraphNode {
 		
 	}
 	
-	public GraphNode(RestNode node) {
-		this.properties = Neo4jUtils.getProperties(node);
+	public GraphNode(Map<String, Object> properties) {
+		this.properties = properties;
 	}
 
 	public Map<String, Object> getProperties() {

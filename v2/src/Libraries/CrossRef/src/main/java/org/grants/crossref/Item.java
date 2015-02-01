@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Class to store CorssRef Item information
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
  *
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class Item {
 	private String doi;
 	private String url;
@@ -116,11 +116,11 @@ public class Item {
 	}
 	
 	public List<String> getAuthorString() {
-		if (null == author || author.size() == 0)
+		if (null == this.author || this.author.size() == 0)
 			return null;
 					
 		List<String> list = new ArrayList<String>();
-		for (Author author : author) 
+		for (Author author : this.author) 
 			list.add(author.getFullName());
 
 		return list;
@@ -138,11 +138,11 @@ public class Item {
 	}
 	
 	public List<String> getEditorString() {
-		if (null == editor || editor.size() == 0)
+		if (null == this.editor || this.editor.size() == 0)
 			return null;
 					
 		List<String> list = new ArrayList<String>();
-		for (Author editor : editor) 
+		for (Author editor : this.editor) 
 			list.add(editor.getFullName());
 
 		return list;
@@ -324,6 +324,11 @@ public class Item {
 			this.funder = funder;
 		else
 			this.funder = null;
+	}
+	
+	@JsonAnySetter
+	public void handleUnknown(String key, Object value) {
+		System.out.println("Warning. Ignoring property: " + key + " with value: " + value);			
 	}
 	
 	@Override

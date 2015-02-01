@@ -2,7 +2,7 @@ package org.grants.crossref;
 
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Class to store Funder information

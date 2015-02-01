@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.ObjectCodec;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Class to parse CrossRef Date object
@@ -17,15 +17,14 @@ import org.codehaus.jackson.map.JsonDeserializer;
  *
  */
 public class CrossRefDateDeserializer  extends JsonDeserializer<Date> {
-	
 	private static final String NODE_TIMESTAMP = "timestamp";
 	private static final String NODE_DATE_PARTS = "date-parts";
 
 	@Override
-	public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+	public Date deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
-		ObjectCodec oc = jsonParser.getCodec();
-		JsonNode node = oc.readTree(jsonParser);
+		ObjectCodec oc = p.getCodec();
+		JsonNode node = oc.readTree(p);
 		
 		final JsonNode nodeStamp = node.get(NODE_TIMESTAMP);
 		if (null != nodeStamp) 
