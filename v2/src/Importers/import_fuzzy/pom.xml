@@ -1,9 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.importers</groupId>
-  <artifactId>import_google</artifactId>
+  <artifactId>import_fuzzy</artifactId>
   <version>1.0.0</version>
-       
+  
+        
   <properties>
     <jdk.version>1.7</jdk.version>
     <neo4j.binding.version>2.0.2-SNAPSHOT</neo4j.binding.version>
@@ -33,7 +34,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.grants.importers.google.App</mainClass>
+		      <mainClass>org.grants.importers.fuzzy.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
@@ -84,11 +85,6 @@
      <version>1.0.1</version>
     </dependency>
     <dependency>
-      <groupId>org.grants.google</groupId>
-      <artifactId>google_query</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-        <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
 	  <artifactId>jackson-core</artifactId>
 	  <version>${jackson.version}</version>
@@ -107,12 +103,17 @@
 	  <groupId>commons-io</groupId>
 	  <artifactId>commons-io</artifactId>
 	  <version>${commons-io.version}</version>
-    </dependency>	
+    </dependency>
+    <dependency>
+      <groupId>org.isbar_software</groupId>
+      <artifactId>fuzzy_search</artifactId>
+      <version>1.0.0</version>
+    </dependency>  
     <dependency>
       <groupId>org.grants.utils</groupId>
       <artifactId>aggr_utils</artifactId>
       <version>1.0.0</version>
     </dependency>
   </dependencies>
-  
+    
 </project>

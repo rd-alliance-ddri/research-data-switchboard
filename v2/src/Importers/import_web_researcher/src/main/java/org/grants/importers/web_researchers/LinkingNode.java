@@ -1,7 +1,5 @@
 package org.grants.importers.web_researchers;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class LinkingNode {
@@ -9,23 +7,25 @@ public class LinkingNode {
 	private final String type;
 	private final String titleLowerCase;
 	private final Pattern pattern;
-	private Set<Long> nodesId = new HashSet<Long>();
+	private final long nodeId;
+	private int counter;
 	
 	public LinkingNode(long nodeId, String title, String type) {
-		this.nodesId.add(nodeId);
+		this.nodeId = nodeId;
 		this.title = title;
 		this.type = type;
 		
 		titleLowerCase = title.toLowerCase();
 		pattern = Pattern.compile(titleLowerCase.replaceAll("[^a-z0-9]", "."));
+		counter = 0;
 	}
 	
-	public void addNodeId(long nodeId) {
-		nodesId.add(nodeId);
+	public void incCounter() {
+		++counter;
 	}
 	
 	public boolean isUnique() {
-		return nodesId.size() == 1;
+		return 0 == counter;
 	}
 	
 	public String getTitle() {
@@ -43,8 +43,8 @@ public class LinkingNode {
 		return pattern;
 	}
 	
-	public Set<Long> getNodesId() {
-		return nodesId;
+	public long getNodeId() {
+		return nodeId;
 	}
 	
 	@Override
@@ -52,6 +52,6 @@ public class LinkingNode {
 		return "RDA:Grant [type=" + type 
 				+ ", title=" + title 
 				+ ", pattern=" + pattern 
-				+ ", nodesId=" + nodesId + "]";
+				+ ", nodeId=" + nodeId + "]";
 	}	
 }

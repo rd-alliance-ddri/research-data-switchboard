@@ -1,20 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.grants.importers</groupId>
-  <artifactId>import_google</artifactId>
+  <groupId>org.grants.utils</groupId>
+  <artifactId>update_cache</artifactId>
   <version>1.0.0</version>
+  <description>	</description>
+  
        
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.7</jdk.version>
-    <neo4j.binding.version>2.0.2-SNAPSHOT</neo4j.binding.version>
+    <neo4j.version>2.1.6</neo4j.version>
+    <junit.version>4.11</junit.version>
     <jackson.version>2.5.0</jackson.version>
     <commons-io.version>2.4</commons-io.version>
     <class.path>jars/</class.path>
   </properties>
-  
+   
   <build>
 	<plugins>
-
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-compiler-plugin</artifactId>
@@ -33,7 +36,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.grants.importers.google.App</mainClass>
+		      <mainClass>org.grants.utils.update.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
@@ -59,36 +62,30 @@
       </plugin>
  	</plugins>
   </build>
-  
-   <repositories>
-    <repository>
-      <id>neo4j-contrib-releases</id>
-      <url>https://raw.github.com/neo4j-contrib/m2/master/releases</url>
-    </repository>
-  </repositories>
-  
+    
   <dependencies>
     <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j-rest-graphdb</artifactId>
-      <version>${neo4j.binding.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.grants.utils</groupId>
-      <artifactId>google_data</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <dependency>
-     <groupId>org.grants.neo4j</groupId>
-  	 <artifactId>neo4j</artifactId>
-     <version>1.0.1</version>
-    </dependency>
+	  <groupId>commons-io</groupId>
+	  <artifactId>commons-io</artifactId>
+	  <version>${commons-io.version}</version>
+    </dependency>	
     <dependency>
       <groupId>org.grants.google</groupId>
       <artifactId>google_query</artifactId>
       <version>1.0.1</version>
     </dependency>
-        <dependency>
+    <dependency>
+      <groupId>org.grants.utils</groupId>
+      <artifactId>google_data</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
 	  <artifactId>jackson-core</artifactId>
 	  <version>${jackson.version}</version>
@@ -103,16 +100,6 @@
 	  <artifactId>jackson-databind</artifactId>
 	  <version>${jackson.version}</version>
 	</dependency>
-	<dependency>
-	  <groupId>commons-io</groupId>
-	  <artifactId>commons-io</artifactId>
-	  <version>${commons-io.version}</version>
-    </dependency>	
-    <dependency>
-      <groupId>org.grants.utils</groupId>
-      <artifactId>aggr_utils</artifactId>
-      <version>1.0.0</version>
-    </dependency>
   </dependencies>
   
 </project>

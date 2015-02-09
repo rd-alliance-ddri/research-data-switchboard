@@ -1,10 +1,4 @@
-package org.grants.importers.google;
-
-/**
- * 
- * @author dima
- *
- */
+package org.grants.importers.fuzzy;
 
 public class App {
 	//private static final String DATA_FOLDER = "publications";
@@ -26,8 +20,8 @@ public class App {
 		try {
 			Importer importer = new Importer(neo4jUrl);
 			importer.init("conf/black.list");
-			importer.processPublications("google/publications");
-			importer.processGrants("google/grants");
+			importer.process("google/publications");
+			importer.process("google/grants");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -6,17 +6,13 @@ package org.grants.importers.google;
  *
  */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,17 +29,19 @@ import org.grants.google.cse.Item;
 import org.grants.google.cse.Query;
 import org.grants.google.cse.QueryResponse;
 import org.grants.neo4j.Neo4jUtils;
+import org.grants.utils.aggrigation.AggrigationUtils;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
-import org.neo4j.rest.graphdb.util.QueryResult;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class Importer {
 
@@ -52,7 +50,11 @@ public class Importer {
 	private RestIndex<Node> indexWebResearcher;
 	
 	private JAXBContext jaxbContext;
+	//private Marshaller jaxbMarshaller;
 	private Unmarshaller jaxbUnmarshaller;
+	
+//	private ObjectMapper mapper; 
+//	private static final TypeReference<Map<String, Object>> refMap = new TypeReference<Map<String, Object>>() {};
 	
 	private Query googleQuery;
 	
@@ -68,14 +70,6 @@ public class Importer {
 		relatedTo
 	}
 	
-	private static final String LABEL_WEB = Labels.Web.name();
-	private static final String LABEL_PATTERN = Labels.Pattern.name();
-	private static final String LABEL_DRYAD = Labels.Dryad.name();
-	private static final String LABEL_PUBLICATION = Labels.Publication.name();
-	private static final String LABEL_RDA = Labels.RDA.name();
-	private static final String LABEL_GRANT = Labels.Grant.name();
-	private static final String LABEL_RESEARCHER = Labels.Researcher.name();
-	
 	private static final String FOLDER_CACHE = "cache";
 	private static final String FOLDER_PUBLICATION = "publication";
 	private static final String FOLDER_GRANT = "grant";
@@ -87,15 +81,11 @@ public class Importer {
 	
 	private static final boolean VALUE_TRUE = true;
 	
-	private static final String TYPE_TITLE = "title";
-//	private static final String TYPE_SIMPLEFIED = "simplefied";
-	private static final String TYPE_SCIENTIFIC = "scientific";
-	private static final String TYPE_SIMPLIFIED = null;
 	
-	private static final String PART_DATA_FROM = "data from: ";
+	private List<Pattern> webPatterns;
+	private Set<String> blackList;
+	//private Map<String, Page> pages;
 	
-	private List<Pattern> webPatterns = new ArrayList<Pattern>();
-	private Set<String> blackList = new HashSet<String>();
 	
 	public Importer(String neo4jUrl) throws FileNotFoundException, UnsupportedEncodingException, JAXBException {
 		graphDb = new RestAPIFacade(neo4jUrl);
@@ -105,7 +95,11 @@ public class Importer {
 		indexWebResearcher = Neo4jUtils.getIndex(graphDb, Labels.Web, Labels.Researcher);
 				
 		jaxbContext = JAXBContext.newInstance(Publication.class, Grant.class, Page.class);
+	//	jaxbMarshaller = jaxbContext.createMarshaller();
 		jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		
+		// setup Object mapper
+		//mapper = new ObjectMapper(); 
 		
 		googleQuery = new Query(null, null); 
 //		//googleQuery.setJsonFolder(dataFolder + "/json");
@@ -125,8 +119,8 @@ public class Importer {
 	 * 
 	 */
 	public void init(String blackList) throws FileNotFoundException, IOException {
-		loadBlackList(blackList);
-		loadWebPatterns();
+		this.blackList = AggrigationUtils.loadBlackList(blackList);
+		this.webPatterns = AggrigationUtils.loadWebPatterns(engine);
 	}
 	
 	/**
@@ -134,7 +128,8 @@ public class Importer {
 	 * @param googleCache
 	 */
 	public void processPublications(String googleCache) {
-		Map<String, LinkingNode> dryadPublications = loadDryadPublications();
+		Map<String, Set<Long>> dryadPublications = AggrigationUtils.loadDryadPublications(engine, null, blackList);
+	//	pages = loadPages(googleCache);
 		processPublications(dryadPublications, googleCache);
 	}
 	
@@ -143,90 +138,15 @@ public class Importer {
 	 * @param googleCache
 	 */
 	public void processGrants(String googleCache) {
-		Map<String, LinkingNode> rdaGrants = loadRdaGrants();
+		Map<String, Set<Long>> rdaGrants = AggrigationUtils.loadRdaGrants(engine, null, blackList);
+	//	pages = loadPages(googleCache);
 		processGrants(rdaGrants, googleCache);
 	}
 	
-	private void loadBlackList(String blackList) throws FileNotFoundException, IOException {
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(blackList)))) {
-		    for(String line; (line = br.readLine()) != null; ) 
-		    	this.blackList.add(line.trim().toLowerCase());
-		}
-	}
-	
-	private void loadWebPatterns() {
-		log ("loaging Web:Pattern's");
-		
-		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_WEB + ":" + LABEL_PATTERN + ") RETURN n.pattern as pattern", null);
-		for (Map<String, Object> row : articles) {
-			String pattern = (String) row.get("pattern");
-			if (null != pattern) {
-				log("Add Pattern: " + pattern);  
-				webPatterns.add(Pattern.compile(pattern));			
-			}
-		}
-	}
-	
-	private Map<String, LinkingNode> loadDryadPublications() {
-		log ("loaging Dryad:Publication's");
-		
-		Map<String, LinkingNode> dryadPublications = new HashMap<String, LinkingNode>();
-		
-		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_DRYAD + ":" + LABEL_PUBLICATION + ") RETURN id(n) AS id, n.title AS title", null);
-		for (Map<String, Object> row : articles) {
-			long nodeId = (long) (Integer) row.get("id");
-			String title = ((String) row.get("title")).trim().toLowerCase();
-			if (null != title) {
-				if (title.contains(PART_DATA_FROM))
-					title = title.substring(PART_DATA_FROM.length());
-				if (!blackList.contains(title)) {
-					if (dryadPublications.containsKey(title)) {
-						log ("Found duplicated page name: " + title);
-						dryadPublications.get(title).addNodeId(nodeId);
-					} else
-						dryadPublications.put(title, new LinkingNode(nodeId, TYPE_TITLE));
-				}
-			}
-		}
-		
-		return dryadPublications;
-	}
-	
-	private Map<String, LinkingNode> loadRdaGrants() {
-		log ("loaging RDA:Grant's");
-		
-		// We only interesting in Grants, that has PURL
-		Map<String, LinkingNode> rdaGrants = new HashMap<String, LinkingNode>();
-
-		
-		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_RDA + ":" + LABEL_GRANT + ") WHERE has (n.identifier_purl) RETURN id(n) AS id, n.name_primary AS primary, n.name_alternative AS alternative", null);
-		for (Map<String, Object> row : articles) {
-			long nodeId = (long) (Integer) row.get("id");
-			String primary = ((String) row.get("primary")).trim().toLowerCase();
-			String alternative = ((String) row.get("alternative")).trim().toLowerCase();
-			if (null != primary && !blackList.contains(primary)) {
-				if (rdaGrants.containsKey(primary)) {
-					log ("Found duplicated grant name: " + primary);
-					rdaGrants.get(primary).addNodeId(nodeId);
-				} else
-					rdaGrants.put(primary, new LinkingNode(nodeId, TYPE_SIMPLIFIED));	
-			}
-			if (null != alternative && !alternative.equals(primary) && !blackList.contains(alternative)) {
-				if (rdaGrants.containsKey(alternative)) {
-					log ("Found duplicated grant name: " + alternative);
-					rdaGrants.get(alternative).addNodeId(nodeId);
-				} else
-					rdaGrants.put(alternative, new LinkingNode(nodeId, TYPE_SCIENTIFIC));	
-			}
-		}
-		
-		return rdaGrants;
-	}
-	
-	private void processPublications(Map<String, LinkingNode> dryadPublications, String googleCache) {
+	private void processPublications(Map<String, Set<Long>> dryadPublications, String googleCache) {
 		log ("Processing cached publications");
 		
-		googleQuery.setJsonFolder(new File(googleCache, FOLDER_CACHE + "/" + FOLDER_JSON).getPath());
+		googleQuery.setJsonFolder(new File(googleCache, FOLDER_JSON).getPath());
 		
 		Map<String, Object> pars = new HashMap<String, Object>();
 		pars.put(PROPERTY_SOURCE_GOOGLE, VALUE_TRUE);
@@ -238,15 +158,15 @@ public class Importer {
 				try {
 					Publication publication = (Publication) jaxbUnmarshaller.unmarshal(file);
 					if (publication != null) {
-						LinkingNode dryadPublication = dryadPublications.get(publication.getTitle().trim().toLowerCase());
-						if (null != dryadPublication) 
+						Set<Long> nodeIds = dryadPublications.get(publication.getTitle().trim().toLowerCase());
+						if (null != nodeIds) 
 							for (String link : publication.getLinks()) 
-								if (isLinkFollowAPattern(link)) {
+								if (AggrigationUtils.isLinkFollowAPattern(webPatterns, link)) {
 									log ("Found matching URL: " + link + " for publication: " + publication.getTitle());
 									logPublication(publication.getTitle());
 									
 									RestNode nodeResearcher = getOrCreateWebResearcher(link, publication.getTitle());
-									for (Long nodeId : dryadPublication.getNodesId()) {
+									for (Long nodeId : nodeIds) {
 										RestNode nodePublication = graphDb.getNodeById(nodeId);
 									
 										Neo4jUtils.createUniqueRelationship(graphDb, nodePublication, nodeResearcher, 
@@ -260,10 +180,10 @@ public class Importer {
 		
 	}	
 	
-	private void processGrants(Map<String, LinkingNode> rdaGrants, String googleCache) {
+	private void processGrants(Map<String, Set<Long>> rdaGrants, String googleCache) {
 		log ("Processing cached grants");
 		
-		googleQuery.setJsonFolder(new File(googleCache, FOLDER_CACHE + "/" + FOLDER_JSON).getPath());
+		googleQuery.setJsonFolder(new File(googleCache, FOLDER_JSON).getPath());
 		
 		Map<String, Object> pars = new HashMap<String, Object>();
 		pars.put(PROPERTY_SOURCE_GOOGLE, VALUE_TRUE);
@@ -275,15 +195,15 @@ public class Importer {
 				try {
 					Grant grant = (Grant) jaxbUnmarshaller.unmarshal(file);
 					if (grant != null) {
-						LinkingNode rdaGrant = rdaGrants.get(grant.getName().trim().toLowerCase());
-						if (null != rdaGrant) 
+						Set<Long> nodeIds = rdaGrants.get(grant.getName().trim().toLowerCase());
+						if (null != nodeIds) 
 							for (String link : grant.getLinks()) 
-								if (isLinkFollowAPattern(link)) {
+								if (AggrigationUtils.isLinkFollowAPattern(webPatterns, link)) {
 									log ("Found matching URL: " + link + " for grant: " + grant.getName());
 									logGrant(grant.getName());
 									
 									RestNode nodeResearcher = getOrCreateWebResearcher(link, grant.getName());
-									for (Long nodeId : rdaGrant.getNodesId()) {
+									for (Long nodeId : nodeIds) {
 										RestNode nodeGrant = graphDb.getNodeById(nodeId);
 										
 										Neo4jUtils.createUniqueRelationship(graphDb, nodeGrant, nodeResearcher, 
@@ -296,25 +216,16 @@ public class Importer {
 				}
 		
 	}	
-	
-	private RestNode findWebResearcher(String link) {
-		IndexHits<Node> hits = indexWebResearcher.get(Neo4jUtils.PROPERTY_KEY, link);
-		if (null != hits && hits.hasNext())
-			return (RestNode) hits.getSingle();
-		
-		return null;
-	}
-	
-	
+
 	private RestNode getOrCreateWebResearcher(String link, String searchString) {
-		RestNode node = findWebResearcher(link);
+		RestNode node = AggrigationUtils.findWebResearcher(indexWebResearcher, link);
 		if (null != node)
 			return node;
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(Neo4jUtils.PROPERTY_KEY, link);
-		map.put(Neo4jUtils.PROPERTY_NODE_SOURCE, LABEL_WEB);
-		map.put(Neo4jUtils.PROPERTY_NODE_TYPE, LABEL_RESEARCHER);
+		map.put(Neo4jUtils.PROPERTY_NODE_SOURCE, AggrigationUtils.LABEL_WEB);
+		map.put(Neo4jUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_RESEARCHER);
 		map.put(PROPERTY_URL, link);
 		
 		String author = getAuthor(link, searchString);
@@ -332,59 +243,92 @@ public class Importer {
 			
 		return node;
 	}
+		
+	private Map<String, Object> getPageMap(String link, String searchString) throws JsonParseException, JsonMappingException, IOException, JAXBException {
+		/*Page page = pages.get(link);
+		if (null != page) {
+			String mapUri = page.getMap();
+			if (null != mapUri && mapUri.isEmpty()) {
+				
+				if (mapUri.equals(VALUE_NULL)) 
+					return null;
+				
+				return mapper.readValue(mapUri, refMap);
+			} 
+			*/
+		
+			QueryResponse response = googleQuery.queryCache(searchString);
+			if (null != response) 
+				for (Item item : response.getItems()) 
+					if (item.getLink().equals(link)) {
+						Map<String, Object> pagemap = item.getPagemap();
+						if (null != pagemap) {
+		/*					String mapFile = FilenameUtils.removeExtension(page.getCache());
+							String mapFileName = FilenameUtils.getName(mapFile).replace("data", "map");
+							String mapFilePath = FilenameUtils.getPathNoEndSeparator(mapFile);
+							String mapBasePath = FilenameUtils.getPathNoEndSeparator(mapFilePath);
+							String mapPath = FilenameUtils.concat(mapBasePath, FOLDER_MAP + "/" + mapFileName + ".json");
+							
+							page.setMap(mapPath);
+							
+							mapper.writeValue(new File(mapPath), pagemap);
+							jaxbMarshaller.marshal(page, new File(page.getSelf()));*/
+							
+							return pagemap;
+						}
+
+						break;
+					}
+			
+	/*		page.setMap(VALUE_NULL);
+			jaxbMarshaller.marshal(page, new File(page.getSelf()));
+		}
+		*/
+		return null;
+	}
 	
 	private String getAuthor(String link, String searchString) {
-		QueryResponse response = googleQuery.queryCache(searchString);
-		
 		String author = null;
 		
-		if (null != response) 
-			for (Item item : response.getItems()) 
-				if (item.getLink().equals(link)) {
-					 Map<String, Object> pagemap = item.getPagemap();
-					 if (null != pagemap) {
-						 @SuppressWarnings("unchecked")
-						 List<Object> metatags = (List<Object>) pagemap.get("metatags");
-						 if (null != metatags && metatags.size() > 0) {
-							 @SuppressWarnings("unchecked")
-							 Map<String, Object> metatag = (Map<String, Object>) metatags.get(0);
-							 if (null != metatag) {
-								 String dcTitle = (String) metatag.get("dc.title");
-								 String citationAuthor = (String) metatag.get("citation_author");
-								 
-								 if (null != citationAuthor) {
-									 author = citationAuthor;
-									 
-									 log("Found citation_author: " + citationAuthor);	
-								 }
-								 
-								 if (null != dcTitle) {
-									 author = dcTitle;
-									 
-									 log("Found dc.title: " + dcTitle);	
-								 } 
-								 	
-								 if (null == author) {
-									 log("Unable to find author information in metatag");																 
-								 }
-							 }
+		try {
+			Map<String, Object> pagemap = getPageMap(link, searchString);
+			if (null != pagemap) {
+				 @SuppressWarnings("unchecked")
+				 List<Object> metatags = (List<Object>) pagemap.get("metatags");
+				 if (null != metatags && metatags.size() > 0) {
+					 @SuppressWarnings("unchecked")
+					 Map<String, Object> metatag = (Map<String, Object>) metatags.get(0);
+					 if (null != metatag) {
+						 String dcTitle = (String) metatag.get("dc.title");
+						 String citationAuthor = (String) metatag.get("citation_author");
+						 
+						 if (null != citationAuthor) {
+							 author = citationAuthor;
+							 
+							 log("Found citation_author: " + citationAuthor);	
+						 }
+						 
+						 if (null != dcTitle) {
+							 author = dcTitle;
+							 
+							 log("Found dc.title: " + dcTitle);	
+						 } 
+						 	
+						 if (null == author) {
+							 log("Unable to find author information in metatag");																 
 						 }
 					 }
-					 
-					 break;
-				}
+				 }
+			 }
 			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		 
 		return author;
 	}
 	
-	
-	private boolean isLinkFollowAPattern(String link) {
-		for (Pattern pattern : webPatterns) 
-			if (pattern.matcher(link).find())
-				return true;
-		return false;
-	}
-	
+		
 	/**
 	 * Service log fiunction
 	 * @param message

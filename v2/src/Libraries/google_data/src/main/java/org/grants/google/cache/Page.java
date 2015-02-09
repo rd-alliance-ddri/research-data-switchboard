@@ -6,10 +6,18 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * @author dima
+ * 
+ * History
+ * 1.0.1: added map field
+ */
+
 @XmlRootElement
 public class Page {
 	private String link;
 	private String cache;
+	private String map;
 	private String self;
 	private Set<String> data = new HashSet<String>(); 
 	//private Map<String, Object> metadata;
@@ -42,6 +50,15 @@ public class Page {
 		this.cache = cache;
 	}
 	
+	public String getMap() {
+		return map;
+	}
+
+	@XmlElement
+	public void setMap(String map) {
+		this.map = map;
+	}
+
 	public Set<String> getData() {
 		return data;
 	}
@@ -74,7 +91,7 @@ public class Page {
 
 	@Override
 	public String toString() {
-		return "Page [link=" + link + ", cache=" + cache + ", self=" + self
+		return "Page [link=" + link + ", cache=" + cache + ", map=" + map + ", self=" + self
 				+ ", data=" + data + /*", metadata=" + metadata +*/ "]";
 	}
 }
