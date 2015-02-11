@@ -1,8 +1,8 @@
 package org.grants.utils.update;
 
 public class App {
-	private static final String FOLDER_SOURCE = "/home/dima/Grants/google";
-	private static final String FOLDER_TARGET = "/home/dima/Grants/google2";
+	private static final String FOLDER_SOURCE = "google";
+	private static final String FOLDER_TARGET = "google2";
 	
 	/**
 	 * Class main function 

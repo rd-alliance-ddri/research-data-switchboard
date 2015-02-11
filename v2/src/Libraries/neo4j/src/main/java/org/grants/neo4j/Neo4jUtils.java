@@ -80,7 +80,7 @@ public class Neo4jUtils {
 		return graphDb.index().forNodes(combineLabel(labelSource, labelType));
 	}
 		
-	public static void createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
+	public static RestRelationship createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
 			RelationshipType type, Map<String, Object> data) {
 
 		// get all node relationships. They should be empty for a new node
@@ -88,9 +88,9 @@ public class Neo4jUtils {
 		for (Relationship rel : rels) 
 			if (rel.getStartNode().getId() == nodeStart.getId() && 
 				rel.getEndNode().getId() == nodeEnd.getId())
-				return;
+				return (RestRelationship) rel;
 		
-		graphDb.createRelationship(nodeStart, nodeEnd, type, data);
+		return graphDb.createRelationship(nodeStart, nodeEnd, type, data);
 	}
 	
 	public static void copyMisingProperties(Relationship rel, Map<String, Object> data) {
@@ -100,7 +100,7 @@ public class Neo4jUtils {
 					rel.setProperty(entity.getKey(), entity.getValue());
 	}
 	
-	public static void createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
+	public static RestRelationship createUniqueRelationship(RestAPI graphDb, RestNode nodeStart, RestNode nodeEnd, 
 			RelationshipType type, Direction direction, Map<String, Object> data) {
 
 		// get all node relationships. They should be empty for a new node
@@ -110,26 +110,26 @@ public class Neo4jUtils {
 			case INCOMING:
 				if (rel.getStartNode().getId() == nodeEnd.getId()) {
 					copyMisingProperties(rel, data);
-					return;
+					return (RestRelationship) rel;
 				}
 			case OUTGOING:
 				if (rel.getEndNode().getId() == nodeEnd.getId()){
 					copyMisingProperties(rel, data);
-					return;
+					return (RestRelationship) rel;
 				}
 			case BOTH:
 				if (rel.getStartNode().getId() == nodeEnd.getId() || 
 				    rel.getEndNode().getId() == nodeEnd.getId()){
 					copyMisingProperties(rel, data);
-					return;
+					return (RestRelationship) rel;
 				}
 			}
 		}
 		
 		if (direction == Direction.INCOMING)
-			graphDb.createRelationship(nodeEnd, nodeStart, type, data);
+			return graphDb.createRelationship(nodeEnd, nodeStart, type, data);
 		else
-			graphDb.createRelationship(nodeStart, nodeEnd, type, data);
+			return graphDb.createRelationship(nodeStart, nodeEnd, type, data);
 	}
 	
 	public static Map<String, Object> getProperties(RestNode node) {
@@ -158,6 +158,25 @@ public class Neo4jUtils {
 		}
 		
 		return pars;
+	}
+	
+	public static String getNodeProperty(RestNode node, String property) {
+		if (node.hasProperty(property))
+			return (String) node.getProperty(property);
+		else
+			return null;
+	}
+	
+	public static String getNodeSource(RestNode node) {
+		return getNodeProperty(node, PROPERTY_NODE_SOURCE);
+	}
+
+	public static String getNodeType(RestNode node) {
+		return getNodeProperty(node, PROPERTY_NODE_TYPE);
+	}
+
+	public static String getNodeKey(RestNode node) {
+		return getNodeProperty(node, PROPERTY_KEY);
 	}
 	
 	public static List<RestNode> findNodesByKey(RestCypherQueryEngine engine, String label,

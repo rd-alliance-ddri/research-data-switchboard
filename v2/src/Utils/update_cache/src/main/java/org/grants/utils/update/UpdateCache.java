@@ -81,8 +81,8 @@ public class UpdateCache {
 	public void process() throws JAXBException, JsonGenerationException, JsonMappingException, IOException {
 		loadLinks();
 		
-	//	processPages(FOLDER_GRANTS);
-	//	processPages(FOLDER_PUBLICATIONS);
+		processPages(FOLDER_GRANTS);
+		processPages(FOLDER_PUBLICATIONS);
 		
 		processGrants();
 		processPublications();

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.neo4j</groupId>
   <artifactId>neo4j</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   
   <properties>
     <jdk.version>1.7</jdk.version>

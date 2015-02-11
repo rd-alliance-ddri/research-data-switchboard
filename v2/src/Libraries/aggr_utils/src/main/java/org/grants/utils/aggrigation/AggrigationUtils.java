@@ -14,24 +14,50 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.grants.neo4j.Neo4jUtils;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.QueryResult;
 
+/**
+ * 
+ * @author dima
+ * VERSIONS
+ * 		1.0.1: added loadOrcidWorks function
+ */
 public class AggrigationUtils {
 	
-	public static final String LABEL_WEB = "Web";
-	public static final String LABEL_DRYAD = "Dryad";
-	public static final String LABEL_RDA = "RDA";
-	public static final String LABEL_PATTERN = "Pattern";
-	public static final String LABEL_GRANT = "Grant";
-	public static final String LABEL_PUBLICATION = "Publication";
-	public static final String LABEL_RESEARCHER = "Researcher";
+	public enum Labels implements Label {
+		Web, Dryad, RDA, Orcid,
+		Pattern,
+		Researcher, Grant, Publication, Work
+	}
 	
-	public static final int MIN_TITLE_LENGTH = 10;
+	public enum RelTypes implements RelationshipType {
+		relatedTo
+	}
+	
+	public static final String LABEL_WEB = Labels.Web.name();
+	public static final String LABEL_DRYAD = Labels.Dryad.name();
+	public static final String LABEL_RDA = Labels.RDA.name();
+	public static final String LABEL_ORCID = Labels.Orcid.name();
+	public static final String LABEL_PATTERN = Labels.Pattern.name();
+	public static final String LABEL_GRANT = Labels.Grant.name();
+	public static final String LABEL_PUBLICATION = Labels.Publication.name();
+	public static final String LABEL_RESEARCHER = Labels.Researcher.name();
+	public static final String LABEL_WORK = Labels.Work.name();
+	
+	public static final String RELATIONSHIP_RELATED_TO = RelTypes.relatedTo.name();
+	
+	public static final String PROPERTY_URL = "url";
+	public static final String PROPERTY_NAME = "name";
+	
+	public static final int MIN_TITLE_LENGTH = 20;
 	public static final int MIN_DISTANCE = 1;
 	public static final double TITLE_DISTANCE = 0.05;	
 	
@@ -69,8 +95,9 @@ public class AggrigationUtils {
 		QueryResult<Map<String, Object>> articles = engine.query("MATCH (n:" + LABEL_DRYAD + ":" + LABEL_PUBLICATION + ") RETURN id(n) AS id, n.title AS title", null);
 		for (Map<String, Object> row : articles) {
 			long nodeId = (long) (Integer) row.get("id");
-			String title = ((String) row.get("title")).trim().toLowerCase();
+			String title = ((String) row.get("title"));
 			if (null != title) {
+				title = title.trim().toLowerCase();
 				if (title.contains(PART_DATA_FROM))
 					title = title.substring(PART_DATA_FROM.length());
 				if (title.length() > MIN_TITLE_LENGTH 
@@ -80,6 +107,32 @@ public class AggrigationUtils {
 		}
 		
 		return nodes;
+	}
+	
+	public static int loadOrcidWorks(RestCypherQueryEngine engine, Map<String, Set<Long>> nodes, Set<String> blackList, int skip, int limit) {
+		String cypher = "MATCH (n:" + LABEL_ORCID + ":" + LABEL_WORK + ") RETURN id(n) AS id, n.title AS title";
+		if (skip > 0)
+			cypher += " SKIP " + skip;
+		if (limit > 0)
+			cypher += " LIMIT " + limit;
+		
+		int counter = 0;
+		
+		QueryResult<Map<String, Object>> articles = engine.query(cypher, null);
+		for (Map<String, Object> row : articles) {
+			long nodeId = (long) (Integer) row.get("id");
+			String title = ((String) row.get("title"));
+			if (null != title) {
+				title = title.trim().toLowerCase();
+				if (title.length() > MIN_TITLE_LENGTH 
+						&& !blackList.contains(title)) 
+					putUnique(nodes, title, nodeId);
+			}
+			
+			++counter;
+		}
+		
+		return counter;
 	}
 	
 	public static Map<String, Set<Long>> loadRdaGrants(RestCypherQueryEngine engine, Map<String, Set<Long>> nodes, Set<String> blackList) {
@@ -141,6 +194,28 @@ public class AggrigationUtils {
 		return null;
 	}	
 	
+	public static RestNode createWebResearcher(RestAPI graphDb, RestIndex<Node> indexWebResearcher, 
+			String link, String author) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(Neo4jUtils.PROPERTY_KEY, link);
+		map.put(Neo4jUtils.PROPERTY_NODE_SOURCE, AggrigationUtils.LABEL_WEB);
+		map.put(Neo4jUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_RESEARCHER);
+		map.put(PROPERTY_URL, link);
+			
+		if (null != author)
+			map.put(PROPERTY_NAME, author);
+			
+		RestNode node = graphDb.createNode(map);
+			
+		if (!node.hasLabel(Labels.Researcher))
+			node.addLabel(Labels.Researcher); 
+		if (!node.hasLabel(Labels.Web))
+			node.addLabel(Labels.Web);	
+	
+		indexWebResearcher.add(node, Neo4jUtils.PROPERTY_KEY, link);	
+				
+		return node;
+	}
 	
 	/*	private Map<String, Page> loadPages(String googleCache) {
 		 Map<String, Page> pages = new HashMap<String, Page>();
