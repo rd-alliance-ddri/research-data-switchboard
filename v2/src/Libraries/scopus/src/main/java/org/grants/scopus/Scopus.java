@@ -1,32 +1,44 @@
 package org.grants.scopus;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.grants.scopus.deserilaize.AffiliationDeserializer;
+import org.grants.scopus.deserilaize.AffiliationsDeserializer;
+import org.grants.scopus.deserilaize.AuthorDeserializer;
+import org.grants.scopus.deserilaize.AuthorsDeserealizer;
+import org.grants.scopus.deserilaize.StringDeserializer;
+import org.grants.scopus.deserilaize.StringsDeserializer;
+import org.grants.scopus.response.Affiliation;
+import org.grants.scopus.response.Author;
 import org.grants.scopus.response.SearchResults;
 import org.grants.scopus.response.facet.Facet;
 import org.grants.scopus.type.AbstractType;
-import org.grants.scopus.type.AcceptType;
+import org.grants.scopus.type.AbstractViewType;
 import org.grants.scopus.type.AuthorFormatType;
 import org.grants.scopus.type.ContentType;
 import org.grants.scopus.type.ResourceType;
 import org.grants.scopus.type.SortType;
 import org.grants.scopus.type.VersionType;
-import org.grants.scopus.type.ViewType;
+import org.grants.scopus.type.SearchViewType;
 
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class Scopus {
 	private static final String URL_SEARCH_API = "https://api.elsevier.com/content/search/";
-	private static final String URL_ABSTRACT_API = "http://api.elsevier.com/content/abstract/";
+	private static final String URL_ABSTRACT_API = "https://api.elsevier.com/content/abstract/";
 	
 	private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
 	private static final String HTTP_HEADER_API_KEY = "X-ELS-APIKey";
@@ -38,11 +50,22 @@ public class Scopus {
 	private static final String SEPARATOR = ";";
 	private static final String SEPARATOR2 = ",";
 	
-	private static final ObjectMapper mapper = new ObjectMapper();   
+	private static final ObjectMapper mapper; 
 	
 	static {
+		mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
 		//mapper.configure(Feature.UNWRAP_ROOT_VALUE, true);
+		
+		SimpleModule testModule = new SimpleModule("Scopus", new Version(1, 0, 0, null, "org.grants.scopus", "scopus"))
+				.addDeserializer(Affiliation.class, new AffiliationDeserializer())
+				.addDeserializer(Affiliation[].class, new AffiliationsDeserializer())
+				.addDeserializer(Author.class, new AuthorDeserializer())
+				.addDeserializer(Author[].class, new AuthorsDeserealizer())
+				.addDeserializer(String.class, new StringDeserializer())
+				.addDeserializer(String[].class, new StringsDeserializer());
+
+		mapper.registerModule(testModule);
 	}
 	
 	/**
@@ -185,12 +208,17 @@ public class Scopus {
 	 * This can also be submitted as the query string parameter "httpAccept". This returns the 
 	 * response in JSON, ATOM, or XML mark-up.
 	 */
-	private AcceptType acceptType;
+	private MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
 	
 	/**
-	 * This alias represents the list of elements that will be returned in the response. 
+	 * This alias represents the list of elements that will be returned in the search response. 
 	 */
-	private ViewType viewType;
+	private SearchViewType searchViewType = SearchViewType.searchViewTypeComplete;
+		
+	/**
+	 * This alias represents the list of elements that will be returned in the abstract response. 
+	 */
+	private AbstractViewType abstractViewType = AbstractViewType.abstractViewTypeFull;
 	
 	/**
 	 * This parameter is used to filter specific categories of content that should be searched/returned. 
@@ -248,18 +276,19 @@ public class Scopus {
 	private List<Facet> facets;
 	
 	/**
-	 * Class constructor
-	 * 
-	 * @param apiKey
-	 * @param instToken
-	 * @param resourceType
-	 */
-	public Scopus(String apiKey, String instToken, ResourceType resourceType) {
-		this.apiKey = apiKey;
-		this.instToken = instToken;
-	//	this.resourceType = resourceType;
-	}
+	 * Applicable only to REF view. Numeric value representing the results offset (i.e. starting position for the resolved references).
 
+		ex. startref=5 
+	 */
+	private Integer startRef = null;
+	
+	/**
+	 * Applicable only to REF view. Numeric value representing the maximum number of resolved references to be returned. If not provided this will be set to a system default based on service level.
+
+	ex. refcount=10 
+	 */
+	private Integer refCount = null;
+	
 	/**
 	 * Class constructor for a scopus object
 	 * @param apiKey
@@ -268,10 +297,9 @@ public class Scopus {
 	public Scopus(String apiKey, String instToken) {
 		this.apiKey = apiKey;
 		this.instToken = instToken;
-	//	this.resourceType = ResourceType.resourceTypeScopus;
 	}
 	
-	public SearchResults parseJson(String json) {
+	public SearchResults parseSearchResult(String json) {
 		try {
 			return mapper.readValue(json, SearchResults.class);
 		} catch (Exception e) {
@@ -281,7 +309,7 @@ public class Scopus {
 		return null;
 	}
 	
-	public SearchResults parseJson(File fileJson) {
+	public SearchResults parseSearchResult(File fileJson) {
 		try {
 			return mapper.readValue(fileJson, SearchResults.class);
 		} catch (Exception e) {
@@ -290,18 +318,44 @@ public class Scopus {
 
 		return null;
 	}
-		
-	public SearchResults search(ResourceType resourceType, String query) {
-		return parseJson(searchString(resourceType, query));
+	
+	/**
+	 * Abstract record parsing is disabled for now, since we do not know, can we use it or not 
+	 * and how we gonna use it if we will
+	 */
+	
+	/*
+	public AbstractResponse parseAbstractResponse(String json) {
+		try {
+			return mapper.readValue(json, AbstractResponse.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 	
-	public String searchString(ResourceType resourceType, String query) {
+	public AbstractResponse parseAbstractResponse(File fileJson) {
+		try {
+			return mapper.readValue(fileJson, AbstractResponse.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}*/
+		
+	public SearchResults search(ResourceType resourceType, String query) throws UnsupportedEncodingException {
+		return parseSearchResult(searchString(resourceType, query));
+	}
+	
+	public String searchString(ResourceType resourceType, String query) throws UnsupportedEncodingException {
 		StringBuilder q = new StringBuilder();
 		
 		q.append(URL_SEARCH_API);
 		q.append(resourceType.toString());
 		q.append("?query=");
-		q.append(query);
+		q.append(URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
 		
 		if (null != fields && !fields.isEmpty()) {
 			StringBuilder sb = null;
@@ -317,9 +371,9 @@ public class Scopus {
 				q.append("&field=");
 				q.append(sb.toString());
 			}				
-		} else if (null != viewType) {
+		} else if (null != searchViewType) {
 			q.append("&view=");
-			q.append(viewType.toString());
+			q.append(searchViewType.toString());
 		}
 		
 		if (null != suppressNavLinks) {
@@ -407,24 +461,8 @@ public class Scopus {
 		Builder builder = Client
 				.create()
 				.resource( url )
-				.type( MediaType.APPLICATION_JSON );
-		// set accept type
-		if (null != acceptType) {
-			switch (acceptType) {
-			case acceptTypeJson:
-				builder = builder.accept( MediaType.APPLICATION_JSON );
-				break;
-				
-			case acceptTypeXml:
-				builder = builder.accept( MediaType.APPLICATION_XML );
-				break;
-				
-			case acceptTypeAtomXml:
-				builder = builder.accept( MediaType.APPLICATION_ATOM_XML );
-				break;
-			}
-		} else
-			builder = builder.accept( MediaType.APPLICATION_JSON );
+				.type( MediaType.APPLICATION_JSON )
+				.accept( mediaType );
 				
 		// set authorization (if any)
 		if (null != authorization)
@@ -452,8 +490,11 @@ public class Scopus {
 		
 		if (response.getStatus() == 200) 
 			return response.getEntity( String.class );
-		else
-			return null;
+		
+		System.out.println("Invalid Scopus response status: " + response.getStatus());
+		System.out.println("Entity: " + response.getEntity( String.class ));
+		
+		return null;
 	}
 	
 	public String abstractString(AbstractType abstractType, String id) {
@@ -463,8 +504,10 @@ public class Scopus {
 		q.append(abstractType.toString());
 		q.append("/");
 		q.append(id);
+		q.append("?");
 		
 		if (null != fields && !fields.isEmpty()) {
+			
 			StringBuilder sb = null;
 			for (String field : fields) {
 				if (null == sb)
@@ -478,88 +521,20 @@ public class Scopus {
 				q.append("&field=");
 				q.append(sb.toString());
 			}				
-		} else if (null != viewType) {
+		} else if (null != abstractViewType) {
 			q.append("&view=");
-			q.append(viewType.toString());
+			q.append(abstractViewType.toString());
 		}
 		
-		if (null != suppressNavLinks) {
-			q.append("&suppressNavLinks=");
-			q.append(suppressNavLinks);
+		if (null != startRef)
+		{
+			q.append("&startref=");
+			q.append(startRef);
 		}
 		
-		if (null != date) {
-			q.append("&date=");
-			q.append(date);
-		}
-
-		if (null != start) {
-			q.append("&start=");
-			q.append(start);
-		}
-		
-		if (null != count) {
-			q.append("&count=");
-			q.append(count);
-		}
-		
-		if (null != sortOptions) {
-			StringBuilder sb = null;
-			for (SortType sortType : sortOptions) {
-				if (null == sb)
-					sb = new StringBuilder();
-				else
-					sb.append(SEPARATOR2);
-				
-				sb.append(sortType.toString());
-			}
-			
-			if (null != sb) {
-				q.append("&sort=");
-				q.append(sb.toString());
-			}
-		}
-		
-		if (null != contentType) {
-			q.append("&content=");
-			q.append(contentType.toString());
-		}
-		
-		if (null != subj) {
-			q.append("&subj=");
-			q.append(subj);
-		}
-		
-		if (null != enableAlias) {
-			q.append("&alias=");
-			q.append(enableAlias);
-		}
-
-		if (null != resolveGroups) {
-			q.append("&resolveGroups=");
-			q.append(resolveGroups);
-		}
-		
-		if (null != authorFormatType) {
-			q.append("&authorFormat=");
-			q.append(authorFormatType.toString());
-		}
-			
-		if (null != facets) {
-			StringBuilder sb = null;
-			for (Facet facet : facets) {
-				if (null == sb)
-					sb = new StringBuilder();
-				else
-					sb.append(SEPARATOR);
-				
-				sb.append(facet.toString());
-			}
-			
-			if (null != sb) {
-				q.append("&facets=");
-				q.append(sb.toString());
-			}
+		if (null != refCount) {
+			q.append("&refcount=");
+			q.append(refCount);
 		}
 		
 		String url = q.toString();
@@ -568,24 +543,8 @@ public class Scopus {
 		Builder builder = Client
 				.create()
 				.resource( url )
-				.type( MediaType.APPLICATION_JSON );
-		// set accept type
-		if (null != acceptType) {
-			switch (acceptType) {
-			case acceptTypeJson:
-				builder = builder.accept( MediaType.APPLICATION_JSON );
-				break;
-				
-			case acceptTypeXml:
-				builder = builder.accept( MediaType.APPLICATION_XML );
-				break;
-				
-			case acceptTypeAtomXml:
-				builder = builder.accept( MediaType.APPLICATION_ATOM_XML );
-				break;
-			}
-		} else
-			builder = builder.accept( MediaType.APPLICATION_JSON );
+				.type( MediaType.APPLICATION_JSON )
+				.accept( mediaType );
 				
 		// set authorization (if any)
 		if (null != authorization)
@@ -613,8 +572,10 @@ public class Scopus {
 		
 		if (response.getStatus() == 200) 
 			return response.getEntity( String.class );
-		else
+		else {
+			System.out.println("Invalid Scopus response status: " + response.getStatus());
 			return null;
+		}
 	}
 
 	public String getApiKey() {
@@ -704,15 +665,7 @@ public class Scopus {
 	public void setCount(Integer count) {
 		this.count = count;
 	}
-
-	public ResourceType getResourceType() {
-		return resourceType;
-	}
-
-	public void setResourceType(ResourceType resourceType) {
-		this.resourceType = resourceType;
-	}
-
+	/*
 	public AcceptType getAcceptType() {
 		return acceptType;
 	}
@@ -721,13 +674,13 @@ public class Scopus {
 		this.acceptType = acceptType;
 	}
 
-	public ViewType getViewType() {
+	public SearchViewType getViewType() {
 		return viewType;
 	}
 
-	public void setViewType(ViewType viewType) {
+	public void setViewType(SearchViewType viewType) {
 		this.viewType = viewType;
-	}
+	}*/
 
 	public ContentType getContentType() {
 		return contentType;

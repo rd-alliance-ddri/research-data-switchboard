@@ -2,7 +2,7 @@ package org.grants.scopus.response;
 
 public class ScopusObject {
 	protected final boolean _fa;
-
+	
 	public boolean is_fa() {
 		return _fa;
 	}

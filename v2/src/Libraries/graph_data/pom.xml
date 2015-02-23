@@ -2,12 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.libraryes</groupId>
   <artifactId>graph_data</artifactId>
-  <version>1.1.0</version>
+  <version>1.3.0</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.7</jdk.version>
-    <class.path>jars/</class.path>
+    <neo4j.version>2.1.6</neo4j.version>
+    <junit.version>4.11</junit.version>
   </properties>
   
   <build>
@@ -24,5 +25,19 @@
 	  
  	</plugins>
   </build>
-   
+     
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j</artifactId>
+      <version>${neo4j.version}</version>
+    </dependency>
+  </dependencies>
+  
 </project>

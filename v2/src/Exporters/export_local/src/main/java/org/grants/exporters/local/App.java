@@ -3,7 +3,7 @@ package org.grants.exporters.local;
 import java.io.IOException;
 
 public class App {
-	private static final String SOURCE_NEO4J_FOLDER = "graph.db";	
+	private static final String SOURCE_NEO4J_FOLDER = "neo4j";	
 	private static final String OUTPUT_FOLDER = "graph";	
 	
 	public static void main(String[] args) {

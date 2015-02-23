@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,7 +11,8 @@ import java.util.Set;
 import org.grants.graph.GraphConnection;
 import org.grants.graph.GraphNode;
 import org.grants.graph.GraphRelationship;
-import org.neo4j.cypher.ExecutionEngine;
+import org.grants.graph.GraphSchema;
+import org.grants.graph.GraphUtils;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -22,36 +22,26 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.graphdb.index.UniqueFactory.UniqueNodeFactory;
 import org.neo4j.graphdb.schema.ConstraintDefinition;
 import org.neo4j.graphdb.schema.Schema;
-import org.neo4j.kernel.impl.util.StringLogger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Importer {
-	private static final String FOLDER_NODE = "node";
-	private static final String FOLDER_RELATIONSHIP = "relationship";
-//	private static final int MAX_COMMANDS = 1024;
-	
-	private static final String PROPERTY_KEY = "key";
-	private static final String PROPERTY_NODE_TYPE = "node_type";
-	private static final String PROPERTY_NODE_SOURCE = "node_source";
 	
 	private Set<String> constrants = new HashSet<String>();
-//	private Map<String, UniqueNodeFactory> factories = new HashMap<String, UniqueNodeFactory>();
 	private Map<String, Index<Node>> indexes = new HashMap<String, Index<Node>>();
+
 	private GraphDatabaseService graphDb;
-	private ExecutionEngine engine; 
-//	private GlobalGraphOperations global;
 	
-	private ObjectMapper mapper; 
+	private static final ObjectMapper mapper = new ObjectMapper(); 
+	
+	private File schemaFolder;
 	private File nodesFolder;
 	private File relationshipsFolder;
 	
+	private int indexCounter;
 	private int nodeCounter;
 	private int relationshipCounter;
 
@@ -59,46 +49,64 @@ public class Importer {
 		System.out.println("Source folder: " + imputFolder);
 		System.out.println("Target Neo4j folder: " + neo4jFolder);
 		
+		graphDb = GraphUtils.getGraphDb( neo4jFolder );
+		
 		// Set input folder
 		File folder = new File(imputFolder);
-		nodesFolder = new File(folder, FOLDER_NODE);
-		if (!nodesFolder.exists() || !nodesFolder.isDirectory())
+		
+		schemaFolder = GraphUtils.getSchemaFolder(folder);
+		if (!schemaFolder.isDirectory())
+			throw new Exception("Invalid schema path: " + schemaFolder.getPath());
+		
+		nodesFolder = GraphUtils.getNodeFolder(folder);
+		if (!nodesFolder.isDirectory())
 			throw new Exception("Invalid nodes path: " + nodesFolder.getPath());
 		
-		relationshipsFolder = new File(folder, FOLDER_RELATIONSHIP);
-		if (!relationshipsFolder.exists() || !relationshipsFolder.isDirectory())
+		relationshipsFolder = GraphUtils.getRelationshipFolder(folder);
+		if (!relationshipsFolder.isDirectory())
 			throw new Exception("Invalid relationships path: " + relationshipsFolder.getPath());
-	
-		//graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(dbFolder);
-		//graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(dbFolder)
-			//	.setConfig( GraphDatabaseSettings.read_only, "true" )
-		//		.newGraphDatabase();
-		graphDb = new GraphDatabaseFactory()
-			.newEmbeddedDatabaseBuilder( neo4jFolder + "/data/graph.db" )
-			.loadPropertiesFromFile( neo4jFolder + "/conf/neo4j.properties" )
-			//.setConfig( GraphDatabaseSettings.nodestore_mapped_memory_size, "10M" )
-			//.setConfig( GraphDatabaseSettings.string_block_size, "60" )
-			//.setConfig( GraphDatabaseSettings.array_block_size, "300" )
-			.newGraphDatabase();
-		
-		// register a shutdown hook
-		registerShutdownHook(graphDb);
-		
-		engine = new ExecutionEngine(graphDb, StringLogger.SYSTEM);
-		//global = GlobalGraphOperations.at(graphDb);
-		
-		// setup Object mapper
-		mapper = new ObjectMapper(); 
 	}
 		
 	public void process() throws Exception {
+		importSchema();
 		importNodes();
 		importRelationships();
 	}	
 	
-	private void importNodes() throws Exception {
-		nodeCounter = 0;
+	private void importSchema() throws Exception {
+		System.out.println("Creating constrants and obtain indexes");
 
+		indexCounter = 0;
+		long beginTime = System.currentTimeMillis();
+		
+		GraphSchema graphSchema = mapper.readValue(new File(schemaFolder, GraphUtils.GRAPH_SCHEMA), GraphSchema.class);
+		
+		// First make sure the constant exists
+		for (String index : graphSchema.getIndexes())
+			try ( Transaction tx = graphDb.beginTx() ) 
+			{
+				createConstrant(index);
+			
+				tx.success();
+			}
+			
+		// Next obtain an index
+		for (String index : graphSchema.getIndexes())
+			try ( Transaction tx = graphDb.beginTx() ) 
+			{
+				obtainIndex(index);
+			}
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println(String.format("Done. Imported %d constrants over %d ms. Average %f ms per constrant", 
+				indexCounter, endTime - beginTime, (float)(endTime - beginTime) / (float)indexCounter));
+
+	}
+	
+	private void importNodes() throws Exception {
+		System.out.println("Importing nodes");
+		
+		nodeCounter = 0;
 		long beginTime = System.currentTimeMillis();
 		
 		File[] nodeFiles = nodesFolder.listFiles();
@@ -107,9 +115,6 @@ public class Importer {
 				System.out.println("Processing node: " + nodeFile.getName());
 
 				GraphNode[] graphNodes = mapper.readValue(nodeFile, GraphNode[].class);
-				for (GraphNode graphNode : graphNodes) 
-					importSchema(graphNode);		
-				
 				try ( Transaction tx = graphDb.beginTx() ) 
 				{
 					for (GraphNode graphNode : graphNodes) 
@@ -120,24 +125,25 @@ public class Importer {
 			}
 		
 		long endTime = System.currentTimeMillis();
-		
 		System.out.println(String.format("Done. Imported %d nodes over %d ms. Average %f ms per node", 
 				nodeCounter, endTime - beginTime, (float)(endTime - beginTime) / (float)nodeCounter));
 	}
 	
 	private void importRelationships() throws Exception {
-		relationshipCounter = 0;
+		System.out.println("Importing relationsips");
 		
+		relationshipCounter = 0;
 		long beginTime = System.currentTimeMillis();
+		
 		File[] relationshipFiles = relationshipsFolder.listFiles();
-				
 		for (File relationshipFile : relationshipFiles) 
 			if (!relationshipFile.isDirectory()) { 
 				System.out.println("Processing relationship: " + relationshipFile.getName());
 				
+				GraphRelationship[] graphRelationships = mapper.readValue(relationshipFile, GraphRelationship[].class);
+				
 				try ( Transaction tx = graphDb.beginTx() ) 
 				{		
-					GraphRelationship[] graphRelationships = mapper.readValue(relationshipFile, GraphRelationship[].class);
 					for (GraphRelationship graphRelationship : graphRelationships) 
 						importRelationship(graphRelationship);
 					
@@ -146,23 +152,12 @@ public class Importer {
 			}
 		
 		long endTime = System.currentTimeMillis();
-		
 		System.out.println(String.format("Done. Imported %d relationships over %d ms. Average %f ms per relationship", 
 				relationshipCounter, endTime - beginTime, (float)(endTime - beginTime) / (float)relationshipCounter));
 	}	
 	
-	private void importSchema(GraphNode graphNode) throws Exception {
-		String source = (String) graphNode.getProperties().get(PROPERTY_NODE_SOURCE);
-		if (null == source || source.isEmpty()) 
-			throw new Exception("Error in node, the node source is empty");
-		String type = (String) graphNode.getProperties().get(PROPERTY_NODE_TYPE);
-		if (null == type || type.isEmpty()) 
-			throw new Exception("Error in node, the node type is empty");
-		
-		createConstrant(source + "_" + type);
-		createIndex(source + "_" + type);
-	}
-	
+
+
 	/*
 	private void importNode(GraphNode graphNode) throws Exception {
 		String source = (String) graphNode.getProperties().get(PROPERTY_NODE_SOURCE);
@@ -233,18 +228,18 @@ public class Importer {
 	
 	@SuppressWarnings("unchecked")
 	private void importNode(GraphNode graphNode) throws Exception {
-		String source = (String) graphNode.getProperties().get(PROPERTY_NODE_SOURCE);
+		String source = (String) graphNode.getProperties().get(GraphUtils.PROPERTY_NODE_SOURCE);
 		if (null == source || source.isEmpty()) 
 			throw new Exception("Error in node, the node source is empty");
-		String type = (String) graphNode.getProperties().get(PROPERTY_NODE_TYPE);
+		String type = (String) graphNode.getProperties().get(GraphUtils.PROPERTY_NODE_TYPE);
 		if (null == type || type.isEmpty()) 
 			throw new Exception("Error in node, the node type is empty");
-		String key = (String) graphNode.getProperties().get(PROPERTY_KEY);
+		String key = (String) graphNode.getProperties().get(GraphUtils.PROPERTY_KEY);
 		if (null == key || key.isEmpty()) 
 			throw new Exception("Error in node, the node key is empty");
 	
 		Index<Node> index = indexes.get(source + "_" + type);
-		Node node = (Node) index.get(PROPERTY_KEY, key).getSingle();
+		Node node = (Node) index.get(GraphUtils.PROPERTY_KEY, key).getSingle();
 		if (null == node) {
 			node = graphDb.createNode();
 				 
@@ -263,7 +258,8 @@ public class Importer {
 				
 			node.addLabel(DynamicLabel.label(source));
 			node.addLabel(DynamicLabel.label(type));
-			index.add(node, PROPERTY_KEY, key);
+			
+			index.add(node, GraphUtils.PROPERTY_KEY, key);
 		}
 
 	}
@@ -319,7 +315,7 @@ public class Importer {
 	private Node findNode(GraphConnection connection) {
 		return indexes
 				.get(connection.getSource() + "_" + connection.getType())
-				.get(PROPERTY_KEY, connection.getKey())
+				.get(GraphUtils.PROPERTY_KEY, connection.getKey())
 				.getSingle();
 	}
 	
@@ -351,35 +347,23 @@ public class Importer {
 		if ( !constrants.contains(label) ) {
 			constrants.add(label);
 			
-			try ( Transaction tx = graphDb.beginTx() ) 
-			{
-				Schema schema = graphDb.schema();
-				Label l = DynamicLabel.label(label);
-				for (ConstraintDefinition constraint : schema.getConstraints(l))
-					for (String property : constraint.getPropertyKeys())
-						if (property.equals(PROPERTY_KEY))
-							return;  // already existing
+			Schema schema = graphDb.schema();
+			Label l = DynamicLabel.label(label);
+			for (ConstraintDefinition constraint : schema.getConstraints(l))
+				for (String property : constraint.getPropertyKeys())
+					if (property.equals(GraphUtils.PROPERTY_KEY))
+						return;  // already existing
 				
-				schema.constraintFor(l)
-					.assertPropertyIsUnique(PROPERTY_KEY)
-					.create();
+			schema.constraintFor(l)
+				.assertPropertyIsUnique(GraphUtils.PROPERTY_KEY)
+				.create();
 	
-				tx.success();
-			}
 		}		
 	}
 	
-	private void createIndex(String label) {
-		if ( !indexes.containsKey(label) ) {
-			
-			Index<Node> index;		
-			try ( Transaction tx = graphDb.beginTx() ) 
-			{
-				index = graphDb.index().forNodes( label );
-			}
-			
-			indexes.put(label, index);			
-		}	
+	private void obtainIndex(String label) {
+		if ( !indexes.containsKey(label) ) 
+			indexes.put(label, graphDb.index().forNodes( label ));			
 	}
 	
 	/*
@@ -448,20 +432,4 @@ public class Importer {
 		    return result;
 		 }
 	}*/
-				
-	private static void registerShutdownHook( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running application).
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-	        {
-	            graphDb.shutdown();
-	        }
-	    } );
-	}
-
 }

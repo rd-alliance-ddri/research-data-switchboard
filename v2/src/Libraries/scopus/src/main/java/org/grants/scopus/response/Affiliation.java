@@ -1,42 +1,70 @@
 package org.grants.scopus.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Set;
 
-public class Affiliation  extends ScopusObject {
-	private final String affilname;
-	private final String affiliationCity;
-	private final String affiliationCountry;
+/**
+ * Affiliation class
+ * 
+ * The AffiliationDeserializer class will be used to initialize this object
+ * 
+ * @author dima
+ */
+
+public class Affiliation {
+	private final String id;
+	private final String name;
+	private final String city;
+	private final String country;
+	private final String url;
+	private final Set<String> alternative;
 	
-	@JsonCreator
 	public Affiliation(
-			@JsonProperty("@_fa") final boolean _fa,
-			@JsonProperty("affilname") final String affilname,
-			@JsonProperty("affiliation-city") final String affiliationCity,
-			@JsonProperty("affiliation-country") final String affiliationCountry) {
-		super(_fa);
+			final String id,
+			final String name,
+			final String city,
+			final String country,
+			final String url,
+			final Set<String> alternative) {
 		
-		this.affilname = affilname;
-		this.affiliationCity = affiliationCity;
-		this.affiliationCountry = affiliationCountry;
+		this.id = id;
+		this.name = name;
+		this.city = city;
+		this.country = country;
+		this.url = url;
+		this.alternative = alternative;
 	}
-	
-	public String getAffilname() {
-		return affilname;
+
+	public String getId() {
+		return id;
 	}
-	
-	public String getAffiliationCity() {
-		return affiliationCity;
+
+	public String getName() {
+		return name;
 	}
-	
-	public String getAffiliationCountry() {
-		return affiliationCountry;
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public Set<String> getAlternative() {
+		return alternative;
 	}
 
 	@Override
 	public String toString() {
-		return "Affiliation [affilname=" + affilname + ", affiliationCity="
-				+ affiliationCity + ", affiliationCountry="
-				+ affiliationCountry + "]";
+		return "Affiliation [id=" + id 
+				+ ", name=" + name 
+				+ ", city=" + city
+				+ ", country=" + country 
+				+ ", url=" + url
+				+ ", alternative=" + alternative + "]";
 	}
 }

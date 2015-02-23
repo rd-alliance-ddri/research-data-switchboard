@@ -8,6 +8,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GoogleUtils {
+	public static final String FOLDER_CACHE = "cache";
+	public static final String FOLDER_LINK = "link";
+	public static final String FOLDER_DATA = "data";
+	public static final String FOLDER_METADATA = "metadata";
+	public static final String FOLDER_GRANT = "grant";
+	public static final String FOLDER_PUBLICATION = "publication";
+	
 	public static final ObjectMapper mapper = new ObjectMapper();
 	public static final TypeReference<Map<String, Object>> refPagemap = new TypeReference<Map<String, Object>>() {};
 
@@ -58,7 +65,24 @@ public class GoogleUtils {
 	public static String getMetatag(File filePagemap, String field) { 
 		return getMetatag(getPagemap(filePagemap), field);
 	}
+		
+	public static final File getLinkFolder(File folder) {
+		return new File(folder, FOLDER_CACHE + "/" + FOLDER_LINK);
+	}
+
+	public static final File getDataFolder(File folder) {
+		return new File(folder, FOLDER_CACHE + "/" + FOLDER_DATA);
+	}
+
+	public static final File getMetadataFolder(File folder) {
+		return new File(folder, FOLDER_CACHE + "/" + FOLDER_METADATA);
+	}
+
+	public static final File getGrantFolder(File folder) {
+		return new File(folder, FOLDER_CACHE + "/" + FOLDER_GRANT);
+	}
 	
-	
-	
+	public static final File getGrantPublication(File folder) {
+		return new File(folder, FOLDER_CACHE + "/" + FOLDER_PUBLICATION);
+	}	
 }

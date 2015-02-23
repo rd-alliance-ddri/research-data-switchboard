@@ -1,24 +1,23 @@
 package org.grants.scopus.response;
 
-import java.util.List;
+import java.util.Arrays;
 
-import org.grants.scopus.deserilaize.AuthorArrayDeserializer;
-import org.grants.scopus.deserilaize.DateArrayDeserializer;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-public class Entry extends ScopusObject {
+@JsonIgnoreProperties({ "@_fa" })
+public class Entry {
 	private String scopusEid;
-	private String scopusId;
+//	private String scopusId;
+	private String acticleNumber;
+	private String intId;
 	private String identifier;
 	private String title;
 	private String crteator;
 	private String description;
 	private String authkeywords;
-	private String openaccess;
-	private String pii;
+//	private String openaccess;
+	//private String pii;
 	private String aggregationType;
 	private String copyright;
 	private String coverDisplayDate;
@@ -35,22 +34,97 @@ public class Entry extends ScopusObject {
 	private String publicationName;
 	private String teaser;
 	private String url;
-	private String pubType;
+//	private String pubType;
 	private String citedbyCount;
 	private String subtype;
 	private String subtypeDescription;
-	private boolean openaccessFlag;
-	private List<Author> authors;
-	private List<Link> links;
-	private List<Date> coverDates;
-	private List<Affiliation> affiliations;
+//	private boolean openaccessFlag;
+	private Affiliation[] affiliations;
+	private Author[] authors;
+	private Link[] links;
+	private String[] coverDates;
+	
+	public Affiliation[] getAffiliations() {
+		return affiliations;
+	}
 
-	@JsonCreator
-	public Entry(
-			@JsonProperty("@_fa") final boolean _fa) {
-		super(_fa);
+	@JsonProperty("affiliation")
+	public void setAffiliations(Affiliation[] affiliations) {
+		this.affiliations = affiliations;
 	}
 	
+	public String getActicleNumber() {
+		return acticleNumber;
+	}
+
+	@JsonProperty("article-number")
+	public void setActicleNumber(String acticleNumber) {
+		this.acticleNumber = acticleNumber;
+	}
+
+	public String getAuthkeywords() {
+		return authkeywords;
+	}
+
+	public void setAuthkeywords(String authkeywords) {
+		this.authkeywords = authkeywords;
+	}
+	
+	public Author[] getAuthors() {
+		return authors;
+	}
+
+	@JsonProperty("author")
+	public void setAuthors(Author[] authors) {
+		this.authors = authors;
+	}
+
+	public String getCitedbyCount() {
+		return citedbyCount;
+	}
+
+	@JsonProperty("citedby-count")
+	public void setCitedbyCount(String citedbyCount) {
+		this.citedbyCount = citedbyCount;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+	
+
+	public String getCrteator() {
+		return crteator;
+	}
+
+	@JsonProperty("dc:creator")
+	public void setCrteator(String crteator) {
+		this.crteator = crteator;
+	}
+
+	@JsonProperty("dc:description")
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public String getIdentifier() {
+		return identifier;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	@JsonProperty("dc:title")
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	@JsonProperty("dc:identifier")
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+
 	public String getScopusEid() {
 		return scopusEid;
 	}
@@ -66,76 +140,24 @@ public class Entry extends ScopusObject {
 		this.scopusEid = eid;
 	}
 
-	
-	public String getScopusId() {
-		return scopusId;
+	public String getIntId() {
+		return intId;
 	}
 
-	@JsonProperty("scopus-id")
-	public void setScopusId(String scopusId) {
-		this.scopusId = scopusId;
-	}
-	
-	public String getIdentifier() {
-		return identifier;
+	@JsonProperty("intid")
+	public void setIntId(String intId) {
+		this.intId = intId;
 	}
 
-	@JsonProperty("dc:identifier")
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
+	public Link[] getLinks() {
+		return links;
 	}
-	
-	public String getTitle() {
-		return title;
+
+	@JsonProperty("link")
+	public void setLinks(Link[] links) {
+		this.links = links;
 	}
 	
-	@JsonProperty("dc:title")
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
-	public String getCrteator() {
-		return crteator;
-	}
-
-	@JsonProperty("dc:creator")
-	public void setCrteator(String crteator) {
-		this.crteator = crteator;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	@JsonProperty("dc:description")
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
-	public String getAuthkeywords() {
-		return authkeywords;
-	}
-
-	public void setAuthkeywords(String authkeywords) {
-		this.authkeywords = authkeywords;
-	}
-	
-	public String getOpenaccess() {
-		return openaccess;
-	}
-
-	public void setOpenaccess(String openaccess) {
-		this.openaccess = openaccess;
-	}
-	
-	public String getPii() {
-		return pii;
-	}
-
-	public void setPii(String pii) {
-		this.pii = pii;
-	}
-
 	public String getAggregationType() {
 		return aggregationType;
 	}
@@ -145,13 +167,22 @@ public class Entry extends ScopusObject {
 		this.aggregationType = aggregationType;
 	}
 	
-	public String getCopyright() {
-		return copyright;
+	public String[] getCoverDates() {
+		return coverDates;
+	}
+	
+	public String getTeaser() {
+		return teaser;
 	}
 
-	@JsonProperty("prism:copyright")
-	public void setCopyright(String copyright) {
-		this.copyright = copyright;
+	@JsonProperty("prism:teaser")
+	public void setTeaser(String teaser) {
+		this.teaser = teaser;
+	}
+		
+	@JsonProperty("prism:coverDate")
+	public void setCoverDates(String[] coverDates) {
+		this.coverDates = coverDates;
 	}
 
 	public String getCoverDisplayDate() {
@@ -162,7 +193,7 @@ public class Entry extends ScopusObject {
 	public void setCoverDisplayDate(String coverDisplayDate) {
 		this.coverDisplayDate = coverDisplayDate;
 	}
-	
+
 	public String getDoi() {
 		return doi;
 	}
@@ -172,15 +203,6 @@ public class Entry extends ScopusObject {
 		this.doi = doi;
 	}
 	
-	public String getIsbn() {
-		return isbn;
-	}
-
-	@JsonProperty("prism:isbn")
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
-	}
-
 	public String getIssn() {
 		return issn;
 	}
@@ -190,6 +212,20 @@ public class Entry extends ScopusObject {
 		this.issn = issn;
 	}
 	
+	public String getIssueIdentifier() {
+		return issueIdentifier;
+	}
+
+
+	public String getIsbn() {
+		return isbn;
+	}
+
+	@JsonProperty("prism:isbn")
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+	
 	public String geteIssn() {
 		return eIssn;
 	}
@@ -197,15 +233,20 @@ public class Entry extends ScopusObject {
 	@JsonProperty("prism:eIssn")
 	public void seteIssn(String eIssn) {
 		this.eIssn = eIssn;
-	}
+	}	
 	
-	public String getVolume() {
-		return volume;
+	public String getIssueName() {
+		return issueName;
 	}
 
-	@JsonProperty("prism:volume")
-	public void setVolume(String volume) {
-		this.volume = volume;
+	@JsonProperty("prism:issueName")
+	public void setIssueName(String issueName) {
+		this.issueName = issueName;
+	}
+	
+	@JsonProperty("prism:issueIdentifier")
+	public void setIssueIdentifier(String issueIdentifier) {
+		this.issueIdentifier = issueIdentifier;
 	}
 	
 	public String getPageRange() {
@@ -216,7 +257,7 @@ public class Entry extends ScopusObject {
 	public void setPageRange(String pageRange) {
 		this.pageRange = pageRange;
 	}
-
+	
 	public String getStartingPage() {
 		return startingPage;
 	}
@@ -234,25 +275,7 @@ public class Entry extends ScopusObject {
 	public void setEndingPage(String endingPage) {
 		this.endingPage = endingPage;
 	}
-	
-	public String getIssueIdentifier() {
-		return issueIdentifier;
-	}
 
-	@JsonProperty("prism:issueIdentifier")
-	public void setIssueIdentifier(String issueIdentifier) {
-		this.issueIdentifier = issueIdentifier;
-	}
-	
-	public String getIssueName() {
-		return issueName;
-	}
-
-	@JsonProperty("prism:issueName")
-	public void setIssueName(String issueName) {
-		this.issueName = issueName;
-	}
-	
 	public String getPublicationName() {
 		return publicationName;
 	}
@@ -260,15 +283,6 @@ public class Entry extends ScopusObject {
 	@JsonProperty("prism:publicationName")
 	public void setPublicationName(String publicationName) {
 		this.publicationName = publicationName;
-	}
-	
-	public String getTeaser() {
-		return teaser;
-	}
-
-	@JsonProperty("prism:teaser")
-	public void setTeaser(String teaser) {
-		this.teaser = teaser;
 	}
 	
 	public String getUrl() {
@@ -280,21 +294,22 @@ public class Entry extends ScopusObject {
 		this.url = url;
 	}
 	
-	public String getPubType() {
-		return pubType;
+	public String getVolume() {
+		return volume;
 	}
 
-	public void setPubType(String pubType) {
-		this.pubType = pubType;
+	@JsonProperty("prism:volume")
+	public void setVolume(String volume) {
+		this.volume = volume;
 	}
 	
-	public String getCitedbyCount() {
-		return citedbyCount;
+	public String getCopyright() {
+		return copyright;
 	}
 
-	@JsonProperty("citedby-count")
-	public void setCitedbyCount(String citedbyCount) {
-		this.citedbyCount = citedbyCount;
+	@JsonProperty("prism:copyright")
+	public void setCopyright(String copyright) {
+		this.copyright = copyright;
 	}
 	
 	public String getSubtype() {
@@ -304,13 +319,90 @@ public class Entry extends ScopusObject {
 	public void setSubtype(String subtype) {
 		this.subtype = subtype;
 	}
-
+	
 	public String getSubtypeDescription() {
 		return subtypeDescription;
 	}
-
+	
 	public void setSubtypeDescription(String subtypeDescription) {
 		this.subtypeDescription = subtypeDescription;
+	}
+
+	@Override
+	public String toString() {
+		return "Entry [scopusEid=" + scopusEid + ", acticleNumber="
+				+ acticleNumber + ", intId=" + intId + ", identifier="
+				+ identifier + ", title=" + title + ", crteator=" + crteator
+				+ ", description=" + description + ", authkeywords="
+				+ authkeywords + ", aggregationType=" + aggregationType
+				+ ", copyright=" + copyright + ", coverDisplayDate="
+				+ coverDisplayDate + ", doi=" + doi + ", isbn=" + isbn
+				+ ", issn=" + issn + ", eIssn=" + eIssn + ", volume=" + volume
+				+ ", pageRange=" + pageRange + ", startingPage=" + startingPage
+				+ ", endingPage=" + endingPage + ", issueIdentifier="
+				+ issueIdentifier + ", issueName=" + issueName
+				+ ", publicationName=" + publicationName + ", teaser=" + teaser
+				+ ", url=" + url + ", citedbyCount=" + citedbyCount
+				+ ", subtype=" + subtype + ", subtypeDescription="
+				+ subtypeDescription + ", affiliations="
+				+ Arrays.toString(affiliations) + ", authors="
+				+ Arrays.toString(authors) + ", links="
+				+ Arrays.toString(links) + ", coverDates="
+				+ Arrays.toString(coverDates) + "]";
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+/*
+	
+	public String getScopusId() {
+		return scopusId;
+	}
+
+	@JsonProperty("scopus-id")
+	public void setScopusId(String scopusId) {
+		this.scopusId = scopusId;
+	}
+	*/
+		
+
+	
+/*
+	public String getOpenaccess() {
+		return openaccess;
+	}
+
+	public void setOpenaccess(String openaccess) {
+		this.openaccess = openaccess;
+	}*/
+	
+	/*
+	public String getPii() {
+		return pii;
+	}
+
+	public void setPii(String pii) {
+		this.pii = pii;
+	}
+*/
+	
+
+	
+
+	/*
+	
+	public String getPubType() {
+		return pubType;
+	}
+
+	public void setPubType(String pubType) {
+		this.pubType = pubType;
 	}
 
 	public boolean isOpenaccessFlag() {
@@ -320,59 +412,7 @@ public class Entry extends ScopusObject {
 	public void setOpenaccessFlag(boolean openaccessFlag) {
 		this.openaccessFlag = openaccessFlag;
 	}
-
-	public List<Author> getAuthors() {
-		return authors;
-	}
-
-	@JsonDeserialize(using = AuthorArrayDeserializer.class)
-	public void setAuthors(List<Author> authors) {
-		this.authors = authors;
-	}
+*/
 	
-	public List<Link> getLinks() {
-		return links;
-	}
-
-	@JsonProperty("link")
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
 	
-	public List<Date> getCoverDates() {
-		return coverDates;
-	}
-
-	@JsonProperty("prism:coverDate")
-	@JsonDeserialize(using = DateArrayDeserializer.class)
-	public void setCoverDates(List<Date> coverDates) {
-		this.coverDates = coverDates;
-	}
-	
-	public List<Affiliation> getAffiliations() {
-		return affiliations;
-	}
-
-	@JsonProperty("affiliation")
-	public void setAffiliations(List<Affiliation> affiliations) {
-		this.affiliations = affiliations;
-	}
-
-	@Override
-	public String toString() {
-		return "Entry [scopusEid=" + scopusEid + ", scopusId=" + scopusId
-				+ ", identifier=" + identifier + ", title=" + title
-				+ ", crteator=" + crteator + ", authkeywords=" + authkeywords
-				+ ", openaccess=" + openaccess + ", pii=" + pii
-				+ ", aggregationType=" + aggregationType + ", copyright="
-				+ copyright + ", coverDisplayDate=" + coverDisplayDate
-				+ ", doi=" + doi + ", isbn=" + isbn + ", issn=" + issn
-				+ ", volume=" + volume + ", startingPage=" + startingPage
-				+ ", endingPage=" + endingPage + ", issueIdentifier="
-				+ issueIdentifier + ", issueName=" + issueName
-				+ ", publicationName=" + publicationName + ", teaser=" + teaser
-				+ ", url=" + url + ", openaccessFlag=" + openaccessFlag
-				+ ", authors=" + authors + ", links=" + links + ", coverDates="
-				+ coverDates + "]";
-	}
 }

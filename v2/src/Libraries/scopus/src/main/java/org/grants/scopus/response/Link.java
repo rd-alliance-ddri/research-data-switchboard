@@ -1,43 +1,44 @@
 package org.grants.scopus.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Link extends ScopusObject {
-	private final String ref;
-	private final String href;
-	private final String type;
-	
-	@JsonCreator
-	public Link(
-			@JsonProperty("@_fa") final boolean _fa,
-			@JsonProperty("@ref") final String ref,
-			@JsonProperty("@href") final String href,
-			@JsonProperty("@type") final String type) {
-		super(_fa);
-		
-		this.ref = ref;
-		this.href = href;
-		this.type = type;
-	}
-	
-	public String getRef() {
-		return ref;
-	}
-
-	public String getHref() {
-		return href;
-	}
+@JsonIgnoreProperties({ "@_fa" })
+public class Link {
+	private String type;
+	private String respType;
+	private String href;
 	
 	public String getType() {
 		return type;
 	}
+
+	@JsonProperty("@ref")
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+	public String getHref() {
+		return href;
+	}
+
+	@JsonProperty("@href") 
+	public void setHref(String href) {
+		this.href = href;
+	}
 	
+	public String getRespType() {
+		return respType;
+	}
+
+	@JsonProperty("@type") 
+	public void setRespType(String respType) {
+		this.respType = respType;
+	}
+
 	@Override
 	public String toString() {
-		return "Link [ref=" + ref 
-				+ ", href=" + href 
-				+ ", type=" + type 
-				+ "]";
+		return "Link [type=" + type + ", refType=" + respType + ", href=" + href + "]";
 	}
 }

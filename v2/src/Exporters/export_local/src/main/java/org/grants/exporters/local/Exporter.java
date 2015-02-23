@@ -3,20 +3,18 @@ package org.grants.exporters.local;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.grants.graph.GraphConnection;
 import org.grants.graph.GraphNode;
 import org.grants.graph.GraphRelationship;
+import org.grants.graph.GraphSchema;
+import org.grants.graph.GraphUtils;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -24,21 +22,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Exporter {
-	private static final String FOLDER_NODE = "node";
-	private static final String FOLDER_RELATIONSHIP = "relationship";
 	private static final int MAX_COMMANDS = 1024;
-	
-	private static final String PROPERTY_KEY = "key";
-	private static final String PROPERTY_NODE_TYPE = "node_type";
-	private static final String PROPERTY_NODE_SOURCE = "node_source";
-	
+
 	private GraphDatabaseService graphDb;
-	//private ExecutionEngine engine; 
 	private GlobalGraphOperations global;
 	
-	private ObjectMapper mapper; 
-	private File nodesFolder;
-	private File relationshipsFolder;
+	private final File schemaFolder;
+	private final File nodesFolder;
+	private final File relationshipsFolder;
 	
 	private int nodeCounter;
 	private int relationshipCounter;
@@ -46,35 +37,30 @@ public class Exporter {
 	private int nodeFileCounter;
 	private int relationshipFileCounter;
 
+	private GraphSchema graphSchema = new GraphSchema();
 	private List<GraphNode> graphNodes;
 	private List<GraphRelationship> graphRelationships;
+	
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public Exporter(String dbFolder, final String outputFolder) {
 		System.out.println("Source Neo4j folder: " + dbFolder);
 		System.out.println("Target folder: " + outputFolder);
 	
-		//graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(dbPath);
-		graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dbFolder)
-				.setConfig( GraphDatabaseSettings.read_only, "true" )
-				.newGraphDatabase();
-		// register a shutdown hook
-		registerShutdownHook(graphDb);
+		graphDb = GraphUtils.getReadOnlyGraphDb(dbFolder);
+		global = GraphUtils.getGlobalOperations(graphDb);
 		
-	//	engine = new ExecutionEngine(graphDb, StringLogger.SYSTEM);
-		global = GlobalGraphOperations.at(graphDb);
-		
-		// setup Object mapper
-		mapper = new ObjectMapper(); 
-
 		// Set output folder
 		File folder = new File(outputFolder);
-		nodesFolder = new File(folder, FOLDER_NODE);
-		relationshipsFolder = new File(folder, FOLDER_RELATIONSHIP);
+
+		schemaFolder = GraphUtils.getSchemaFolder(folder);
+		nodesFolder = GraphUtils.getNodeFolder(folder);
+		relationshipsFolder = GraphUtils.getRelationshipFolder(folder);
 		
+		schemaFolder.mkdirs();
 		nodesFolder.mkdirs();
 		relationshipsFolder.mkdirs();
-	}
-	
+	}	
 	
 	public void process() throws JsonGenerationException, JsonMappingException, IOException {
 		nodeCounter = relationshipCounter = nodeFileCounter = relationshipFileCounter = 0;
@@ -101,6 +87,9 @@ public class Exporter {
 		if (null != graphRelationships)
 			saveRelationships();
 		
+		if (graphSchema.getIndexes() != null)
+			saveSchema();
+		
 		long endTime = System.currentTimeMillis();
 		
 		System.out.println(String.format("Done. Exported %d nodes and %d relationships over %d ms. Average %f ms per node", 
@@ -110,7 +99,7 @@ public class Exporter {
 	private void exportNode(Node node) {
 	//	System.out.println("Node: " + node.getId());
 			
-		GraphNode graphNode = new GraphNode(getProperties(node));
+		GraphNode graphNode = GraphUtils.createNode(node);
 		if (null == graphNodes)
 			graphNodes = new ArrayList<GraphNode>();
 		graphNodes.add(graphNode);
@@ -118,7 +107,9 @@ public class Exporter {
 
 		Iterable<Relationship> relationships = node.getRelationships(Direction.OUTGOING);
 		if (null != relationships && relationships.iterator().hasNext()) {
-			GraphConnection start = createConnection(node);
+			GraphConnection start = GraphUtils.createConnection(node);
+			graphSchema.addIndex(start);
+
 			for (Relationship relationship : relationships)
 				exportRelationship(start, relationship);
 		}
@@ -128,9 +119,10 @@ public class Exporter {
 	private void exportRelationship(GraphConnection start, Relationship relationship)  {
 	//	System.out.println("Relationship: " + relationship.getId());
 
-		GraphConnection end = createConnection(relationship.getEndNode());
-		GraphRelationship graphRelationship = new GraphRelationship(
-				relationship.getType().name(), getProperties(relationship), start, end);
+		GraphConnection end = GraphUtils.createConnection(relationship.getEndNode());
+		graphSchema.addIndex(end);
+		
+		GraphRelationship graphRelationship = GraphUtils.createRelationship(start, end, relationship);
 		
 		if (null == graphRelationships)
 			graphRelationships = new ArrayList<GraphRelationship>();
@@ -138,76 +130,22 @@ public class Exporter {
 		++relationshipCounter;		
 	}
 	
+	private void saveSchema() throws JsonGenerationException, JsonMappingException, IOException {
+		mapper.writeValue(new File(schemaFolder, GraphUtils.GRAPH_SCHEMA), graphSchema);
+		graphSchema.setIndexes(null);
+	}
+	
 	private void saveNodes() throws JsonGenerationException, JsonMappingException, IOException {
-		String fileName = Long.toString(nodeFileCounter) + ".json";
+		String fileName = Long.toString(nodeFileCounter) + GraphUtils.GRAPH_EXTENSION;
 		mapper.writeValue(new File(nodesFolder, fileName), graphNodes);
 		graphNodes = null;
 		++nodeFileCounter;
 	}
 	
 	private void saveRelationships() throws JsonGenerationException, JsonMappingException, IOException {
-		String fileName = Long.toString(relationshipFileCounter) + ".json";
+		String fileName = Long.toString(relationshipFileCounter) + GraphUtils.GRAPH_EXTENSION;
 		mapper.writeValue(new File(relationshipsFolder, fileName), graphRelationships);
 		graphRelationships = null;
 		++relationshipFileCounter;
 	}
-	
-	private static GraphConnection createConnection(Node node) {
-		String source = null;
-		String type = null;
-		String key = null;
-		
-		if (node.hasProperty(PROPERTY_NODE_SOURCE))
-			source = (String) node.getProperty(PROPERTY_NODE_SOURCE);
-		if (node.hasProperty(PROPERTY_NODE_TYPE))
-			type = (String) node.getProperty(PROPERTY_NODE_TYPE);
-		if (node.hasProperty(PROPERTY_KEY))
-			key = (String) node.getProperty(PROPERTY_KEY);
-		
-		return new GraphConnection(source, type, key);		
-	}
-	
-	private static Map<String, Object> getProperties(Node node) {
-		Iterable<String> keys = node.getPropertyKeys();
-		Map<String, Object> pars = null;
-		
-		for (String key : keys) {
-			if (null == pars)
-				pars = new HashMap<String, Object>();
-			
-			pars.put(key, node.getProperty(key));
-		}
-		
-		return pars;
-	}
-	
-	private static Map<String, Object> getProperties(Relationship relationship) {
-		Iterable<String> keys = relationship.getPropertyKeys();
-		Map<String, Object> pars = null;
-		
-		for (String key : keys) {
-			if (null == pars)
-				pars = new HashMap<String, Object>();
-			
-			pars.put(key, relationship.getProperty(key));
-		}
-		
-		return pars;
-	}
-	
-	private static void registerShutdownHook( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running application).
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-	        {
-	            graphDb.shutdown();
-	        }
-	    } );
-	}
-
 }

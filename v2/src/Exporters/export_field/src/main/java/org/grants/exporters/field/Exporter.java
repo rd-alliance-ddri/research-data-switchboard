@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.grants.graph.GraphConnection;
 import org.grants.graph.GraphField;
+import org.grants.graph.GraphUtils;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -49,22 +50,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 
 public class Exporter {
-	private static final String FOLDER_FIELD = "field";
 	private static final int MAX_COMMANDS = 1024;
-	
-	private static final String PROPERTY_KEY = "key";
-	private static final String PROPERTY_NODE_TYPE = "node_type";
-	private static final String PROPERTY_NODE_SOURCE = "node_source";
-	
+		
 	private GraphDatabaseService graphDb;
-	//private ExecutionEngine engine; 
 	private GlobalGraphOperations global;
 	
 	private String nodeSource;
 	private String nodeType; 
 	private String propertyName;
 	
-	private ObjectMapper mapper; 
+	private static final ObjectMapper mapper = new ObjectMapper(); 
 	
 	private File fieldsFolder;
 	private int fieldCounter;
@@ -92,21 +87,13 @@ public class Exporter {
 		this.propertyName = propertyName;
 	
 		//graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(dbPath);
-		graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dbFolder)
-				.setConfig( GraphDatabaseSettings.read_only, "true" )
-				.newGraphDatabase();
-		// register a shutdown hook
-		registerShutdownHook(graphDb);
+		graphDb = GraphUtils.getReadOnlyGraphDb(dbFolder);
+		global = GraphUtils.getGlobalOperations(graphDb);
 		
-	//	engine = new ExecutionEngine(graphDb, StringLogger.SYSTEM);
-		global = GlobalGraphOperations.at(graphDb);
-		
-		// setup Object mapper
-		mapper = new ObjectMapper(); 
-
 		// Set output folder
 		File folder = new File(outputFolder);
-		fieldsFolder = new File(folder, FOLDER_FIELD);
+
+		fieldsFolder = GraphUtils.getFieldFolder(folder);
 		fieldsFolder.mkdirs();
 	}
 	
@@ -151,7 +138,7 @@ public class Exporter {
 	private void exportField(Node node) {
 	//	System.out.println("Node: " + node.getId());
 			
-		GraphField graphField = createField(node, propertyName);
+		GraphField graphField = GraphUtils.createField(node, propertyName);
 		if (null != graphField) {
 			if (null == graphFields)
 				graphFields = new ArrayList<GraphField>();
@@ -168,69 +155,9 @@ public class Exporter {
 	 * @throws IOException
 	 */
 	private void saveFields() throws JsonGenerationException, JsonMappingException, IOException {
-		String fileName = Long.toString(fieldFileCounter) + ".json";
+		String fileName = Long.toString(fieldFileCounter) + GraphUtils.GRAPH_EXTENSION;
 		mapper.writeValue(new File(fieldsFolder, fileName), graphFields);
 		graphFields = null;
 		++fieldFileCounter;
 	}
-	
-	/**
-	 * Function to Create GraphField instance
-	 * 
-	 * @param node
-	 * @param propertyName
-	 * @return
-	 */
-	private static GraphField createField(Node node, String propertyName) {
-		if (node.hasProperty(propertyName)) {
-			GraphConnection conn = createConnection(node);
-			String field = (String) node.getProperty(propertyName);
-			
-			return new GraphField(conn, field);
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Function to Create GraphConnection instance
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private static GraphConnection createConnection(Node node) {
-		String source = null;
-		String type = null;
-		String key = null;
-		
-		if (node.hasProperty(PROPERTY_NODE_SOURCE))
-			source = (String) node.getProperty(PROPERTY_NODE_SOURCE);
-		if (node.hasProperty(PROPERTY_NODE_TYPE))
-			type = (String) node.getProperty(PROPERTY_NODE_TYPE);
-		if (node.hasProperty(PROPERTY_KEY))
-			key = (String) node.getProperty(PROPERTY_KEY);
-		
-		return new GraphConnection(source, type, key);		
-	}
-	
-	/**
-	 * Shutdown Hook
-	 * 
-	 * @param graphDb
-	 */
-	private static void registerShutdownHook( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running application).
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-	        {
-	            graphDb.shutdown();
-	        }
-	    } );
-	}
-
 }

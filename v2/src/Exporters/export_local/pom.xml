@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.exports</groupId>
   <artifactId>export_local</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -77,18 +77,13 @@
     <dependency>
       <groupId>org.grants.libraryes</groupId>
       <artifactId>graph_data</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
 	  <artifactId>jackson-core</artifactId>
 	  <version>${jackson.version}</version>
     </dependency>
-    <dependency>
-  	  <groupId>com.fasterxml.jackson.core</groupId>
-  	  <artifactId>jackson-annotations</artifactId>
-  	  <version>${jackson.version}</version>
-	</dependency>
 	<dependency>
 	  <groupId>com.fasterxml.jackson.core</groupId>
 	  <artifactId>jackson-databind</artifactId>
