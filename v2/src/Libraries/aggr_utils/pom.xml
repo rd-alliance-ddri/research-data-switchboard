@@ -2,49 +2,47 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.grants.utils</groupId>
   <artifactId>aggr_utils</artifactId>
-  <version>1.1.0</version>
-         
-  <properties>
+  <version>1.0.0</version>
+  
+   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.7</jdk.version>
-    <neo4j.binding.version>2.0.2-SNAPSHOT</neo4j.binding.version>
-    <jackson.version>2.5.0</jackson.version>
-    <commons-io.version>2.4</commons-io.version>
-    <class.path>jars/</class.path>
+	<junit.version>4.11</junit.version>
+	<graph_utils.version>1.0.0</graph_utils.version>
+	<neo4j_local_utils.version>1.0.0</neo4j_local_utils.version>
   </properties>
-  
+
   <build>
-	<plugins>
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>3.1</version>
-		<configuration>
-			<source>${jdk.version}</source>
-			<target>${jdk.version}</target>
-		</configuration>
-	  </plugin>	
- 	</plugins>
+        <plugins>
+          <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
+                </configuration>
+          </plugin>
+        </plugins>
   </build>
-  
-   <repositories>
-    <repository>
-      <id>neo4j-contrib-releases</id>
-      <url>https://raw.github.com/neo4j-contrib/m2/master/releases</url>
-    </repository>
-  </repositories>
-  
+
   <dependencies>
-    <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j-rest-graphdb</artifactId>
-      <version>${neo4j.binding.version}</version>
+  	<dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.grants.neo4j</groupId>
-  	  <artifactId>neo4j</artifactId>
-      <version>1.0.1</version>
+      <groupId>org.grants.utils</groupId>
+      <artifactId>graph_utils</artifactId>
+      <version>${graph_utils.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.grants.utils</groupId>
+      <artifactId>neo4j_local_utils</artifactId>
+      <version>${neo4j_local_utils.version}</version> 
     </dependency>
   </dependencies>
-  
   
 </project>

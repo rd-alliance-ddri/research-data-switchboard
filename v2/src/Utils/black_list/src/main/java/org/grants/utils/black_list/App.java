@@ -45,7 +45,7 @@ public class App {
 			creator.processNodes("CrossRef", "Publication", "title");
 			creator.processNodes("Dryad", "Publication", "title");
 			
-		//	creator.save();
+			creator.save();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

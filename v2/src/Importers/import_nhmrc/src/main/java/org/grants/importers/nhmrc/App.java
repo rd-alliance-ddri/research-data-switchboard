@@ -11,7 +11,8 @@ package org.grants.importers.nhmrc;
 public class App {
 
 	//private static final String NEO4J_URL = "http://ec2-54-69-203-235.us-west-2.compute.amazonaws.com:7474/db/data/"; 
-	private static final String NEO4J_URL = "http://localhost:7472/db/data/";
+	//private static final String NEO4J_URL = "http://localhost:7474/db/data/";
+	private static final String NEO4J_FOLDER = "neo4j-1";
 
 	/**
 	 * Main class function
@@ -19,11 +20,11 @@ public class App {
 	 * If missing, the default parameters will be used.
 	 */
 	public static void main(String[] args) {
-		String neo4jUrl = NEO4J_URL;
+		String neo4jFolder = NEO4J_FOLDER;
 		if (args.length > 1 && null != args[1] && !args[1].isEmpty())
-			neo4jUrl = args[1];
+			neo4jFolder = args[1];
 		
-		Importer importer = new Importer(neo4jUrl);
+		Importer importer = new Importer(neo4jFolder);
 		importer.importGrants();
 	}
 }

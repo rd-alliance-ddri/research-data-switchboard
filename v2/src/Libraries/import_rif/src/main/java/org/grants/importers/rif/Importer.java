@@ -39,7 +39,10 @@ import au.org.ands.standards.rif_cs.registryobjects.Activity;
 import au.org.ands.standards.rif_cs.registryobjects.Collection;
 import au.org.ands.standards.rif_cs.registryobjects.DatesType;
 import au.org.ands.standards.rif_cs.registryobjects.DescriptionType;
+import au.org.ands.standards.rif_cs.registryobjects.ElectronicAddressType;
 import au.org.ands.standards.rif_cs.registryobjects.IdentifierType;
+import au.org.ands.standards.rif_cs.registryobjects.LocationType;
+import au.org.ands.standards.rif_cs.registryobjects.LocationType.Address;
 import au.org.ands.standards.rif_cs.registryobjects.NameType;
 import au.org.ands.standards.rif_cs.registryobjects.Party;
 import au.org.ands.standards.rif_cs.registryobjects.RegistryObjects;
@@ -89,6 +92,7 @@ public class Importer {
 	private static final String PROPERTY_DESCRIPTION = "subject";
 	private static final String PROPERTY_URL = "url";
 	private static final String PROPERTY_INSTITUTION = "institution";
+	private static final String PROPERTY_EMAIL = "email";
 	
 	private static final String NAME_PART_FAMILY = "family";
 	private static final String NAME_PART_GIVEN = "given";
@@ -593,9 +597,20 @@ public class Importer {
 					
 					addData(map, type, getFullName(name));
 				}
-			} /*else if (object instanceof LocationType) {
+			} else if (object instanceof LocationType) {
 				LocationType location = (LocationType) object;
-			} */ else if (object instanceof SubjectType) {
+				
+				for (Address address : location.getAddress()) 
+					for (Object addressPart : address.getElectronicOrPhysical()) 
+						if (addressPart instanceof ElectronicAddressType) {
+							ElectronicAddressType electronic = (ElectronicAddressType) addressPart;
+							if (electronic.getType().equals(PROPERTY_EMAIL)) 
+								addData(map, PROPERTY_EMAIL, electronic.getValue());
+							else if (electronic.getType().equals(PROPERTY_URL))
+								addData(map, PROPERTY_URL, electronic.getValue());
+						}
+				
+			}  else if (object instanceof SubjectType) {
 				SubjectType subject = (SubjectType) object;
 				
 				String type = subject.getType();

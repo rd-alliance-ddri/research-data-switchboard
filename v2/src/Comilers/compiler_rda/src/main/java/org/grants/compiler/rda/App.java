@@ -2,8 +2,8 @@ package org.grants.compiler.rda;
 
 public class App {
 
-	private static final String SOURCE_NEO4J_URL = "http://localhost:7472/db/data/";	
-	private static final String TARGET_NEO4J_URL = "http://localhost:7482/db/data/";	
+	private static final String SOURCE_NEO4J_URL = "http://localhost:7474/db/data/";	
+	private static final String TARGET_NEO4J_URL = "http://localhost:7476/db/data/";	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

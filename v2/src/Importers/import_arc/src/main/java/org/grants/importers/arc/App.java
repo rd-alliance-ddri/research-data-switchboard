@@ -10,7 +10,7 @@ package org.grants.importers.arc;
 
 public class App {
 	//private static final String NEO4J_URL = "http://ec2-54-69-203-235.us-west-2.compute.amazonaws.com:7474/db/data/"; 
-	private static final String NEO4J_URL = "http://localhost:7472/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
 
 	/**
 	 * Main class function

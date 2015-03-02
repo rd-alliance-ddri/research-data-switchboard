@@ -272,14 +272,15 @@ public class Compiler {
 			
 			Map<String, Object> map = new HashMap<String, Object>();
 			
-			map.put(Neo4jUtils.PROPERTY_URL, url);
+			map.put(PROPERTY_RDA_URL, url);
 			map.put(PROPERTY_RDA_SLUG, slug);
 			map.put(PROPERTY_RDA_ID, rdaId);
 			map.put(PROPERTY_RDA_KEY, rdaKey);
 			
 			for (Map.Entry<String, Object> entry : props.entrySet()) {
 				String entryKey = entry.getKey();
-				if (entryKey.equals(PROPERTY_INSTITUTION) 
+				if (entryKey.equals(PROPERTY_INSTITUTION)
+						|| entryKey.equals(Neo4jUtils.PROPERTY_URL)
 						|| entryKey.equals(PROPERTY_DATE) 
 						|| entryKey.equals(PROPERTY_NAME) 
 						|| entryKey.equals(PROPERTY_IDENTIFIER)

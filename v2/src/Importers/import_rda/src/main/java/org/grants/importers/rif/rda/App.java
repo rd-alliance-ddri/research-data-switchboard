@@ -17,7 +17,7 @@ import org.grants.importers.rif.Importer;
 
 public class App {
 	private static final String XML_FOLDER_URI = "rda/xml/rif";
-	private static final String NEO4J_URL = "http://localhost:7472/db/data/";
+	private static final String NEO4J_URL = "http://localhost:7474/db/data/";
 	
 	/**
 	 * Class main function 
