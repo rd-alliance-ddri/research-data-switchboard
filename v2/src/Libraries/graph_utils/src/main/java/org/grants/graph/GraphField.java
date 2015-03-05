@@ -1,24 +1,24 @@
 package org.grants.graph;
 
 public class GraphField {
-	private GraphConnection conn;
+	private GraphIndex index;
 	private Object field;
 	
 	public GraphField() {
 		
 	}
 	
-	public GraphField(GraphConnection conn, Object field) {
-		this.conn = conn;
+	public GraphField(GraphIndex index, Object field) {
+		this.index = index;
 		this.field = field;
 	}
 
-	public GraphConnection getConn() {
-		return conn;
+	public GraphIndex getConn() {
+		return index;
 	}
 
-	public void setConn(GraphConnection conn) {
-		this.conn = conn;
+	public void setConn(GraphIndex index) {
+		this.index = index;
 	}
 
 	public Object getField() {
@@ -31,6 +31,6 @@ public class GraphField {
 
 	@Override
 	public String toString() {
-		return "GraphField [conn=" + conn + ", field=" + field + "]";
+		return "GraphField [index=" + index + ", field=" + field + "]";
 	}
 }

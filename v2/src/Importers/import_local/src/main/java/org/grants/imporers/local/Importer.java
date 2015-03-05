@@ -1,10 +1,10 @@
 package org.grants.imporers.local;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,29 +14,18 @@ import org.grants.graph.GraphConnection;
 import org.grants.graph.GraphIndex;
 import org.grants.graph.GraphNode;
 import org.grants.graph.GraphRelationship;
-import org.grants.graph.GraphSchema;
 import org.grants.graph.GraphUtils;
 import org.grants.neo4j.local.Neo4jUtils;
 import org.graph.aggrigation.AggrigationUtils;
-import org.neo4j.cypher.ExecutionEngine;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.graphdb.index.UniqueFactory.UniqueNodeFactory;
-import org.neo4j.graphdb.schema.ConstraintDefinition;
-import org.neo4j.graphdb.schema.Schema;
-import org.neo4j.kernel.impl.util.StringLogger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,7 +42,11 @@ public class Importer {
 	
 	private int nodeCounter;
 	private int relationshipCounter;
-
+	
+	private String[] labels = new String[] { 
+			"Dryad", "RDA", "CrossRef", "ORCID", "Scopus", "Web", "CERN", "figshare", "NHMRC", "ARC"
+	};
+	
 	public Importer(final String neo4jFolder, final String imputFolder) throws Exception {
 		System.out.println("Source folder: " + imputFolder);
 		System.out.println("Target Neo4j folder: " + neo4jFolder);
@@ -166,23 +159,42 @@ public class Importer {
 				relationshipCounter, endTime - beginTime, (float)(endTime - beginTime) / (float)relationshipCounter));
 	}	
 	
-	@SuppressWarnings("unchecked")
 	private void importNode(GraphNode graphNode) throws Exception {
-		String source = (String) graphNode.getProperties().get(AggrigationUtils.PROPERTY_NODE_SOURCE);
-		String type = (String) graphNode.getProperties().get(AggrigationUtils.PROPERTY_NODE_TYPE);
-		if (null == type || type.isEmpty()) 
-			throw new Exception("Error in node, the node type is empty");
+				
 		String key = (String) graphNode.getProperties().get(AggrigationUtils.PROPERTY_KEY);
 		if (null == key || key.isEmpty()) 
 			throw new Exception("Error in node, the node key is empty");
-	
-		String indexLabel;
+		String type = (String) graphNode.getProperties().get(AggrigationUtils.PROPERTY_NODE_TYPE);
+		if (null == type || type.isEmpty()) 
+			throw new Exception("Error in node, the node type is empty");
+
+		Set<String> labels = new HashSet<String>();
+		if (graphNode.getProperties().containsKey(AggrigationUtils.PROPERTY_NODE_SOURCE)) {
+			Object _source = graphNode.getProperties().get(AggrigationUtils.PROPERTY_NODE_SOURCE);
+			if (null != _source) {
+				if (_source instanceof String) 
+					labels.add(getCorrectLabel((String) _source));
+				else if (_source instanceof Collection<?>) 
+					for (Object _label : (Collection<?>)_source) 
+						labels.add(getCorrectLabel((String) _label));
+
+				List<String> list = new ArrayList<String>();
+				list.addAll(labels);
+				graphNode.getProperties().put(AggrigationUtils.PROPERTY_NODE_SOURCE, list);
+			}
+		}
+
+		labels.add(type);
+
+		
+	/*	String indexLabel;
 		if (null != source && source.isEmpty())
 			indexLabel = source + "_" + type;
 		else
 			indexLabel = type;
-		
 		Index<Node> index = getIndex(indexLabel);
+		*/
+		Index<Node> index = getIndex(type);
 		Node node = (Node) index.get(AggrigationUtils.PROPERTY_KEY, key).getSingle();
 		if (null == node) {
 			node = graphDb.createNode();
@@ -193,17 +205,20 @@ public class Importer {
 				for (Entry<String, Object> entry : graphNode.getProperties().entrySet()) {  
 					Object value = entry.getValue();
 					if (null != value) {
-						if (value instanceof Collection<?>) 
-							node.setProperty(entry.getKey(), ((Collection<String>) value).toArray(new String[0]));
+						if (value instanceof Collection<?>) {
+							String[] arr = ((Collection<?>) value).toArray(new String[((Collection<?>) value).size()]);
+							if (arr.length == 1)
+								node.setProperty(entry.getKey(), arr[0]);
+							else if (arr.length > 1)
+								node.setProperty(entry.getKey(), arr);
+						}
 						else
 							node.setProperty(entry.getKey(), value);
 					}
 				}
 			
-			if (null != source)
-				node.addLabel(DynamicLabel.label(source));
-			node.addLabel(DynamicLabel.label(type));
-			
+			for (String label : labels)
+				node.addLabel(DynamicLabel.label(label));
 			
 			index.add(node, AggrigationUtils.PROPERTY_KEY, key);
 		}
@@ -240,6 +255,15 @@ public class Importer {
 		Index<Node> index = graphDb.index().forNodes( label );
 		indexes.put(label, index);
 		return index;
+	}
+	
+	private String getCorrectLabel(String label) throws Exception {
+		label = label.toLowerCase();
+		for (String l : labels)
+			if (l.toLowerCase().equals(label))
+				return l;
+		
+		return null;
 	}
 
 	private Node findNode(GraphConnection connection) {

@@ -1,47 +1,47 @@
 package org.grants.graph;
 
 public class GraphIndex {
-	private String label;
+	private String index;
 	private String key;
-	private boolean unique;
+	private String value;
 	
 	public GraphIndex() {
 		
 	}
 	
-	public GraphIndex(String label, String key, boolean unique) {
-		this.label = label;
+	public GraphIndex(String index, String key, String value) {
+		this.index = index;
 		this.key = key;
-		this.unique = unique;
+		this.value = value;
 	}
-	
-	public String getLabel() {
-		return label;
+
+	public String getIndex() {
+		return index;
 	}
-	
-	public void setLabel(String label) {
-		this.label = label;
+
+	public void setIndex(String index) {
+		this.index = index;
 	}
-	
+
 	public String getKey() {
 		return key;
 	}
-	
+
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
-	public boolean isUnique() {
-		return unique;
+
+	public String getValue() {
+		return value;
 	}
-	
-	public void setUnique(boolean unique) {
-		this.unique = unique;
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return "GraphIndex [label=" + label + ", key=" + key + ", unique="
-				+ unique + "]";
+		return "GraphIndex [index=" + index + ", key=" + key + ", value="
+				+ value + "]";
 	}
 }

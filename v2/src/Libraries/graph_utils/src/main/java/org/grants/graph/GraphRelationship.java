@@ -3,8 +3,8 @@ package org.grants.graph;
 import java.util.Map;
 
 public class GraphRelationship {
-	private GraphConnection start;
-	private GraphConnection end;
+	private GraphIndex start;
+	private GraphIndex end;
 	private String relationship;
 	private Map<String, Object> properties;
 
@@ -13,26 +13,26 @@ public class GraphRelationship {
 	}
 	
 	public GraphRelationship(String relationship, Map<String, Object> properties, 
-			GraphConnection start, GraphConnection end) {
+			GraphIndex start, GraphIndex end) {
 		this.relationship = relationship;
 		this.properties = properties;
 		this.start = start;
 		this.end = end;		
 	}
 	
-	public GraphConnection getStart() {
+	public GraphIndex getStart() {
 		return start;
 	}
 
-	public void setStart(GraphConnection start) {
+	public void setStart(GraphIndex start) {
 		this.start = start;
 	}
 
-	public GraphConnection getEnd() {
+	public GraphIndex getEnd() {
 		return end;
 	}
 
-	public void setEnd(GraphConnection end) {
+	public void setEnd(GraphIndex end) {
 		this.end = end;
 	}
 	

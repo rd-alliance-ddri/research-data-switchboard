@@ -16,14 +16,15 @@ import org.grants.graph.GraphRelationship;
 import org.grants.graph.GraphUtils;
 import org.grants.neo4j.local.Neo4jUtils;
 import org.graph.aggrigation.AggrigationUtils;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -33,7 +34,8 @@ public class Exporter {
 	private static final int MAX_COMMANDS = 1024;
 	
 	private GraphDatabaseService graphDb;
-	private GlobalGraphOperations global;
+//	private GlobalGraphOperations global;
+	private ExecutionEngine engine;
 	
 	private final File schemaFolder;
 	private final File nodesFolder;
@@ -54,7 +56,7 @@ public class Exporter {
 	private static final String PROPERTY_IDENTIFIER_NLA = "identifier_nla";
 	private static final String PROPERTY_IDENTIFIER_NLA_PARTY = "identifier_nla.party";
 	private static final String PROPERTY_IDENTIFIER_PULR = "identifier_purl";
-	private static final String PROPERTY_IDENTIFIER_URI = "identifier_uri";
+	//private static final String PROPERTY_IDENTIFIER_URI = "identifier_uri";
 	private static final String PROPERTY_IDENTIFIER_AU_ANL_PEAU = "identifier_AU-ANL:PEAU";
 	private static final String PROPERTY_IDENTIFIER_ORCID = "identifier_orcid";
 	private static final String PROPERTY_IDENTIFIER_ARC = "identifier_arc";
@@ -74,7 +76,7 @@ public class Exporter {
 	private static final String PROPERTY_AUTHOR = "author";
 	private static final String PROPERTY_CONTRIBUTORS = "contributors";
 	private static final String PROPERTY_PUBLICATION_DATE = "publication_date";
-	
+		
 	private List<GraphIndex> graphIndex;
 	private List<GraphNode> graphNodes;
 	private List<GraphRelationship> graphRelationships;
@@ -91,6 +93,26 @@ public class Exporter {
 	private long nodeFileCounter = 0;
 	private long relationshipFileCounter;
 	
+	private List<DoubleLabel> institutionSources;
+	private List<DoubleLabel> researcherSources;
+	private List<DoubleLabel> grantSources;
+	private List<DoubleLabel> datasetSources;
+	private List<DoubleLabel> publicationSources;
+	
+	private static final String PART_NAME_SEPARATOR = " - ";
+	private static final String[] INVALID_NAMES = { "Research Profiles", 
+		"UWA Staff Profile", 
+		"People: Applied Signal Processing Academic and Adjunct staff", 
+		"School of Politics &amp; International Relations",
+		"School of History", 
+		"China in the World", "Our People", 
+		"Climate Change Institute",
+		"Examination of doctoral dissertations",
+		"People",
+		"Graduate students"
+		};
+		
+	
 	/**
 	 * Class constructor 
 	 * 
@@ -106,7 +128,8 @@ public class Exporter {
 			
 		//graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(dbPath);
 		graphDb = Neo4jUtils.getReadOnlyGraphDb(dbFolder);
-		global = Neo4jUtils.getGlobalOperations(graphDb);
+	//	global = Neo4jUtils.getGlobalOperations(graphDb);
+		engine = Neo4jUtils.getExecutionEngine(graphDb);
 		
 		// Set output folder
 		File folder = new File(outputFolder);
@@ -118,6 +141,34 @@ public class Exporter {
 		schemaFolder.mkdirs();
 		nodesFolder.mkdirs();
 		relationshipsFolder.mkdirs();
+				
+		institutionSources = new ArrayList<DoubleLabel>();
+		institutionSources.add(new DoubleLabel(AggrigationUtils.Labels.RDA, AggrigationUtils.Labels.Institution));
+		institutionSources.add(new DoubleLabel(AggrigationUtils.Labels.Web, AggrigationUtils.Labels.Institution));
+		institutionSources.add(new DoubleLabel(Labels.ARC, AggrigationUtils.Labels.Institution));
+		institutionSources.add(new DoubleLabel(Labels.NHMRC, AggrigationUtils.Labels.Institution));
+		
+		researcherSources = new ArrayList<DoubleLabel>();
+		researcherSources.add(new DoubleLabel(Labels.Orcid, AggrigationUtils.Labels.Researcher));
+		researcherSources.add(new DoubleLabel(AggrigationUtils.Labels.Web, AggrigationUtils.Labels.Researcher));
+		researcherSources.add(new DoubleLabel(AggrigationUtils.Labels.RDA, AggrigationUtils.Labels.Researcher));
+		researcherSources.add(new DoubleLabel(AggrigationUtils.Labels.FigShare, AggrigationUtils.Labels.Researcher));
+		researcherSources.add(new DoubleLabel(AggrigationUtils.Labels.CrossRef, AggrigationUtils.Labels.Researcher));
+		
+		grantSources = new ArrayList<DoubleLabel>();
+		grantSources.add(new DoubleLabel(AggrigationUtils.Labels.RDA, AggrigationUtils.Labels.Grant));
+		grantSources.add(new DoubleLabel(Labels.ARC, AggrigationUtils.Labels.Grant));
+		grantSources.add(new DoubleLabel(Labels.NHMRC, AggrigationUtils.Labels.Grant));
+		
+		datasetSources = new ArrayList<DoubleLabel>();
+		datasetSources.add(new DoubleLabel(AggrigationUtils.Labels.RDA, AggrigationUtils.Labels.Dataset));
+		datasetSources.add(new DoubleLabel(AggrigationUtils.Labels.Dryad, AggrigationUtils.Labels.Dataset));
+		datasetSources.add(new DoubleLabel(AggrigationUtils.Labels.Dryad, AggrigationUtils.Labels.Publication));
+
+		publicationSources = new ArrayList<DoubleLabel>();
+		publicationSources.add(new DoubleLabel(AggrigationUtils.Labels.CrossRef, AggrigationUtils.Labels.Publication));
+		publicationSources.add(new DoubleLabel(AggrigationUtils.Labels.FigShare, AggrigationUtils.Labels.Publication));
+		publicationSources.add(new DoubleLabel(Labels.Orcid, Labels.Work));
 	}
 	
 	/**
@@ -161,11 +212,11 @@ public class Exporter {
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_KEY, true));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_PUBLICATION, AggrigationUtils.PROPERTY_KEY, true));
 
-		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RDA, AggrigationUtils.PROPERTY_KEY, true));
+	/*	graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RDA, AggrigationUtils.PROPERTY_KEY, true));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_ORCID, AggrigationUtils.PROPERTY_KEY, true));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DRYAD, AggrigationUtils.PROPERTY_KEY, true));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_FIGSHARE, AggrigationUtils.PROPERTY_KEY, true));
-
+*/
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_INSTITUTION, AggrigationUtils.PROPERTY_TITLE, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_TITLE, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_TITLE, false));
@@ -182,6 +233,12 @@ public class Exporter {
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_NODE_TYPE, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_PUBLICATION, AggrigationUtils.PROPERTY_NODE_TYPE, false));
 
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_INSTITUTION, AggrigationUtils.PROPERTY_NODE_SOURCE, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RESEARCHER, AggrigationUtils.PROPERTY_NODE_SOURCE, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_NODE_SOURCE, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_NODE_SOURCE, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_PUBLICATION, AggrigationUtils.PROPERTY_NODE_SOURCE, false));
+		
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_INSTITUTION, AggrigationUtils.PROPERTY_DATE, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_DATE, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_DATE, false));
@@ -200,6 +257,26 @@ public class Exporter {
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_PURL, false));
 		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_GRANT_NUMBER, false));
 
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_INSTITUTION, AggrigationUtils.PROPERTY_RDA_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RESEARCHER, AggrigationUtils.PROPERTY_RDA_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_GRANT, AggrigationUtils.PROPERTY_RDA_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_RDA_URL, false));
+
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_INSTITUTION, AggrigationUtils.PROPERTY_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RESEARCHER, AggrigationUtils.PROPERTY_URL, false));
+
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RESEARCHER, AggrigationUtils.PROPERTY_ORCID_URL, false));
+
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_DATASET, AggrigationUtils.PROPERTY_DRYAD_URL, false));
+
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RESEARCHER, AggrigationUtils.PROPERTY_FIGSHARE_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_PUBLICATION, AggrigationUtils.PROPERTY_FIGSHARE_URL, false));
+
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_FIGSHARE, AggrigationUtils.PROPERTY_FIGSHARE_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_ORCID, AggrigationUtils.PROPERTY_ORCID_URL, false));
+		graphIndex.add(new GraphIndex(AggrigationUtils.LABEL_RDA, AggrigationUtils.PROPERTY_RDA_URL, false));
+
+		
 		saveSchema();
 	}
 	
@@ -219,57 +296,61 @@ public class Exporter {
 	private void exportInstitutions() throws JsonGenerationException, JsonMappingException, IOException {
 		System.out.println("Export institutions");
 		
-		try ( Transaction tx = graphDb.beginTx() ) {
-			ResourceIterable<Node> institutions = global.getAllNodesWithLabel( AggrigationUtils.Labels.Institution );
-			for (Node institution : institutions) 
-				if (!mapInstitutionsKeys.containsKey(institution.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_INSTITUTION);
-					
-					Set<String> sources = new HashSet<String>();
-					
-					Map<Long, Node> nodes = getKnownAs(institution, null);
-					for (Node node : nodes.values())  
-						if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
-							exportRdaInstitution(node, properties);
-							sources.add(AggrigationUtils.LABEL_RDA);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.Web)) {
-							exportWebInstitution(node, properties);
-							sources.add(AggrigationUtils.LABEL_WEB);
-						}
-					for (Node node : nodes.values()) {
-						if (node.hasLabel(Labels.ARC)) {
-							exportArcOrNhmrcInstitution(node, properties);
-							sources.add(Labels.ARC.name());
-						}
-						if (node.hasLabel(Labels.NHMRC))  {
-							exportArcOrNhmrcInstitution(node, properties);
-							sources.add(Labels.NHMRC.name());
-						}						
-					}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapInstitutionsKeys.put(nodeId, key);
-					
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_INSTITUTION + ": " + key);
+		for (DoubleLabel label : institutionSources) 
+			try ( Transaction tx = graphDb.beginTx() ) {
+				ExecutionResult result = getAllNodesWithDoubleLabel(label);
+				ResourceIterator<Node> institutions = result.columnAs("n");
+				while (institutions.hasNext()) {
+					Node institution = institutions.next();
+					if (!mapInstitutionsKeys.containsKey(institution.getId())) {
 						
-						exportGraphNode(new GraphNode(properties));
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_INSTITUTION);
 						
+						Set<String> sources = new HashSet<String>();
+						
+						Map<Long, Node> nodes = getKnownAs(institution, null, institutionSources);
+						for (Node node : nodes.values())  
+							if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
+								exportRdaInstitution(node, properties);
+								sources.add(AggrigationUtils.LABEL_RDA);
+							}
 						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_INSTITUTION, key);
+							if (node.hasLabel(AggrigationUtils.Labels.Web)) {
+								exportWebInstitution(node, properties);
+								sources.add(AggrigationUtils.LABEL_WEB);
+							}
+						for (Node node : nodes.values()) {
+							if (node.hasLabel(Labels.ARC)) {
+								exportArcOrNhmrcInstitution(node, properties);
+								sources.add(Labels.ARC.name());
+							}
+							if (node.hasLabel(Labels.NHMRC))  {
+								exportArcOrNhmrcInstitution(node, properties);
+								sources.add(Labels.NHMRC.name());
+							}						
+						}
+						
+						if (sources.size() == 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
+						else if (sources.size() > 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
+	
+						String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
+						for (Long nodeId : nodes.keySet())
+							mapInstitutionsKeys.put(nodeId, key);
+						
+						if (null != key) {
+							System.out.println(AggrigationUtils.LABEL_INSTITUTION + ": " + key);
+							
+							exportGraphNode(new GraphNode(properties));
+							
+							for (Node node : nodes.values()) 
+								exportRelationships(node, AggrigationUtils.LABEL_INSTITUTION, key);
+						}
 					}
 				}
-		}
+			}
 	}
 	
 	
@@ -295,67 +376,71 @@ public class Exporter {
 	public void exportResearchers() throws JsonGenerationException, JsonMappingException, IOException {
 		System.out.println("Export researchers");
 		
-		try ( Transaction tx = graphDb.beginTx() ) {
-			ResourceIterable<Node> researchers = global.getAllNodesWithLabel( AggrigationUtils.Labels.Researcher );
-			for (Node researcher : researchers) 
-				if (!mapResearchersKeys.containsKey(researcher.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_RESEARCHER);
-					
-					Set<String> sources = new HashSet<String>();
-
-					Map<Long, Node> nodes = getKnownAs(researcher, null);
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(Labels.Orcid)) {
-							exportOrcidResearcher(node, properties);
-							sources.add(AggrigationUtils.LABEL_ORCID);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.Web)) {
-							exportWebResearcher(node, properties);
-							sources.add(AggrigationUtils.LABEL_WEB);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
-							exportRdaResearcher(node, properties);
-							sources.add(AggrigationUtils.LABEL_RDA);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.FigShare)) {
-							exportFigShareResearcher(node, properties);
-							sources.add(AggrigationUtils.LABEL_FIGSHARE);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.CrossRef)) {
-							exportCrossRefResearcher(node, properties);
-							sources.add(AggrigationUtils.LABEL_CROSSREF);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(Labels.NHMRC)) {
-							exportNHMRCRefResearcher(node, properties);
-							sources.add(Labels.NHMRC.name());
-						}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-					
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapResearchersKeys.put(nodeId, key);
-
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_RESEARCHER + ": " + key);
+		for (DoubleLabel label : researcherSources) 
+			try ( Transaction tx = graphDb.beginTx() ) {
+				ExecutionResult result = getAllNodesWithDoubleLabel(label);
+				ResourceIterator<Node> researchers = result.columnAs("n");
+				while (researchers.hasNext()) {
+					Node researcher = researchers.next();
+					if (!mapResearchersKeys.containsKey(researcher.getId())) {
 						
-						exportGraphNode(new GraphNode(properties));
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_RESEARCHER);
 						
+						Set<String> sources = new HashSet<String>();
+	
+						Map<Long, Node> nodes = getKnownAs(researcher, null, researcherSources);
 						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_RESEARCHER, key);
+							if (node.hasLabel(Labels.Orcid)) {
+								exportOrcidResearcher(node, properties);
+								sources.add(AggrigationUtils.LABEL_ORCID);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.Web)) {
+								exportWebResearcher(node, properties);
+								sources.add(AggrigationUtils.LABEL_WEB);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
+								exportRdaResearcher(node, properties);
+								sources.add(AggrigationUtils.LABEL_RDA);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.FigShare)) {
+								exportFigShareResearcher(node, properties);
+								sources.add(AggrigationUtils.LABEL_FIGSHARE);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.CrossRef)) {
+								exportCrossRefResearcher(node, properties);
+								sources.add(AggrigationUtils.LABEL_CROSSREF);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(Labels.NHMRC)) {
+								exportNHMRCRefResearcher(node, properties);
+								sources.add(Labels.NHMRC.name());
+							}
+						
+						if (sources.size() == 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
+						else if (sources.size() > 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
+						
+						String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
+						for (Long nodeId : nodes.keySet())
+							mapResearchersKeys.put(nodeId, key);
+	
+						if (null != key) {
+							System.out.println(AggrigationUtils.LABEL_RESEARCHER + ": " + key);
+							
+							exportGraphNode(new GraphNode(properties));
+							
+							for (Node node : nodes.values()) 
+								exportRelationships(node, AggrigationUtils.LABEL_RESEARCHER, key);
+						}
+					}
 				}
 			}
-		}
 	}
 	
 	/**
@@ -378,52 +463,56 @@ public class Exporter {
 	private void exportGrants() throws JsonGenerationException, JsonMappingException, IOException {
 		System.out.println("Export grants");
 		
-		try ( Transaction tx = graphDb.beginTx() ) {
-			ResourceIterable<Node> grants = global.getAllNodesWithLabel( AggrigationUtils.Labels.Grant );
-			for (Node grant : grants) 
-				if (!mapGrantsKeys.containsKey(grant.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_GRANT);
-					
-					Set<String> sources = new HashSet<String>();
-					
-					Map<Long, Node> nodes = getKnownAs(grant, null);
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
-							exportRDAGrant(node, properties);
-							sources.add(AggrigationUtils.LABEL_RDA);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(Labels.ARC)) {
-							exportARCGrant(node, properties);
-							sources.add(Labels.ARC.name());
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(Labels.NHMRC)) {
-							exportNHMRCGrant(node, properties);
-							sources.add(Labels.NHMRC.name());
-						}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-									
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapGrantsKeys.put(nodeId, key);
-					
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_GRANT + ": " + key);
+		for (DoubleLabel label : grantSources) 
+			try ( Transaction tx = graphDb.beginTx() ) {
+				ExecutionResult result = getAllNodesWithDoubleLabel(label);
+				ResourceIterator<Node> grants = result.columnAs("n");
+				while (grants.hasNext()) {
+					Node grant = grants.next();
+					if (!mapGrantsKeys.containsKey(grant.getId())) {
 						
-						exportGraphNode(new GraphNode(properties));
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_GRANT);
 						
+						Set<String> sources = new HashSet<String>();
+						
+						Map<Long, Node> nodes = getKnownAs(grant, null, grantSources);
 						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_GRANT, key);
+							if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
+								exportRDAGrant(node, properties);
+								sources.add(AggrigationUtils.LABEL_RDA);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(Labels.ARC)) {
+								exportARCGrant(node, properties);
+								sources.add(Labels.ARC.name());
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(Labels.NHMRC)) {
+								exportNHMRCGrant(node, properties);
+								sources.add(Labels.NHMRC.name());
+							}
+						
+						if (sources.size() == 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
+						else if (sources.size() > 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
+										
+						String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
+						for (Long nodeId : nodes.keySet())
+							mapGrantsKeys.put(nodeId, key);
+						
+						if (null != key) {
+							System.out.println(AggrigationUtils.LABEL_GRANT + ": " + key);
+							
+							exportGraphNode(new GraphNode(properties));
+							
+							for (Node node : nodes.values()) 
+								exportRelationships(node, AggrigationUtils.LABEL_GRANT, key);
+						}
+					}
 				}
 			}
-		}
 	}
 	
 	/**
@@ -445,47 +534,51 @@ public class Exporter {
 	private void exportDatasets() throws JsonGenerationException, JsonMappingException, IOException {
 		System.out.println("Export datasets");
 		
-		try ( Transaction tx = graphDb.beginTx() ) {
-			ResourceIterable<Node> datasets = global.getAllNodesWithLabel( AggrigationUtils.Labels.Dataset );
-			for (Node dataset : datasets) 
-				if (!mapDatasetsKeys.containsKey(dataset.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_DATASET);
-					
-					Set<String> sources = new HashSet<String>();
-					
-					Map<Long, Node> nodes = getKnownAs(dataset, null);
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
-							exportRDADataset(node, properties);
-							sources.add(AggrigationUtils.LABEL_RDA);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.Dryad)) {
-							exportDryadDataset(node, properties);
-							sources.add(AggrigationUtils.LABEL_DRYAD);
-						}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-								
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapDatasetsKeys.put(nodeId, key);
-					
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_DATASET + ": " + key);
+		for (DoubleLabel label : datasetSources)
+			try ( Transaction tx = graphDb.beginTx() ) {
+				ExecutionResult result = getAllNodesWithDoubleLabel(label);
+				ResourceIterator<Node> datasets = result.columnAs("n");
+				while (datasets.hasNext()) {
+					Node dataset = datasets.next();
+					if (!mapDatasetsKeys.containsKey(dataset.getId())) {
 						
-						exportGraphNode(new GraphNode(properties));
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_DATASET);
 						
+						Set<String> sources = new HashSet<String>();
+						
+						Map<Long, Node> nodes = getKnownAs(dataset, null, datasetSources);
 						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_DATASET, key);
+							if (node.hasLabel(AggrigationUtils.Labels.RDA)) {
+								exportRDADataset(node, properties);
+								sources.add(AggrigationUtils.LABEL_RDA);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.Dryad)) {
+								exportDryadDataset(node, properties);
+								sources.add(AggrigationUtils.LABEL_DRYAD);
+							}
+						
+						if (sources.size() == 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
+						else if (sources.size() > 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
+									
+						String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
+						for (Long nodeId : nodes.keySet())
+							mapDatasetsKeys.put(nodeId, key);
+						
+						if (null != key) {
+							System.out.println(AggrigationUtils.LABEL_DATASET + ": " + key);
+							
+							exportGraphNode(new GraphNode(properties));
+							
+							for (Node node : nodes.values()) 
+								exportRelationships(node, AggrigationUtils.LABEL_DATASET, key);
+						}
+					}
 				}
 			}
-		}
 	}
 	
 	/**
@@ -508,108 +601,217 @@ public class Exporter {
 	private void exportPublications() throws JsonGenerationException, JsonMappingException, IOException {
 		System.out.println("Export publication");
 			
-		try ( Transaction tx = graphDb.beginTx() ) {
-			ResourceIterable<Node> works = global.getAllNodesWithLabel( Labels.Work );
-			for (Node work : works) 
-				if (!mapPublicationsKeys.containsKey(work.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_PUBLICATION);
-					
-					Set<String> sources = new HashSet<String>();
-					
-					Map<Long, Node> nodes = getKnownAs(work, null);
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(Labels.Orcid)) {
-							exportOrcidPublication(node, properties);							
-							sources.add(AggrigationUtils.LABEL_ORCID);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.CrossRef)) {
-							exportCrossRefPublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_CROSSREF);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.FigShare)) {
-							exportFigSharePublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_FIGSHARE);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.Dryad)) {
-							exportDryadPublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_DRYAD);
-						}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-					
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapPublicationsKeys.put(nodeId, key);
-					
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_PUBLICATION + ": " + key);
+		for (DoubleLabel label : publicationSources)
+			try ( Transaction tx = graphDb.beginTx() ) {
+				ExecutionResult result = getAllNodesWithDoubleLabel(label);
+				ResourceIterator<Node> publications = result.columnAs("n");
+				while (publications.hasNext()) {
+					Node publication = publications.next();
+					if (!mapPublicationsKeys.containsKey(publication.getId())) {
 						
-						exportGraphNode(new GraphNode(properties));
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_PUBLICATION);
 						
+						Set<String> sources = new HashSet<String>();
+						
+						Map<Long, Node> nodes = getKnownAs(publication, null, publicationSources);
 						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_PUBLICATION, key);
-				}
+							if (node.hasLabel(Labels.Orcid)) {
+								exportOrcidPublication(node, properties);							
+								sources.add(AggrigationUtils.LABEL_ORCID);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.CrossRef)) {
+								exportCrossRefPublication(node, properties);
+								sources.add(AggrigationUtils.LABEL_CROSSREF);
+							}
+						for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.FigShare)) {
+								exportFigSharePublication(node, properties);
+								sources.add(AggrigationUtils.LABEL_FIGSHARE);
+							}
+	/*					for (Node node : nodes.values()) 
+							if (node.hasLabel(AggrigationUtils.Labels.Dryad)) {
+								exportDryadPublication(node, properties);
+								sources.add(AggrigationUtils.LABEL_DRYAD);
+							}*/
+						
+						if (sources.size() == 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
+						else if (sources.size() > 1)
+							properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
+						
+						String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
+						for (Long nodeId : nodes.keySet())
+							mapPublicationsKeys.put(nodeId, key);
+						
+						if (null != key) {
+							System.out.println(AggrigationUtils.LABEL_PUBLICATION + ": " + key);
+							
+							exportGraphNode(new GraphNode(properties));
+							
+							for (Node node : nodes.values()) 
+								exportRelationships(node, AggrigationUtils.LABEL_PUBLICATION, key);
+						}
+					}
+				}		
 			}
+	}
+	
+	private ExecutionResult getAllNodesWithDoubleLabel(DoubleLabel source) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("MATCH (n:");
+		sb.append(source.getSource());
+		sb.append(":");
+		sb.append(source.getType());
+		sb.append(") RETURN n");
+		
+		System.out.println(sb.toString());
+		
+		return engine.execute(sb.toString());
+	}
+	
+	private Object getProperty(Node node, String key) {
+		return node.getProperty(key, null);
+	}
+	
+	private String getUri(Node node, String key) throws IOException {
+		Object uri = node.getProperty(key, null);
+		if (null != uri) {
+			if (uri instanceof String)
+				return AggrigationUtils.extractUri((String) uri);
+			else if (uri instanceof String[] && ((String[]) uri).length > 0) 
+				return AggrigationUtils.extractUri(((String[]) uri)[0]);
+			else 
+				throw new IOException("Invalid URI propertry class: " + uri.getClass());
+		}
+		
+		return null;
+	}
+
+	private String getOrcid(Node node, String key) throws IOException {
+		Object orcid = node.getProperty(key, null);
+		if (null != orcid) {
+			if (orcid instanceof String)
+				return AggrigationUtils.extractOrcid((String) orcid);
+			else if (orcid instanceof String[] && ((String[]) orcid).length > 0) 
+				return AggrigationUtils.extractOrcid(((String[]) orcid)[0]);
+			else 
+				throw new IOException("Invalid URI propertry class: " + orcid.getClass());
+		}
+		
+		return null;
+		
+		//return AggrigationUtils.extractOrcid((String) node.getProperty(key, null));
+	}
+
+	private String getDoi(Node node, String key) throws IOException {
+		Object doi = node.getProperty(key, null);
+		if (null != doi) {
+			if (doi instanceof String)
+				return AggrigationUtils.extractDoi((String) doi);
+			else if (doi instanceof String[] && ((String[]) doi).length > 0) 
+				return AggrigationUtils.extractDoi(((String[]) doi)[0]);
+			else 
+				throw new IOException("Invalid URI propertry class: " + doi.getClass());
+		}
+		
+		return null;
+		
+		//return AggrigationUtils.extractDoi((String) node.getProperty(key, null));
+	}
+
+	private String getDoiUri(Node node, String key) throws IOException {
+		Object doi = node.getProperty(key, null);
+		if (null != doi) {
+			if (doi instanceof String)
+				return AggrigationUtils.generateDoiUri(AggrigationUtils.extractDoi((String) doi));
+			else if (doi instanceof String[] && ((String[]) doi).length > 0) 
+				return AggrigationUtils.generateDoiUri(AggrigationUtils.extractDoi(((String[]) doi)[0]));
+			else 
+				throw new IOException("Invalid URI propertry class: " + doi.getClass());
+		}
+		
+		return null;
+		
+//		return AggrigationUtils.generateDoiUri(AggrigationUtils.extractDoi((String) node.getProperty(key, null)));
+	}
+	
+	private String getResearcherTitle(Node node) {
+		String title = (String) node.getProperty(PROPERTY_NAME, null);
+		if (null != title) {
+			String[] titles = title.split(PART_NAME_SEPARATOR);
+			for (String part : titles) {
+				String namePart = part.trim();
+				if (!namePart.isEmpty() && !AggrigationUtils.isAllUpper(namePart)) {
+					for (String invalidName : INVALID_NAMES) 
+						if (namePart.equals(invalidName)) {
+							namePart = null;
+							break;
+						}
 			
-			ResourceIterable<Node> publications = global.getAllNodesWithLabel( AggrigationUtils.Labels.Publication );
-			for (Node publication : publications) 
-				if (!mapPublicationsKeys.containsKey(publication.getId())) {
-					
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(AggrigationUtils.PROPERTY_NODE_TYPE, AggrigationUtils.LABEL_PUBLICATION);
-					
-					Set<String> sources = new HashSet<String>();
-					
-					Map<Long, Node> nodes = getKnownAs(publication, null);
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.CrossRef)) {
-							exportCrossRefPublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_CROSSREF);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.FigShare)) {
-							exportFigSharePublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_FIGSHARE);
-						}
-					for (Node node : nodes.values()) 
-						if (node.hasLabel(AggrigationUtils.Labels.Dryad)) {
-							exportDryadPublication(node, properties);
-							sources.add(AggrigationUtils.LABEL_DRYAD);
-						}
-					
-					if (sources.size() == 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.iterator().next());
-					else if (sources.size() > 1)
-						properties.put(AggrigationUtils.PROPERTY_NODE_SOURCE, sources.toArray(new String[sources.size()]));
-					
-					String key = (String) properties.get(AggrigationUtils.PROPERTY_KEY);
-					for (Long nodeId : nodes.keySet())
-						mapPublicationsKeys.put(nodeId, key);
-					
-					if (null != key) {
-						System.out.println(AggrigationUtils.LABEL_PUBLICATION + ": " + key);
-						
-						exportGraphNode(new GraphNode(properties));
-						
-						for (Node node : nodes.values()) 
-							exportRelationships(node, AggrigationUtils.LABEL_PUBLICATION, key);
+					if (null != namePart)
+						return namePart;
 				}
 			}
 		}
+		
+		return null;
 	}
 	
+	private void exportSingle(Map<String, Object> properties, String key, Object value) {
+		if (null != value && !properties.containsKey(key))
+			properties.put(key, value);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void exportSet(Map<String, Object> properties, String key, Object value) {
+		if (null != value) 
+			if (properties.containsKey(key)) {
+				Object oldValue = properties.get(key);
+				if (oldValue instanceof Set<?>) {
+					((Set<Object>)oldValue).add(value);
+				} else {
+					Set<Object> set = new HashSet<Object>();
+					set.add(oldValue);
+					set.add(value);
+					properties.put(key, set);
+				}
+			} else
+				properties.put(key, value);
+	}
 	
+		
+	/*
 	private void exportProperty(Node node, Map<String, Object> properties, String key1, String key2) {
 		if (!properties.containsKey(key2) && node.hasProperty(key1)) 
 			properties.put(key2, node.getProperty(key1));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void exportUriSet(Node node, Map<String, Object> properties, String key1, String key2) {
+		if (node.hasProperty(key1)) {
+			if (!properties.containsKey(key2))
+				properties.put(key2, node.getProperty(key1));
+			else {
+				String uri = AggrigationUtils.extractUri((String) node.getProperty(key1));
+				
+				if (null != uri && !uri.isEmpty()) { // Only string values are supported for now
+					Object value2 = properties.get(key2);
+					if (value2 instanceof String) {
+						if (!value2.equals(uri)) {
+							Set<String> set = new HashSet<String>();
+							set.add((String) value2);
+							set.add(uri);
+							
+							properties.put(key2, set);
+						}
+					} else if (value2 instanceof Set<?>) 
+						((Set<String>) value2).add(uri);
+				}
+				
+			}
+		}
 	}
 	
 	private void exportUri(Node node, Map<String, Object> properties, String key1, String key2) {
@@ -654,7 +856,7 @@ public class Exporter {
 					properties.put(key2, doi);
 			}	
 		}
-	}
+	}*/
 
 	private void exportGraphNode(GraphNode grahpNode) throws JsonGenerationException, JsonMappingException, IOException {
 		if (null == graphNodes)
@@ -681,6 +883,7 @@ public class Exporter {
 				&& properties.containsKey(AggrigationUtils.PROPERTY_NODE_TYPE);
 	}*/
 	
+	/*
 	private void exportSourceConnection(Map<String, Object> properties, String nodeSource, String url) throws JsonGenerationException, JsonMappingException, IOException {
 		if (properties.containsKey(AggrigationUtils.PROPERTY_KEY)) {
 			String key = AggrigationUtils.extractUri(url);
@@ -701,161 +904,166 @@ public class Exporter {
 				exportGraphRelationship(rel);
 			}
 		}
-	}
+	}*/
 		
 	private void exportRdaInstitution(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_URL, AggrigationUtils.PROPERTY_KEY);
-//		exportUri(node, properties, PROPERTY_IDENTIFIER_URI, AggrigationUtils.PROPERTY_KEY);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_AU_ANL_PEAU, AggrigationUtils.PROPERTY_NLA);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_NLA_PARTY, AggrigationUtils.PROPERTY_NLA);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_PULR, AggrigationUtils.PROPERTY_PURL);
-		exportProperty(node, properties, PROPERTY_NAME_PRIMARY, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_FORMELY, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_ALTERNATIVE, AggrigationUtils.PROPERTY_TITLE);
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_URL));
+//		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, PROPERTY_IDENTIFIER_URI));
+		exportSingle(properties, AggrigationUtils.PROPERTY_NLA, getUri(node, PROPERTY_IDENTIFIER_AU_ANL_PEAU));
+		exportSingle(properties, AggrigationUtils.PROPERTY_NLA, getUri(node, PROPERTY_IDENTIFIER_NLA_PARTY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_PURL, getUri(node, PROPERTY_IDENTIFIER_PULR));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_PRIMARY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_FORMELY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_ALTERNATIVE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_ALTERNATIVE));
+		exportSet(properties, AggrigationUtils.PROPERTY_RDA_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));
 		
-		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+//		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
 	}	
 	
-	private void exportWebInstitution(Node node, Map<String, Object> properties) {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_URL, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_COUNTRY, AggrigationUtils.PROPERTY_COUNTRY);	
+	private void exportWebInstitution(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_URL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, AggrigationUtils.PROPERTY_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_COUNTRY, getProperty(node, AggrigationUtils.PROPERTY_COUNTRY));	
+		exportSet(properties, AggrigationUtils.PROPERTY_URL, getUri(node, AggrigationUtils.PROPERTY_URL));	
 	}
 	
 	private void exportArcOrNhmrcInstitution(Node node, Map<String, Object> properties) {
 		// Only export node, if it key is avaliable
-	//	exportUri(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_TITLE);
-
-//		exportSourceConnection(properties, (String) node.getProperty(AggrigationUtils.PROPERTY_NODE_SOURCE), (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME));
 	}
 	
 	private void exportOrcidResearcher(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_GYVEN_NAMES, AggrigationUtils.PROPERTY_FIRST_NAME);
-		exportProperty(node, properties, PROPERTY_FAMILY_NAME, AggrigationUtils.PROPERTY_LAST_NAME);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_FULL_NAME, AggrigationUtils.PROPERTY_FULL_NAME);
-		exportOrcid(node, properties, PROPERTY_ORCID_ID, AggrigationUtils.PROPERTY_ORCID);
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FIRST_NAME, getProperty(node, PROPERTY_GYVEN_NAMES));
+		exportSingle(properties, AggrigationUtils.PROPERTY_LAST_NAME, getProperty(node, PROPERTY_FAMILY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, AggrigationUtils.PROPERTY_FULL_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_ORCID, getOrcid(node, PROPERTY_ORCID_ID));
+		exportSet(properties, AggrigationUtils.PROPERTY_ORCID_URL, getUri(node, AggrigationUtils.PROPERTY_URL));	
 		
-		exportSourceConnection(properties, AggrigationUtils.LABEL_ORCID, (String) properties.get(AggrigationUtils.PROPERTY_KEY));
+//		exportSourceConnection(properties, AggrigationUtils.LABEL_ORCID, (String) properties.get(AggrigationUtils.PROPERTY_KEY));
 	}
 	
-	private void exportWebResearcher(Node node, Map<String, Object> properties) {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
+	private void exportWebResearcher(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getResearcherTitle(node));
+		exportSet(properties, AggrigationUtils.PROPERTY_URL, getUri(node, AggrigationUtils.PROPERTY_URL));	
 	}
 	
 	private void exportRdaResearcher(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_NAME_PRIMARY, AggrigationUtils.PROPERTY_FULL_NAME);
-		exportProperty(node, properties, PROPERTY_NAME_ALTERNATIVE, AggrigationUtils.PROPERTY_FULL_NAME);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_AU_ANL_PEAU, AggrigationUtils.PROPERTY_NLA);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_NLA, AggrigationUtils.PROPERTY_NLA);
-		exportOrcid(node, properties, PROPERTY_IDENTIFIER_ORCID, AggrigationUtils.PROPERTY_ORCID);
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, PROPERTY_NAME_PRIMARY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, PROPERTY_NAME_ALTERNATIVE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_NLA, getUri(node, PROPERTY_IDENTIFIER_AU_ANL_PEAU));
+		exportSingle(properties, AggrigationUtils.PROPERTY_NLA, getUri(node, PROPERTY_IDENTIFIER_NLA));
+		exportSingle(properties, AggrigationUtils.PROPERTY_ORCID, getOrcid(node, PROPERTY_IDENTIFIER_ORCID));
+		exportSet(properties, AggrigationUtils.PROPERTY_RDA_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));	
 		
-		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+		//exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
 	}
 	
 	private void exportFigShareResearcher(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_FULL_NAME);
-		exportOrcid(node, properties, AggrigationUtils.PROPERTY_ORCID, AggrigationUtils.PROPERTY_ORCID);
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, PROPERTY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_ORCID, getOrcid(node, AggrigationUtils.PROPERTY_ORCID));
+		exportSet(properties, AggrigationUtils.PROPERTY_FIGSHARE_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));	
 
-		exportSourceConnection(properties, AggrigationUtils.LABEL_FIGSHARE, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+		//exportSourceConnection(properties,, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
 	}
 	
-	private void exportCrossRefResearcher(Node node, Map<String, Object> properties) {
-		exportProperty(node, properties, PROPERTY_GIVEN_NAME, AggrigationUtils.PROPERTY_FIRST_NAME);
-		exportProperty(node, properties, PROPERTY_FAMILY_NAME, AggrigationUtils.PROPERTY_LAST_NAME);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_FULL_NAME, AggrigationUtils.PROPERTY_FULL_NAME);
-		exportOrcid(node, properties, AggrigationUtils.PROPERTY_ORCID, AggrigationUtils.PROPERTY_ORCID);
+	private void exportCrossRefResearcher(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_FIRST_NAME, getProperty(node, PROPERTY_GIVEN_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_LAST_NAME, getProperty(node, PROPERTY_FAMILY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, AggrigationUtils.PROPERTY_FULL_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_ORCID, getOrcid(node, AggrigationUtils.PROPERTY_ORCID));
 	}
 	
 	private void exportNHMRCRefResearcher(Node node, Map<String, Object> properties) {
-		exportProperty(node, properties, PROPERTY_FAMILY_NAME, AggrigationUtils.PROPERTY_LAST_NAME);
+		exportSingle(properties, AggrigationUtils.PROPERTY_FIRST_NAME, getProperty(node, AggrigationUtils.PROPERTY_FIRST_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_LAST_NAME, getProperty(node, AggrigationUtils.PROPERTY_LAST_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_FULL_NAME, getProperty(node, AggrigationUtils.PROPERTY_FULL_NAME));
 	}
 	
 	private void exportRDAGrant(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportUri(node, properties, PROPERTY_IDENTIFIER_PULR, AggrigationUtils.PROPERTY_KEY);
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_NAME_PRIMARY, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_ALTERNATIVE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_TITLE);
-		exportUri(node, properties, PROPERTY_IDENTIFIER_PULR, AggrigationUtils.PROPERTY_PURL);
-		exportProperty(node, properties, PROPERTY_IDENTIFIER_ARC, AggrigationUtils.PROPERTY_GRANT_NUMBER);
-		exportProperty(node, properties, PROPERTY_IDENTIFIER_NHMRC, AggrigationUtils.PROPERTY_GRANT_NUMBER);
-	
-		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, PROPERTY_IDENTIFIER_PULR));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_PRIMARY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_ALTERNATIVE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_PURL, getUri(node, PROPERTY_IDENTIFIER_PULR));
+		exportSingle(properties, AggrigationUtils.PROPERTY_GRANT_NUMBER, getProperty(node, PROPERTY_IDENTIFIER_ARC));
+		exportSingle(properties, AggrigationUtils.PROPERTY_GRANT_NUMBER, getProperty(node, PROPERTY_IDENTIFIER_NHMRC));
+		exportSet(properties, AggrigationUtils.PROPERTY_RDA_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));	
+
+//		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
 	}
 	
-	private void exportARCGrant(Node node, Map<String, Object> properties) {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_SCIENTIFIC_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportUri(node, properties, AggrigationUtils.PROPERTY_PURL, AggrigationUtils.PROPERTY_PURL);
-		exportProperty(node, properties, PROPERTY_RESEARCHERS, AggrigationUtils.PROPERTY_AUTHORS);
-		exportProperty(node, properties, PROPERTY_IDENTIFIER_ARC, AggrigationUtils.PROPERTY_GRANT_NUMBER);
-		exportProperty(node, properties, PROPERTY_START_YEAR, AggrigationUtils.PROPERTY_DATE);
-		exportProperty(node, properties, PROPERTY_APPLICATION_YEAR, AggrigationUtils.PROPERTY_DATE);
+	private void exportARCGrant(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_SCIENTIFIC_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_PURL, getUri(node, AggrigationUtils.PROPERTY_PURL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_AUTHORS, getProperty(node, PROPERTY_RESEARCHERS));
+		exportSingle(properties, AggrigationUtils.PROPERTY_GRANT_NUMBER, getProperty(node, PROPERTY_IDENTIFIER_ARC));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DATE, getProperty(node, PROPERTY_START_YEAR));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DATE, getProperty(node, PROPERTY_APPLICATION_YEAR));
 	}
 	
-	private void exportNHMRCGrant(Node node, Map<String, Object> properties) {
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportProperty(node, properties, PROPERTY_SCIENTIFIC_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_SIMPLIFIED_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportUri(node, properties, AggrigationUtils.PROPERTY_PURL, AggrigationUtils.PROPERTY_PURL);
-		exportProperty(node, properties, PROPERTY_START_YEAR, AggrigationUtils.PROPERTY_DATE);
-		exportProperty(node, properties, PROPERTY_APPLICATION_YEAR, AggrigationUtils.PROPERTY_DATE);
+	private void exportNHMRCGrant(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_SCIENTIFIC_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_SIMPLIFIED_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_PURL, getUri(node, AggrigationUtils.PROPERTY_PURL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DATE, getProperty(node, PROPERTY_START_YEAR));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DATE, getProperty(node, PROPERTY_APPLICATION_YEAR));
 	}
 	
 	private void exportRDADataset(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportDoiUri(node, properties, PROPERTY_IDENTIFIER_DOI, AggrigationUtils.PROPERTY_KEY);
-		exportUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportDoi(node, properties, PROPERTY_IDENTIFIER_DOI, AggrigationUtils.PROPERTY_DOI);
-		exportProperty(node, properties, PROPERTY_NAME_PRIMARY, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_ALTERNATIVE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_FULL, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_NAME_TEXT, AggrigationUtils.PROPERTY_TITLE);
-		exportDoi(node, properties, PROPERTY_IDENTIFIER_DOI, AggrigationUtils.PROPERTY_DOI);
-
-		exportSourceConnection(properties, AggrigationUtils.LABEL_RDA, (String) node.getProperty(AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getDoiUri(node, PROPERTY_IDENTIFIER_DOI));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DOI, getDoi(node, PROPERTY_IDENTIFIER_DOI));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_PRIMARY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_ALTERNATIVE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_FULL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, PROPERTY_NAME_TEXT));
+		exportSet(properties, AggrigationUtils.PROPERTY_RDA_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));	
 	}
 	
 	private void exportDryadDataset(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportDoiUri(node, properties, AggrigationUtils.PROPERTY_DOI, AggrigationUtils.PROPERTY_KEY);
-		exportUri(node, properties, AggrigationUtils.PROPERTY_URL, AggrigationUtils.PROPERTY_KEY);
-		exportDoi(node, properties, AggrigationUtils.PROPERTY_DOI, AggrigationUtils.PROPERTY_DOI);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_AUTHOR, AggrigationUtils.PROPERTY_AUTHORS);
-
-		exportSourceConnection(properties, AggrigationUtils.LABEL_DRYAD, (String) properties.get(AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getDoiUri(node, AggrigationUtils.PROPERTY_DOI));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getUri(node, AggrigationUtils.PROPERTY_URL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DOI, getDoi(node, AggrigationUtils.PROPERTY_DOI));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, AggrigationUtils.PROPERTY_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_AUTHORS, getProperty(node, PROPERTY_AUTHOR));
+		exportSet(properties, AggrigationUtils.PROPERTY_DRYAD_URL, getUri(node, AggrigationUtils.PROPERTY_KEY));	
 	}
 	
-	private void exportOrcidPublication(Node node, Map<String, Object> properties) {
-		exportDoiUri(node, properties, PROPERTY_IDENTIFIER_DOI2, AggrigationUtils.PROPERTY_KEY);
-		exportDoi(node, properties, PROPERTY_IDENTIFIER_DOI2, AggrigationUtils.PROPERTY_DOI);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_IDENTIFIER_ISBN, AggrigationUtils.PROPERTY_ISBN);
-		exportProperty(node, properties, PROPERTY_CONTRIBUTORS, AggrigationUtils.PROPERTY_AUTHORS);
-		exportProperty(node, properties, PROPERTY_PUBLICATION_DATE, AggrigationUtils.PROPERTY_DATE);
+	private void exportOrcidPublication(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getDoiUri(node, PROPERTY_IDENTIFIER_DOI2));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DOI, getDoi(node, PROPERTY_IDENTIFIER_DOI2));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, AggrigationUtils.PROPERTY_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_ISBN, getProperty(node, PROPERTY_IDENTIFIER_ISBN));
+		exportSingle(properties, AggrigationUtils.PROPERTY_AUTHORS, getProperty(node, PROPERTY_CONTRIBUTORS));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DATE, getProperty(node, PROPERTY_PUBLICATION_DATE));
 	}
 	
-	private void exportCrossRefPublication(Node node, Map<String, Object> properties) {
-		exportDoiUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportDoi(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_DOI);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, PROPERTY_AUTHOR, AggrigationUtils.PROPERTY_AUTHORS);
+	private void exportCrossRefPublication(Node node, Map<String, Object> properties) throws IOException {
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getDoiUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DOI, getDoi(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, AggrigationUtils.PROPERTY_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_AUTHORS, getProperty(node, PROPERTY_AUTHOR));
 	}
 	
 	private void exportFigSharePublication(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
-		exportDoiUri(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_KEY);
-		exportDoi(node, properties, AggrigationUtils.PROPERTY_KEY, AggrigationUtils.PROPERTY_DOI);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_TITLE, AggrigationUtils.PROPERTY_TITLE);
-		exportProperty(node, properties, AggrigationUtils.PROPERTY_AUTHORS, AggrigationUtils.PROPERTY_AUTHORS);
-
-		exportSourceConnection(properties, AggrigationUtils.LABEL_FIGSHARE, (String) node.getProperty(AggrigationUtils.PROPERTY_URL));
+		exportSingle(properties, AggrigationUtils.PROPERTY_KEY, getDoiUri(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_DOI, getDoi(node, AggrigationUtils.PROPERTY_KEY));
+		exportSingle(properties, AggrigationUtils.PROPERTY_TITLE, getProperty(node, AggrigationUtils.PROPERTY_TITLE));
+		exportSingle(properties, AggrigationUtils.PROPERTY_AUTHORS, getProperty(node, AggrigationUtils.PROPERTY_AUTHORS));
+		exportSet(properties, AggrigationUtils.PROPERTY_FIGSHARE_URL, getUri(node, AggrigationUtils.PROPERTY_URL));	
 	}
 	
+	/*
 	private void exportDryadPublication(Node node, Map<String, Object> properties) throws JsonGenerationException, JsonMappingException, IOException {
 		exportDoiUri(node, properties, AggrigationUtils.PROPERTY_DOI, AggrigationUtils.PROPERTY_KEY);
 		exportDoi(node, properties, AggrigationUtils.PROPERTY_DOI, AggrigationUtils.PROPERTY_DOI);
@@ -864,8 +1072,8 @@ public class Exporter {
 	
 		exportSourceConnection(properties, AggrigationUtils.LABEL_DRYAD, (String) properties.get(AggrigationUtils.PROPERTY_KEY));
 	}
-	
-	private Map<Long, Node> getKnownAs(Node node, Map<Long, Node> map) {
+	*/
+	private Map<Long, Node> getKnownAs(Node node, Map<Long, Node> map, List<DoubleLabel> sources) {
 		if (null == map)
 			map = new HashMap<Long, Node>();
 		map.put(node.getId(), node);
@@ -873,8 +1081,12 @@ public class Exporter {
 		Iterable<Relationship> rels = node.getRelationships(AggrigationUtils.RelTypes.knownAs);
 		for (Relationship rel : rels) {
 			Node other = rel.getOtherNode(node);
-			if (!map.containsKey(other.getId()))
-				getKnownAs(other, map);
+			if (!map.containsKey(other.getId())) 
+				for (DoubleLabel source : sources) 
+					if (other.hasLabel(source.getSource()) && other.hasLabel(source.getType())) {
+						getKnownAs(other, map, sources);
+						break;
+					}
 		}
 		
 		return map;

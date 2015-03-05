@@ -74,6 +74,10 @@ public class AggrigationUtils {
     public static final String PROPERTY_AUTHORS = "authors";
     public static final String PROPERTY_DOI = "doi";
     public static final String PROPERTY_ISBN = "isbn";
+    public static final String PROPERTY_RDA_URL = "rda_url";
+    public static final String PROPERTY_ORCID_URL = "orcid_url";
+    public static final String PROPERTY_DRYAD_URL = "dryad_url";
+    public static final String PROPERTY_FIGSHARE_URL = "figshare_url";
     
     private static final String PART_PROTOCOL = "://";
     private static final String PART_SLASH = "/";
@@ -81,7 +85,6 @@ public class AggrigationUtils {
     private static final String PART_ORCID_URI = "orcid.org/";
     private static final String PART_DOI_PERFIX = "doi:";
     private static final String PART_DOI_URI = "dx.doi.org/";
-    private static final String VALUE_NULL = "null";
 	
     private static final Pattern patternDoi = Pattern.compile("(^|doi:|dx\\.doi\\.org/)\\d{2}\\.\\d{4,}/.+$");
     private static final Pattern patternOrcid = Pattern.compile("\\d{4}-\\d{4}-\\d{4}-\\d{4}");
@@ -158,36 +161,38 @@ public class AggrigationUtils {
     }
     
     public static String extractOrcid(String str) {
-		 Matcher matcher = patternOrcid.matcher(str);
-		 if (matcher.find())
-			  return matcher.group();
-		
-		 return null;
+    	if (null != str && !str.isEmpty()) {
+    		Matcher matcher = patternOrcid.matcher(str);
+			if (matcher.find())
+				return matcher.group();
+    	}
+    	
+    	return null;
 	}
     
     public static String extractDoi(String str) {
-		 Matcher matcher = patternDoi.matcher(str);
-		 if (matcher.find()) {
-
-			  String doi =  matcher.group();
-			  if (doi.startsWith(PART_DOI_PERFIX))
-				  doi = doi.substring(PART_DOI_PERFIX.length());
-			  else if (doi.startsWith(PART_ORCID_URI))
-				  doi = doi.substring(PART_ORCID_URI.length());
-			  if (doi.isEmpty() || doi.toLowerCase().equals(VALUE_NULL))
-				  return null;
+    	if (null != str && !str.isEmpty()) {
+    		Matcher matcher = patternDoi.matcher(str);
+    		if (matcher.find()) {
+    			String doi =  matcher.group();
+    			if (doi.startsWith(PART_DOI_PERFIX))
+    				doi = doi.substring(PART_DOI_PERFIX.length());
+    			else if (doi.startsWith(PART_ORCID_URI))
+    				doi = doi.substring(PART_ORCID_URI.length());
 			  
-			  return doi;
-		 }
-		 return null;
+    			return doi;
+    		}
+    	}
+    	
+		return null;
 	}
     
-    public static String generateOrcidUri(String doi) {
-    	return PART_ORCID_URI + doi;
+    public static String generateOrcidUri(String orcid) {
+    	return (null == orcid || orcid.isEmpty()) ? null : (PART_ORCID_URI + orcid);
     }
     
     public static String generateDoiUri(String doi) {
-    	return PART_DOI_URI + doi;
+    	return (null == doi || doi.isEmpty()) ? null : (PART_DOI_URI + doi);
     }
     
 	public static Set<String> loadList(String listName) throws FileNotFoundException, IOException {
@@ -211,5 +216,12 @@ public class AggrigationUtils {
 		    	bw.write("\n");
 		    }	
 	    }
+	}
+	
+	public static boolean isAllUpper(String s) {
+	    for(char c : s.toCharArray()) 
+	    	if(Character.isLetter(c) && Character.isLowerCase(c)) 
+	    		return false;
+	    return true;
 	}
 }
